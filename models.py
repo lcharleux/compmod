@@ -28,7 +28,7 @@ class RingCompression(object):
     """
     Ri = self.inner_radius
     Ro = self.outer_radius
-    mesh = RegularQuadMesh(self.Nt, self.Nr, .251, Ro - Ri, name = self.elType)
+    mesh = RegularQuadMesh(self.Nt, self.Nr, .25, Ro - Ri, name = self.elType)
     def function(x, y, z, labels):
       theta = 2 * np.pi * x
       r = y + Ri
