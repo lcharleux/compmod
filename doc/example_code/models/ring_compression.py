@@ -2,7 +2,7 @@ from compmod.models import RingCompression
 import matplotlib.pyplot as plt
 
 
-model = RingCompression()
+model = RingCompression(inner_radius = 5., outer_radius = 6., Nr = 10, Nt = 40)
 model.MakeMesh()
 mesh = model.mesh
 x,y,z = mesh.get_edges() # Mesh edges
@@ -15,6 +15,6 @@ fig.gca().set_aspect('equal')
 plt.grid()
 plt.plot(xb,yb,'k-', linewidth = 2.)
 plt.plot(xe, ye,'k-', linewidth = .5)
-plt.triplot(X,Y,tri)
+#plt.triplot(X,Y,tri)
 plt.show()
 
