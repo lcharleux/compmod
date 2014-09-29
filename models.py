@@ -1,11 +1,11 @@
 # A repository for compartmentalized models compatible simulation models.
-
+import abapy
 
 class RingCompression(object):
   """
  Ring compression test.
   """
-  def __init__(self, inner_radius, outer_radius, Nr, Nt):
+  def __init__(self, inner_radius, outer_radius, Nr, Nt, elType = 'CPS4'):
     """
     :param inner_radius: inner radius of the ring
     :type inner_radius: float
@@ -20,3 +20,8 @@ class RingCompression(object):
     self.outer_radius = outer_radius
     self.Nr = Nr
     self.Nt = Nt
+    self.elType = elType
+    
+  def MakeMesh(self):
+      self.mesh = abapy.mesh.RegularQuadMesh(self.Nr, self.Nt, 1., 1., name = self.elType)
+      
