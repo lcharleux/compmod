@@ -8,7 +8,7 @@ class RingCompression(object):
   """
  Ring compression test.
   """
-  def __init__(self, inner_radius = 1., outer_radius = 2., Nr = 8, Nt = 8, disp = .5,  label = 'ringCompression', elType = 'CPS4', material =VonMises(labels = 'SAMPLE_MAT'), workdir = 'workdir/', abqlauncher = '/opt/Abaqus/6.9/Commands/abaqus'  ):
+  def __init__(self, inner_radius = 1., outer_radius = 2., Nr = 8, Nt = 8, disp = .5, nFrames = 100,  label = 'ringCompression', elType = 'CPS4', material =VonMises(labels = 'SAMPLE_MAT'), workdir = 'workdir/', abqlauncher = '/opt/Abaqus/6.9/Commands/abaqus'  ):
     """
     :param inner_radius: inner radius of the ring
     :type inner_radius: float
@@ -29,6 +29,7 @@ class RingCompression(object):
     self.workdir = workdir
     self.abqlauncher = abqlauncher
     self.label = label
+    self.nFrames = nFrames
     
   def MakeMesh(self):
     """
@@ -109,7 +110,7 @@ I_SAMPLE.SURFACE_FACES, I_PLATE.SURFACE
 **----------------------------------
 *STEP, NAME = LOADING, NLGEOM = YES, INC=1000000
 *STATIC, DIRECT
-0.001, 1.
+#FRAME_DURATION, 1.
 *BOUNDARY
 I_SAMPLE.LEFT_NODES, 1, 1
 I_SAMPLE.RIGHT_NODES, 2, 2
@@ -134,7 +135,7 @@ RF2, U2
 *END STEP
 *STEP, NAME = UNLOADING, NLGEOM = YES, INC=1000000
 *STATIC, DIRECT
-0.001, 1.
+#FRAME_DURATION, 1.
 *BOUNDARY
 I_SAMPLE.LEFT_NODES, 1, 1
 I_SAMPLE.RIGHT_NODES, 2, 2
@@ -161,6 +162,7 @@ RF2, U2
     pattern = pattern.replace('#SAMPLE_MAT', self.material.dump2inp())
     pattern = pattern.replace('#OUTER_RADIUS', str(self.outer_radius))
     pattern = pattern.replace('#DISP', str(-self.disp))
+    pattern = pattern.replace('#FRAME_DURATION', str(1. / self.nFrames))
     f =open(self.workdir + self.label + ".inp", 'w')
     f.write(pattern)
     f.close()
