@@ -2,12 +2,13 @@
 from abapy.mesh import RegularQuadMesh
 from abapy.materials import VonMises
 import numpy as np
+import subprocess
 
 class RingCompression(object):
   """
  Ring compression test.
   """
-  def __init__(self, inner_radius = 1., outer_radius = 2., Nr = 8, Nt = 8, disp = .5,  elType = 'CPS4', material =VonMises(labels = 'SAMPLE_MAT') ):
+  def __init__(self, inner_radius = 1., outer_radius = 2., Nr = 8, Nt = 8, disp = .5,  label = 'ringCompression', elType = 'CPS4', material =VonMises(labels = 'SAMPLE_MAT'), workdir = 'workdir/', abqlauncher = '/opt/Abaqus/6.9/Commands/abaqus'  ):
     """
     :param inner_radius: inner radius of the ring
     :type inner_radius: float
@@ -25,6 +26,9 @@ class RingCompression(object):
     self.elType = elType
     self.material = material
     self.disp = disp
+    self.workdir = workdir
+    self.abqlauncher = abqlauncher
+    self.label = label
     
   def MakeMesh(self):
     """
@@ -116,7 +120,7 @@ I_PLATE.REFNODE, 3, 6
 *OUTPUT, FIELD, FREQUENCY = 1
 *NODE OUTPUT
 COORD, U, 
-*ELEMENT OUTPUT, ELSET=I_SAMPLE.ALL_ELEMENTS, DIRECTIONS = YES, POSITION=NODES
+*ELEMENT OUTPUT, ELSET=I_SAMPLE.ALL_ELEMENTS, DIRECTIONS = YES
 LE, EE, PE, PEEQ, S, 
 *OUTPUT, HISTORY
 *ENERGY OUTPUT
@@ -135,6 +139,20 @@ RF2, U2
     f =open(path, 'w')
     f.write(pattern)
     f.close()
+
+def Run(self):
+    '''
+    Runs the simulation.
+    '''
+    
+    import os, time, subprocess
+    t0 = time.time()
+    print '< Running simulation {0} in Abaqus>'.format(self.simname) 
+    p = subprocess.Popen( '{0} job={1} input={1}.inp interactive'.format(self.abqlauncher, self.label), cwd = self.workdir, shell=True, stdout = subprocess.PIPE)
+    trash = p.communicate()
+    t1 = time.time()
+    self.duration = t1 - t0
+    print '< Ran {0} in Abaqus: duration {1:.2f}s>'.format(self.simname, t1 - t0)   
 
 def PostProc(self):
   pattern = """# ABQPOSTPROC.PY
