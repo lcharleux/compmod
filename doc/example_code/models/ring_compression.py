@@ -2,9 +2,13 @@ from compmod.models import RingCompression
 import matplotlib.pyplot as plt
 import numpy as np
 
-Nt, Nr = 20, 5
-model = RingCompression(inner_radius = 5., outer_radius = 6., disp = 3., Nr = Nr, Nt = Nt)
+Nt, Nr = 8, 4
+model = RingCompression(inner_radius = 5., outer_radius = 6., disp = 3., Nr = Nr, Nt = Nt, workdir = "workdir/")
 model.MakeMesh()
+model.MakeInp()
+#model.Run()
+model.PostProc()
+
 mesh = model.mesh
 x,y,z = mesh.get_edges() # Mesh edges
 X,Y,Z,tri = mesh.dump2triplot()
@@ -19,6 +23,6 @@ plt.plot(xe, ye,'k-', linewidth = .5)
 #plt.triplot(X,Y,tri)
 #plt.show()
 plt.savefig('workdir/ring_compression.pdf')
-model.MakeInp('workdir/ring_compression.inp')
+
 
 

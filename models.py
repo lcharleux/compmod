@@ -58,7 +58,7 @@ class RingCompression(object):
     
     self.mesh = mesh
   
-  def MakeInp(self, path):
+  def MakeInp(self):
     pattern = """**----------------------------------
 **RING COMPRESSION SIMULATION
 **----------------------------------
@@ -107,7 +107,7 @@ I_SAMPLE.SURFACE_FACES, I_PLATE.SURFACE
 **----------------------------------
 ** STEPS
 **----------------------------------
-*STEP, NAME = LOADING0, NLGEOM = YES, INC=1000000
+*STEP, NAME = LOADING, NLGEOM = YES, INC=1000000
 *STATIC, DIRECT
 0.001, 1.
 *BOUNDARY
@@ -131,31 +131,57 @@ ALLPD
 ALLSE
 *NODE OUTPUT, NSET=I_PLATE.REFNODE
 RF2, U2
+*END STEP
+*STEP, NAME = UNLOADING, NLGEOM = YES, INC=1000000
+*STATIC, DIRECT
+0.001, 1.
+*BOUNDARY
+I_SAMPLE.LEFT_NODES, 1, 1
+I_SAMPLE.RIGHT_NODES, 2, 2
+I_PLATE.REFNODE, 2, 2, 0.
+I_PLATE.REFNODE, 1, 1
+I_PLATE.REFNODE, 3, 6
+*RESTART, WRITE, FREQUENCY = 0
+*OUTPUT, FIELD, FREQUENCY = 1
+*NODE OUTPUT
+COORD, U, 
+*ELEMENT OUTPUT, ELSET=I_SAMPLE.ALL_ELEMENTS, DIRECTIONS = YES
+LE, EE, PE, PEEQ, S, 
+*OUTPUT, HISTORY
+*ENERGY OUTPUT
+ALLFD, ALLWK
+*ENERGY OUTPUT, ELSET=I_SAMPLE.ALL_ELEMENTS
+ALLPD
+*ENERGY OUTPUT, ELSET=I_SAMPLE.ALL_ELEMENTS
+ALLSE
+*NODE OUTPUT, NSET=I_PLATE.REFNODE
+RF2, U2
 *END STEP"""
     pattern = pattern.replace('#RING_MESH', self.mesh.dump2inp())
     pattern = pattern.replace('#SAMPLE_MAT', self.material.dump2inp())
     pattern = pattern.replace('#OUTER_RADIUS', str(self.outer_radius))
     pattern = pattern.replace('#DISP', str(-self.disp))
-    f =open(path, 'w')
+    f =open(self.workdir + self.label + ".inp", 'w')
     f.write(pattern)
     f.close()
 
-def Run(self):
+  def Run(self):
     '''
     Runs the simulation.
     '''
     
     import os, time, subprocess
     t0 = time.time()
-    print '< Running simulation {0} in Abaqus>'.format(self.simname) 
+    print '< Running simulation {0} in Abaqus>'.format(self.label) 
     p = subprocess.Popen( '{0} job={1} input={1}.inp interactive'.format(self.abqlauncher, self.label), cwd = self.workdir, shell=True, stdout = subprocess.PIPE)
     trash = p.communicate()
     t1 = time.time()
     self.duration = t1 - t0
-    print '< Ran {0} in Abaqus: duration {1:.2f}s>'.format(self.simname, t1 - t0)   
+    print '< Ran {0} in Abaqus: duration {1:.2f}s>'.format(self.label, t1 - t0)   
 
-def PostProc(self):
-  pattern = """# ABQPOSTPROC.PY
+  def PostProc(self):
+    import os, subprocess, time, pickle
+    pattern = """# ABQPOSTPROC.PY
 # Warning: executable only in abaqus abaqus viewer -noGUI,... not regular python.
 import sys
 from abapy.postproc import GetFieldOutput_byRpt as gfo
@@ -186,7 +212,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
   fo['U'] = [
     gvfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 1,
+      step = 0,
       frame = -1,
       original_position = 'NODAL', 
       new_position = 'NODAL', 
@@ -196,7 +222,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
       delete_report = True),
     gvfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 2,
+      step = 1,
       frame = -1,
       original_position = 'NODAL', 
       new_position = 'NODAL', 
@@ -208,7 +234,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
   fo['S'] = [
     gtfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 1,
+      step = 0,
       frame = -1,
       original_position = 'INTEGRATION_POINT', 
       new_position = 'NODAL', 
@@ -218,7 +244,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
       delete_report = True),
     gtfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 2,
+      step = 1,
       frame = -1,
       original_position = 'INTEGRATION_POINT', 
       new_position = 'NODAL', 
@@ -229,7 +255,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
   fo['LE'] = [
     gtfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 1,
+      step = 0,
       frame = -1,
       original_position = 'INTEGRATION_POINT', 
       new_position = 'NODAL', 
@@ -239,7 +265,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
       delete_report = True),
     gtfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 2,
+      step = 1,
       frame = -1,
       original_position = 'INTEGRATION_POINT', 
       new_position = 'NODAL', 
@@ -251,7 +277,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
   fo['EE'] = [
     gtfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 1,
+      step = 0,
       frame = -1,
       original_position = 'INTEGRATION_POINT', 
       new_position = 'NODAL', 
@@ -261,7 +287,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
       delete_report = True),
     gtfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 2,
+      step = 1,
       frame = -1,
       original_position = 'INTEGRATION_POINT', 
       new_position = 'NODAL', 
@@ -273,7 +299,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
   fo['PE'] = [
     gtfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 1,
+      step = 0,
       frame = -1,
       original_position = 'INTEGRATION_POINT', 
       new_position = 'NODAL', 
@@ -283,7 +309,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
       delete_report = True),
     gtfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 2,
+      step = 1,
       frame = -1,
       original_position = 'INTEGRATION_POINT', 
       new_position = 'NODAL', 
@@ -295,7 +321,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
   fo['PEEQ'] = [
     gfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 1,
+      step = 0,
       frame = -1,
       original_position = 'INTEGRATION_POINT', 
       new_position = 'NODAL', 
@@ -305,7 +331,7 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
       delete_report = True),
     gfo(odb = odb, 
       instance = 'I_SAMPLE', 
-      step = 2,
+      step = 1,
       frame = -1,
       original_position = 'INTEGRATION_POINT', 
       new_position = 'NODAL', 
@@ -316,25 +342,34 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
   # History Outputs
   data['history'] = {} 
   ho = data['history']
-  ref_node = odb.rootAssembly.instances['I_PLATE'].nodeSets['REF_NODE'].nodes[0].label
+  ref_node = odb.rootAssembly.instances['I_PLATE'].nodeSets['REFNODE'].nodes[0].label
   ho['force'] =  gho(odb,'RF2')['Node I_PLATE.'+str(ref_node)] # GetFieldOutputByKey returns all the occurences of the required output (here 'RF2') and stores it in a dict. Each dict key refers to a location. Here we have to specify the location ('Node I_INDENTER.1') mainly for displacement which has been requested at several locations.
   ho['disp'] =   gho(odb,'U2')['Node I_PLATE.'+str(ref_node)]
   ho['allse'] =   gho(odb,'ALLSE').values()[0]
   ho['allpd'] =   gho(odb,'ALLPD').values()[0]
   ho['allfd'] =   gho(odb,'ALLFD').values()[0]
   ho['allwk'] =   gho(odb,'ALLWK').values()[0]
-  #ho['carea'] =  gho(odb,'CAREA    ASSEMBLY_I_SAMPLE_SURFACE_FACES/ASSEMBLY_I_INDENTER_SURFACE_FACES').values()[0]
-  
-  # CONTACT DATA PROCESSING
-  ho['contact'] = Get_ContactData(odb = odb, instance = 'I_SAMPLE', node_set = 'TOP_NODES')
+ 
  
 else:
   data['completed'] = False
 # Closing and dumping
 odb.close()
 dump(data, file_name+'.pckl')"""  
-  
-  
+    pattern = pattern.replace('#FILE_NAME', self.label)  
+    f = open(self.workdir + self.label + '_abqpostproc.py', 'w')
+    f.write(pattern)
+    f.close()
+    
+    t0 = time.time()
+    p = subprocess.Popen( [self.abqlauncher,  'viewer', 'noGUI={0}'.format(self.label + '_abqpostproc.py')], cwd = self.workdir,stdout = subprocess.PIPE )
+    trash = p.communicate()
+    t1 = time.time()
+    print '< Post Processed {0} in Abaqus: duration {1:.2f}s>'.format(self.label, t1 - t0) 
+    f = open(self.workdir + self.label + ".pckl", 'r')
+    self.outputs = pickle.load(f)
+    f.close()  
+    
   
   
   
