@@ -1,4 +1,5 @@
 *~
 *.pyc
+*.pdf
 tests/*
 doc/example_code/models/workdir/*
