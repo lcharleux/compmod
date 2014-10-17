@@ -1,6 +1,8 @@
 # A repository for compartmentalized models compatible simulation models.
 from abapy.mesh import RegularQuadMesh
 from abapy.materials import VonMises
+from abapy.materials import Hollomon
+from abapy.misc import load
 import numpy as np
 import subprocess
 
@@ -8,7 +10,7 @@ class RingCompression(object):
   """
  Ring compression test.
   """
-  def __init__(self, inner_radius = 1., outer_radius = 2., Nr = 8, Nt = 8, disp = .5, nFrames = 100,  label = 'ringCompression', elType = 'CPS4', material =VonMises(labels = 'SAMPLE_MAT'), workdir = 'workdir/', abqlauncher = '/opt/Abaqus/6.9/Commands/abaqus'  ):
+  def __init__(self, inner_radius = 1., outer_radius = 2., Nr = 8, Nt = 8, disp = .5, nFrames = 100,  label = 'ringCompression', elType = 'CPS4', material = VonMises(labels = 'SAMPLE_MAT'), workdir = 'D:/Simulations/Dossier_travail_Abaqus', abqlauncher = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe'  ):
     """
     :param inner_radius: inner radius of the ring
     :type inner_radius: float
@@ -368,9 +370,9 @@ dump(data, file_name+'.pckl')"""
     trash = p.communicate()
     t1 = time.time()
     print '< Post Processed {0} in Abaqus: duration {1:.2f}s>'.format(self.label, t1 - t0) 
-    f = open(self.workdir + self.label + ".pckl", 'r')
-    self.outputs = pickle.load(f)
-    f.close()  
+    
+    self.outputs = load(self.workdir + self.label + ".pckl")
+     
     
   
   
