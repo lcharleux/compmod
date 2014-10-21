@@ -6,7 +6,7 @@ import numpy as np
 import pickle, copy
 
 #PAREMETERS
-inner_radius, outer_radius = 95.54 , 100.72
+inner_radius, outer_radius = 95.54/2 , 100.72/2
 Nt, Nr = 40, 10 
 disp = 50.
 nFrames = 1000
@@ -30,7 +30,7 @@ material = Hollomon(
 m = RingCompression( material = material , 
   inner_radius = inner_radius, 
   outer_radius = outer_radius, 
-  disp = disp, 
+  disp = disp/2, 
   nFrames = nFrames, 
   Nr = Nr, 
   Nt = Nt, 
