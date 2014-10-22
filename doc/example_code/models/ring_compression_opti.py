@@ -3,6 +3,7 @@
 from abapy.materials import Hollomon
 from compmod.models import RingCompression
 from scipy import interpolate
+from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle, copy
@@ -11,15 +12,15 @@ node = platform.node()
 
 
 #FIXED PAREMETERS
-file_name = 'D:/Desktop/Article_compression_anneaux/Optimisation_compression_anneau/test_exp.txt'
-inner_radius, outer_radius = 95/2, 100/2
-Nt, Nr = 10, 3 
-displacement = 50.
-nFrames = 50
-sy = 200.e6
-E = 200.e9
-nu = .3
-n = .3
+settings = {}
+settings['file_name'] = 'test_exp.txt'
+settings['inner_radius'], settings['outer_radius'] = 95/2, 100/2
+settings['Nt'], settings['Nr'] = 10, 3 
+settings['displacement'] = 45.
+settings['nFrames'] = 100
+settings['E'] = 200.e9
+settings['nu'] = .3
+
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
   workdir = "workdir/"
@@ -44,15 +45,16 @@ def read_file(file_name):
       data = ligne.split() # Lines are splitted
       force_exp.append(float(data[0]))
       disp_exp.append(float(data[1]))
-  return np.array(disp_exp), np.array(force_exp)
+  return -np.array(disp_exp), -np.array(force_exp)
 
 
 
 class Simulation(object):
   
-  def __init__(self, sy, n):
+  def __init__(self, sy, n, settings):
     self.sy = sy
     self.n = n
+    self.settings = settings
     
     
   def Run(self):
@@ -61,7 +63,17 @@ class Simulation(object):
     """
     #MODEL DEFINITION
     sy = self.sy
-    n = self.n    
+    n = self.n
+  
+    E = self.settings['E']
+    nu = self.settings['nu']
+    inner_radius = self.settings['inner_radius']
+    outer_radius = self.settings['outer_radius']
+    disp = self.settings['displacement']/2.
+    nFrames = self.settings['nFrames']
+    Nr = self.settings['Nr']
+    Nt = self.settings['Nt']
+    print E, nu, sy, n
     material = Hollomon(
       labels = "SAMPLE_MAT",
       E = E, nu = nu,
@@ -70,7 +82,7 @@ class Simulation(object):
       material = material , 
       inner_radius = inner_radius, 
       outer_radius = outer_radius, 
-      disp = displacement/2, 
+      disp = disp, 
       nFrames = nFrames, 
       Nr = Nr, 
       Nt = Nt, 
@@ -101,11 +113,56 @@ class Simulation(object):
     f = interpolate.interp1d(disp.data[0], force.data[0])
     return f
 
+class Opti(object):
+  
+  def __init__(self, sy0, n0, settings):
+    
+    self.sy0 = sy0
+    self.n0 = n0
+    self.settings = settings
+    self.sy = []
+    self.n = []
+    self.err = []
+    disp_exp, force_exp = read_file(self.settings['file_name'])
+    g = interpolate.interp1d(disp_exp, force_exp)
+    self.disp_exp = disp_exp
+    self.force_exp = force_exp
+    self.g = g
+    
+  def Err(self, param):
+    """
+    Compute the residual error between experimental and simulated curve
+    """
+    sy = param[0]
+    n =param[1]
+   
+    s = Simulation(sy, n ,self.settings)
+    s.Run()
+    f = s.Interp()
+    d = self.settings['displacement']
+    disp = np.linspace(0., d, 100)
+    force_sim = f(disp)
+    
+    g = self.g
+    force_exp = g(disp)
+    
+    err = np.sqrt(((force_exp - force_sim)**2).sum())
+    self.sy.append(sy)
+    self.n.append(n)
+    self.err.append(err)
+    return err
+    
+  def Optimize(self):
+    p0 = [self.sy0, self.n0]
+    
+    result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':5})
+    self.result = result
+    
+O = Opti(200.e6, 0.3, settings)
+O.Optimize()
 
 
-s = Simulation(200.e6, 0.3)
-s.Run()
-s.Interp()
+
 #print s.force.data[0]
 """
 f = s.Interp()
