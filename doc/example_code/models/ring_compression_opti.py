@@ -14,13 +14,14 @@ node = platform.node()
 #FIXED PAREMETERS
 settings = {}
 settings['file_name'] = 'test_exp.txt'
-settings['inner_radius'], settings['outer_radius'] = 95./2, 100./2
-settings['Nt'], settings['Nr'] = 10, 3 
+settings['inner_radius'], settings['outer_radius'] = 45.18 , 50.36
+settings['Nt'], settings['Nr'] = 80, 8 
 settings['displacement'] = 45.
-settings['nFrames'] = 100
-settings['E'] = 200.e3
+settings['nFrames'] = 10000
+settings['E'] = 74.e3
 settings['nu'] = .3
 settings['iteration'] = 10
+settings['thickness'] = 20.02
 
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
@@ -74,6 +75,7 @@ class Simulation(object):
     nFrames = self.settings['nFrames']
     Nr = self.settings['Nr']
     Nt = self.settings['Nt']
+    thickness = self.settings['thickness']
     print E, nu, sy, n
     material = Hollomon(
       labels = "SAMPLE_MAT",
@@ -84,7 +86,8 @@ class Simulation(object):
       inner_radius = inner_radius, 
       outer_radius = outer_radius, 
       disp = disp, 
-      nFrames = nFrames, 
+      nFrames = nFrames,
+      thickness = thickness,
       Nr = Nr, 
       Nt = Nt, 
       workdir = workdir,
@@ -165,7 +168,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(200., 0.3, settings)
+O = Opti(100., 0.1, settings)
 O.Optimize()
 
 

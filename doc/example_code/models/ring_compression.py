@@ -6,14 +6,15 @@ import numpy as np
 import pickle, copy
 
 #PAREMETERS
-inner_radius, outer_radius = 95.54/2 , 100.72/2
-Nt, Nr = 40, 10 
-disp = 50.
-nFrames = 1000
-sy = 200.e6
-E = 200.e9
+inner_radius, outer_radius = 37.3 , 38.81
+Nt, Nr = 40, 5 
+disp = 45.
+nFrames = 10000
+sy = 300
+E = 62000
 nu = .3
-n = .3
+n = .1
+thickness = 20
 workdir = "D:/Simulations/Dossier_travail_Abaqus/"
 label = "ringCompression"
 elType = "CPS4"
@@ -30,7 +31,8 @@ material = Hollomon(
 m = RingCompression( material = material , 
   inner_radius = inner_radius, 
   outer_radius = outer_radius, 
-  disp = disp/2, 
+  disp = disp/2,
+  thickness = thickness,
   nFrames = nFrames, 
   Nr = Nr, 
   Nt = Nt, 

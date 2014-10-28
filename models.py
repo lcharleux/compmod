@@ -10,7 +10,7 @@ class RingCompression(object):
   """
  Ring compression test.
   """
-  def __init__(self, inner_radius = 1., outer_radius = 2., Nr = 8, Nt = 8, disp = .5, nFrames = 100,  label = 'ringCompression', elType = 'CPS4', material = VonMises(labels = 'SAMPLE_MAT'), workdir = 'D:/Simulations/Dossier_travail_Abaqus', abqlauncher = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe'  ):
+  def __init__(self, inner_radius = 1., outer_radius = 2., Nr = 8, Nt = 8, disp = .5, nFrames = 100,  label = 'ringCompression', elType = 'CPS4', material = VonMises(labels = 'SAMPLE_MAT'), workdir = 'D:/Simulations/Dossier_travail_Abaqus', abqlauncher = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe', thickness = 1.):
     """
     :param inner_radius: inner radius of the ring
     :type inner_radius: float
@@ -32,6 +32,7 @@ class RingCompression(object):
     self.abqlauncher = abqlauncher
     self.label = label
     self.nFrames = nFrames
+    self.thickness = thickness
     
   def MakeMesh(self):
     """
@@ -72,6 +73,7 @@ class RingCompression(object):
 *PART, NAME = P_SAMPLE
 #RING_MESH
 *SOLID SECTION, ELSET = ALL_ELEMENTS, MATERIAL = SAMPLE_MAT
+#THICK_SECTION
 *END PART
 **----------------------------------
 ** INDENTER DEFINITION
@@ -110,9 +112,9 @@ I_SAMPLE.SURFACE_FACES, I_PLATE.SURFACE
 **----------------------------------
 ** STEPS
 **----------------------------------
-*STEP, NAME = LOADING, NLGEOM = YES, INC=1000000
-*STATIC, DIRECT
-#FRAME_DURATION, 1.
+*STEP, NAME = LOADING, NLGEOM = YES, INC=1000
+*Static
+0.25, 1, 1e-08, 1.
 *BOUNDARY
 I_SAMPLE.LEFT_NODES, 1, 1
 I_SAMPLE.RIGHT_NODES, 2, 2
@@ -135,9 +137,9 @@ ALLSE
 *NODE OUTPUT, NSET=I_PLATE.REFNODE
 RF2, U2
 *END STEP
-*STEP, NAME = UNLOADING, NLGEOM = YES, INC=1000000
-*STATIC, DIRECT
-#FRAME_DURATION, 1.
+*STEP, NAME = UNLOADING, NLGEOM = YES, INC=1000
+*Static
+0.25, 1, 1e-08, 1.
 *BOUNDARY
 I_SAMPLE.LEFT_NODES, 1, 1
 I_SAMPLE.RIGHT_NODES, 2, 2
@@ -164,7 +166,8 @@ RF2, U2
     pattern = pattern.replace('#SAMPLE_MAT', self.material.dump2inp())
     pattern = pattern.replace('#OUTER_RADIUS', str(self.outer_radius))
     pattern = pattern.replace('#DISP', str(-self.disp))
-    pattern = pattern.replace('#FRAME_DURATION', str(1. / self.nFrames))
+    #pattern = pattern.replace('#FRAME_DURATION', str(1. / self.nFrames))
+    pattern = pattern.replace('#THICK_SECTION', str(self.thickness))
     f =open(self.workdir + self.label + ".inp", 'w')
     f.write(pattern)
     f.close()
@@ -179,6 +182,7 @@ RF2, U2
     print '< Running simulation {0} in Abaqus>'.format(self.label) 
     p = subprocess.Popen( '{0} job={1} input={1}.inp interactive'.format(self.abqlauncher, self.label), cwd = self.workdir, shell=True, stdout = subprocess.PIPE)
     trash = p.communicate()
+    print trash
     t1 = time.time()
     self.duration = t1 - t0
     print '< Ran {0} in Abaqus: duration {1:.2f}s>'.format(self.label, t1 - t0)   
