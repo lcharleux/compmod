@@ -114,7 +114,7 @@ I_SAMPLE.SURFACE_FACES, I_PLATE.SURFACE
 **----------------------------------
 *STEP, NAME = LOADING, NLGEOM = YES, INC=1000
 *Static
-0.25, 1, 1e-08, 1.
+#FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
 *BOUNDARY
 I_SAMPLE.LEFT_NODES, 1, 1
 I_SAMPLE.RIGHT_NODES, 2, 2
@@ -166,7 +166,7 @@ RF2, U2
     pattern = pattern.replace('#SAMPLE_MAT', self.material.dump2inp())
     pattern = pattern.replace('#OUTER_RADIUS', str(self.outer_radius))
     pattern = pattern.replace('#DISP', str(-self.disp))
-    #pattern = pattern.replace('#FRAME_DURATION', str(1. / self.nFrames))
+    pattern = pattern.replace('#FRAME_DURATION', str(1. / self.nFrames))
     pattern = pattern.replace('#THICK_SECTION', str(self.thickness))
     f =open(self.workdir + self.label + ".inp", 'w')
     f.write(pattern)
