@@ -15,19 +15,31 @@ class Simulation(object):
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     
-  def Run(self):
+  def Run(self, deleteOldFiles = True):
     '''
     Runs the simulation.
     '''
-    
+    if deleteOldFiles: self.DeleteOldFiles()
     t0 = time.time()
     print '< Running simulation {0} in Abaqus>'.format(self.label) 
     p = subprocess.Popen( '{0} job={1} input={1}.inp interactive'.format(self.abqlauncher, self.label), cwd = self.workdir, shell=True, stdout = subprocess.PIPE)
     trash = p.communicate()
-    print trash
+    print trash[0]
     t1 = time.time()
     self.duration = t1 - t0
     print '< Ran {0} in Abaqus: duration {1:.2f}s>'.format(self.label, t1 - t0)   
+  
+  def DeleteOldFiles(self):
+    """
+    Deletes old job files.
+    """
+    suffixes = ['.odb', '.lck', '.log', '.dat', '.com', '.sim', '.sta', '.prt', '.msg']
+    for s in suffixes:
+      path = self.workdir + self.label + s
+      try:
+        os.remove(path)
+      except OSError:
+        pass
   
   def RunPostProc(self):
     """
@@ -94,7 +106,7 @@ iSample.Top,    2, 2, #DISP
 *Output, field, frequency=999999
 *Node Output
 U
-*Element Output, directions=YES, position = nodes
+*Element Output, directions=YES
 E, PE, EE, PEEQ, S
 ** HYSTORY OUTPUTS
 *Output, history
@@ -108,6 +120,8 @@ U2
 COOR1
 *Node Output, nset=iSample.Right
 COOR1
+*Element Output, elset=iSample.allElements, directions=NO
+EVOL
 *End Step
   """
     section_pattern = "*Solid Section, elset=Elset{0}, material={1}\n*Elset, Elset=Elset{0}\n{0},\n"
@@ -127,6 +141,7 @@ COOR1
         matinp += material[i].dump2inp() + '\n'
     
     m = RegularQuadMesh(Nx, Ny, l1= lx, l2 = ly, name = elType)
+    m.add_set(label = "AllElements", elements = m.labels)
     pattern = pattern.replace("#MESH", m.dump2inp())
     pattern = pattern.replace("#SECTIONS", sections[:-1])
     pattern = pattern.replace("#MATERIALS", matinp[:-1])
@@ -136,8 +151,138 @@ COOR1
     f.write(pattern)
     f.close()
 
+  def MakePostProc(self):
+    """
+    Makes the post-proc script
+    """
+    pattern = """# ABQPOSTPROC.PY
+# Warning: executable only in abaqus abaqus viewer -noGUI,... not regular python.
+import sys
+from abapy.postproc import GetFieldOutput_byRpt as gfo
+from abapy.postproc import GetVectorFieldOutput_byRpt as gvfo
+from abapy.postproc import GetTensorFieldOutput_byRpt as gtfo
+from abapy.postproc import GetHistoryOutputByKey as gho
+from abapy.indentation import Get_ContactData
+from abapy.misc import dump
+from odbAccess import openOdb
+from abaqusConstants import JOB_STATUS_COMPLETED_SUCCESSFULLY
 
 
+
+# Odb opening  
+file_name = '#FILE_NAME'
+odb = openOdb(file_name + '.odb')
+data = {}
+
+# Check job status:
+job_status = odb.diagnosticData.jobStatus
+
+if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
+  data['completed'] = True 
+  # Field Outputs
+  data['field'] = {}
+  fo = data['field']
+  fo['U'] = [
+    gvfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'NODAL', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'U', 
+      delete_report = True)
+      ]
+ 
+      
+  fo['S'] = [
+    gtfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'INTEGRATION_POINT', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'S', 
+      sub_set_type = 'element', 
+      delete_report = True),
+    ]
+   
+  fo['LE'] = [
+    gtfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'INTEGRATION_POINT', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'LE', 
+      sub_set_type = 'element', 
+      delete_report = True),
+    ] 
+      
+  fo['EE'] = [
+    gtfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'INTEGRATION_POINT', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'EE', 
+      sub_set_type = 'element', 
+      delete_report = True),
+    ]     
+  
+  fo['PE'] = [
+    gtfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'INTEGRATION_POINT', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'PE', 
+      sub_set_type = 'element', 
+      delete_report = True),
+    ] 
+  
+  fo['PEEQ'] = [
+    gfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'INTEGRATION_POINT', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'PEEQ', 
+      sub_set_type = 'element', 
+      delete_report = True),
+    ] 
+  # History Outputs
+  data['history'] = {} 
+  ho = data['history']
+  ho['disp'] =   gho(odb,'U2')
+  ho['force'] =   gho(odb,'RF2')
+  ho['allse'] =   gho(odb,'ALLSE').values()[0]
+  ho['allpd'] =   gho(odb,'ALLPD').values()[0]
+  ho['allwk'] =   gho(odb,'ALLWK').values()[0]
+  ho['volume'] =  gho(odb,'EVOL')
+  
+  
+  # Mesh 
+  
+else:
+  data['completed'] = False
+# Closing and dumping
+odb.close()
+dump(data, file_name+'.pckl')"""
+    pattern = pattern.replace("#FILE_NAME", self.label)
+    f = open(self.workdir + self.label + '_abqpostproc.py', 'w')
+    f.write(pattern)
+    f.close()
+  
+  
 class RingCompression(Simulation):
   """
  Ring compression test.
