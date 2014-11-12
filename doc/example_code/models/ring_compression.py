@@ -60,7 +60,7 @@ if outputs['completed']:
     return outputs['field']['S'][step].vonmises()
   
   def plot_mesh(ax, mesh, outputs, step, field_func =None, zone = 'upper right', cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
-    """workdir + label + '.pckl'
+    """
     A function that plots the deformed mesh with a given field on it.
     """
     mesh2 = copy.deepcopy(mesh)
