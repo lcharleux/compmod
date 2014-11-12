@@ -46,8 +46,9 @@ class Simulation(object):
     Runs the post processing script.
     """
     t0 = time.time()
-    p = subprocess.Popen( [self.abqlauncher,  'viewer', 'noGUI={0}'.format(self.label + '_abqpostproc.py')], cwd = self.workdir,stdout = subprocess.PIPE )
+    p = subprocess.Popen( [self.abqlauncher,  'viewer', 'noGUI={0}'.format(self.label + '_abqpostproc.py')], cwd = self.workdir,stdout = subprocess.PIPE, shell=True )
     trash = p.communicate()
+    print trash[0]
     t1 = time.time()
     print '< Post Processed {0} in Abaqus: duration {1:.2f}s>'.format(self.label, t1 - t0) 
     self.outputs = load(self.workdir + self.label + ".pckl")
