@@ -66,7 +66,7 @@ class CuboidTest(Simulation):
   Performs various tests on cuboids
   """
   def __init__(self, **kwargs):
-    defaultArgs = {"Nx":10, "Ny":10, "lx":1., "ly":1., "disp":.25}
+    defaultArgs = {"Nx":10, "Ny":10, "lx":1., "ly":1., "disp":.25, "thickness":1.}
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     super(CuboidTest, self).__init__(**kwargs)
@@ -134,15 +134,19 @@ EVOL
     disp = self.disp
     nFrames = self.nFrames
     Ne = Nx * Ny
-    section_pattern = "*Solid Section, elset=Elset{0}, material={1}\n*Elset, Elset=Elset{0}\n{0},\n"
     sections = ""
     matinp = ""
     if self.compart:
+      section_pattern = "*Solid Section, elset=Elset{0}, material={1}\n*Elset, Elset=Elset{0}\n{0},\n"
       labels = [mat.labels[0] for mat in material]
       for i in xrange(Ne):
         sections += section_pattern.format(i+1, labels[i]) 
         matinp += material[i].dump2inp() + '\n'
-    
+    else:
+      section_pattern = "*SOLID SECTION, ELSET = ALLELEMENTS, MATERIAL = {0}\n{1}"  
+      label = material.labels[0]
+      sections = section_pattern.format(label, self.thickness)
+      matinp = material.dump2inp() 
     m = RegularQuadMesh(Nx, Ny, l1= lx, l2 = ly, name = elType)
     m.add_set(label = "AllElements", elements = m.labels)
     pattern = pattern.replace("#MESH", m.dump2inp())

@@ -8,7 +8,7 @@ import platform
 
 
 
-#PAREMETERS
+#PARAMETERS
 lx, ly = 1., 1.
 Nx, Ny = 20, 20 
 Ne = Nx * Ny
@@ -24,18 +24,24 @@ if node ==  'serv2-ms-symme':
   abqlauncher   = '/opt/abaqus/Commands/abaqus' # Local machine configuration
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe'
+compart = False
 
 
+if compart:
+  E  = 1. * np.ones(Ne) # Young's modulus
+  nu = .3 * np.ones(Ne) # Poisson's ratio
+  sy_mean = .01
+  sy = np.random.rayleigh(sy_mean, Ne)
+  labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
+  material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i]) for i in xrange(Ne)]
+else:
+  E = 1.
+  nu =.3
+  sy = .01
+  labels = 'SAMPLE_MAT'
+  material = materials.VonMises(labels = labels, E = E, nu = nu, sy = sy)
 
-
-E  = 1. * np.ones(Ne) # Young's modulus
-nu = .3 * np.ones(Ne) # Poisson's ratio
-sy_mean = .01
-sy = np.random.rayleigh(sy_mean, Ne)
-labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
-material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i]) for i in xrange(Ne)]
-
-m = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = True, disp = disp, elType = elType)
+m = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType)
 
 m.MakeInp()
 m.Run()
@@ -55,7 +61,7 @@ if m.outputs['completed']:
   surface = volume / length
   logstrain = np.log10(1. + disp / ly)
   linstrain = disp/ly
-  strain = linstrain 
+  strain = linstrain
   stress = force / surface 
    
   fig = plt.figure(0)
