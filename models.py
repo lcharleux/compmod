@@ -46,7 +46,7 @@ class Simulation(object):
     Runs the post processing script.
     """
     t0 = time.time()
-    p = subprocess.Popen( [self.abqlauncher,  'viewer', 'noGUI={0}'.format(self.label + '_abqpostproc.py')], cwd = self.workdir,stdout = subprocess.PIPE, shell=True )
+    p = subprocess.Popen( "{0} viewer -noGUI {1}".format(self.abqlauncher, self.label + '_abqpostproc.py'), cwd = self.workdir,stdout = subprocess.PIPE, shell=True)
     trash = p.communicate()
     print trash[0]
     t1 = time.time()
@@ -60,6 +60,7 @@ class Simulation(object):
     self.MakePostProc()
     self.RunPostProc()
   
+    
 class CuboidTest(Simulation):
   """
   Performs various tests on cuboids
@@ -125,7 +126,7 @@ COOR1
 EVOL
 *End Step
   """
-    section_pattern = "*Solid Section, elset=Elset{0}, material={1}\n*Elset, Elset=Elset{0}\n{0},\n"
+    
     Nx , Ny = self.Nx, self.Ny
     lx, ly = self.lx, self.ly
     elType = self.elType
@@ -133,6 +134,7 @@ EVOL
     disp = self.disp
     nFrames = self.nFrames
     Ne = Nx * Ny
+    section_pattern = "*Solid Section, elset=Elset{0}, material={1}\n*Elset, Elset=Elset{0}\n{0},\n"
     sections = ""
     matinp = ""
     if self.compart:
@@ -290,7 +292,7 @@ class RingCompression(Simulation):
   """
  Ring compression test.
   """
-  def __init__(self, inner_radius = 1., outer_radius = 2., thickness = 1., Nr = 8, Nt = 8, disp = .5, nFrames = 100,  label = 'ringCompression', elType = 'CPS4', material = VonMises(labels = 'SAMPLE_MAT'), workdir = "", abqlauncher = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe'):
+  def __init__(self, **kwargs):
     """
     :param inner_radius: inner radius of the ring
     :type inner_radius: float
@@ -301,18 +303,17 @@ class RingCompression(Simulation):
     :param Nt: Number of elements in the orthoradial direction
     :type Nt: int
     """
-    self.inner_radius = inner_radius
-    self.outer_radius = outer_radius
-    self.Nr = Nr
-    self.Nt = Nt
-    self.elType = elType
-    self.material = material
-    self.disp = disp
-    self.workdir = workdir
-    self.abqlauncher = abqlauncher
-    self.label = label
-    self.nFrames = nFrames
-    self.thickness = thickness
+    defaultArgs = {
+      "inner_radius": 1., 
+      "inner_radius": 2.,  
+      "thickness": 1.,
+      "Nr":10, 
+      "Nt":10, 
+      "disp": .5,
+      }
+    for key, value in defaultArgs.iteritems(): setattr(self, key, value)
+    for key, value in kwargs.iteritems(): setattr(self, key, value)
+    super(RingCompression, self).__init__(**kwargs)
     
   def MakeMesh(self):
     """
@@ -352,8 +353,7 @@ class RingCompression(Simulation):
 ** SAMPLE DEFINITION
 *PART, NAME = P_SAMPLE
 #RING_MESH
-*SOLID SECTION, ELSET = ALL_ELEMENTS, MATERIAL = SAMPLE_MAT
-#THICK_SECTION
+#SECTIONS
 *END PART
 **----------------------------------
 ** INDENTER DEFINITION
@@ -388,7 +388,7 @@ I_SAMPLE.SURFACE_FACES, I_PLATE.SURFACE
 ** MATERIALS
 **----------------------------------
 ** SAMPLE MATERIAL
-#SAMPLE_MAT
+#MATERIALS
 **----------------------------------
 ** STEPS
 **----------------------------------
@@ -419,7 +419,7 @@ RF2, U2
 *END STEP
 *STEP, NAME = UNLOADING, NLGEOM = YES, INC=1000
 *Static
-0.25, 1, 1e-08, 1.
+#FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
 *BOUNDARY
 I_SAMPLE.LEFT_NODES, 1, 1
 I_SAMPLE.RIGHT_NODES, 2, 2
@@ -442,12 +442,30 @@ ALLSE
 *NODE OUTPUT, NSET=I_PLATE.REFNODE
 RF2, U2
 *END STEP"""
+    Nr , Nt = self.Nr, self.Nt
+    Ne = Nr * Nt
+    material = self.material
+    sections = ""
+    matinp = ""
+    if self.compart:
+      section_pattern = "*Solid Section, elset=Elset{0}, material={1}\n{2}\n*Elset, Elset=Elset{0}\n{0},\n"
+      labels = [mat.labels[0] for mat in material]
+      for i in xrange(Ne):
+        sections += section_pattern.format(i+1, labels[i], self.thickness) 
+        matinp += material[i].dump2inp() + '\n'
+      matinp = matinp[:-1]  
+    else:
+      section_pattern = "*SOLID SECTION, ELSET = ALL_ELEMENTS, MATERIAL = {0}\n{1}"  
+      label = material.labels[0]
+      sections = section_pattern.format(label, self.thickness)
+      matinp = material.dump2inp() 
+        
     pattern = pattern.replace('#RING_MESH', self.mesh.dump2inp())
-    pattern = pattern.replace('#SAMPLE_MAT', self.material.dump2inp())
     pattern = pattern.replace('#OUTER_RADIUS', str(self.outer_radius))
     pattern = pattern.replace('#DISP', str(-self.disp))
     pattern = pattern.replace('#FRAME_DURATION', str(1. / self.nFrames))
-    pattern = pattern.replace('#THICK_SECTION', str(self.thickness))
+    pattern = pattern.replace('#SECTIONS', sections)
+    pattern = pattern.replace('#MATERIALS', matinp)
     f =open(self.workdir + self.label + ".inp", 'w')
     f.write(pattern)
     f.close()

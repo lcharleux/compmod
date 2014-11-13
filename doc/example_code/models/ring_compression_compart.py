@@ -1,5 +1,5 @@
 from compmod.models import RingCompression
-from abapy.materials import Hollomon
+from abapy import materials
 from abapy.misc import load
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,14 +8,18 @@ import platform
 
 #PAREMETERS
 inner_radius, outer_radius = 1. , 2.
-Nt, Nr = 20, 5 
+Nt, Nr = 40, 10 
+Ne = Nt * Nr
 disp = .25
 nFrames = 100
-sy = .01
-E = 1.
-nu = .3
-n = .1
 thickness = 1.
+E  = 1. * np.ones(Ne) # Young's modulus
+nu = .3 * np.ones(Ne) # Poisson's ratio
+sy_mean = .01
+sy = np.random.rayleigh(sy_mean, Ne)
+labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
+material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i]) for i in xrange(Ne)]
+
 workdir = "workdir/"
 label = "ringCompression"
 elType = "CPS4"
@@ -24,15 +28,14 @@ if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' 
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 
 
+
+
 #TASKS
 run_sim = True
 plot = True
 
 #MODEL DEFINITION
-material = Hollomon(
-  labels = "SAMPLE_MAT",
-  E = E, nu = nu,
-  sy = sy, n = n)
+
 m = RingCompression( material = material , 
   inner_radius = inner_radius, 
   outer_radius = outer_radius, 
@@ -44,7 +47,8 @@ m = RingCompression( material = material ,
   workdir = workdir,
   label = label, 
   elType = elType,
-  abqlauncher = abqlauncher)
+  abqlauncher = abqlauncher,
+  compart = True)
 
 # SIMULATION
 m.MakeMesh()
@@ -63,7 +67,7 @@ if outputs['completed']:
     """
     A function that defines the scalar field you want to plot
     """
-    return outputs['field']['S'][step].vonmises()
+    return outputs['field']['LE'][step].vonmises()
   
   def plot_mesh(ax, mesh, outputs, step, field_func =None, zone = 'upper right', cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
     """
@@ -95,7 +99,7 @@ if outputs['completed']:
   ax = fig.add_subplot(1, 1, 1)
   ax.set_aspect('equal')
   plt.grid()
-  plot_mesh(ax, mesh, outputs, 0, field_func, cbar_label = '$\sigma_{eq}$')
+  plot_mesh(ax, mesh, outputs, 0, field_func, cbar_label = '$\epsilon_{eq}$')
   plot_mesh(ax, mesh, outputs, 0, field_func = None, cbar = False, disp = False)
   plt.xlabel('$x$')
   plt.ylabel('$y$')

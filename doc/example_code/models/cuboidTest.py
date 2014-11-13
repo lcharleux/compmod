@@ -10,7 +10,7 @@ import platform
 
 #PAREMETERS
 lx, ly = 1., 1.
-Nx, Ny = 40, 40 
+Nx, Ny = 20, 20 
 Ne = Nx * Ny
 disp = .1
 nFrames = 20
@@ -18,8 +18,8 @@ workdir = "workdir/"
 label = "cuboidTest"
 elType = "CPE4"
 node = platform.node()
-if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
-if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Local machine configuration
+if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
+if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux server
 
 
 
