@@ -7,26 +7,31 @@ import pickle, copy
 import platform
 
 #PAREMETERS
-inner_radius, outer_radius = 1. , 2.
-Nt, Nr = 40, 10 
+inner_radius, outer_radius = 20. , 50.
+Nt, Nr = 80, 20 
 Ne = Nt * Nr
-disp = .25
+disp = 10
 nFrames = 100
 thickness = 1.
-E  = 1. * np.ones(Ne) # Young's modulus
+E  = 120000. * np.ones(Ne) # Young's modulus
 nu = .3 * np.ones(Ne) # Poisson's ratio
-sy_mean = .01
-sy = np.random.rayleigh(sy_mean, Ne)
+Ssat =1000 * np.ones(Ne)
+n = 200 * np.ones(Ne)
+sy_mean = 200.
+
+ray_param = sy_mean/1.253314
+sy = np.random.rayleigh(ray_param, Ne)
 labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
-material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i]) for i in xrange(Ne)]
+material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
 
 workdir = "workdir/"
 label = "ringCompression"
-elType = "CPS4"
+elType = "CPE4"
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
-
+if node ==  'epua-pd47': 
+  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
 
 
 
