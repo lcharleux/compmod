@@ -23,8 +23,10 @@ if node ==  'lcharleux':
 if node ==  'serv2-ms-symme': 
   abqlauncher   = '/opt/abaqus/Commands/abaqus' # Local machine configuration
 if node ==  'epua-pd47': 
-  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe'
-compart = False
+  abqlauncher   = 'C:\SIMULIA\Abaqus\6.13-1'
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
+compart = True
 
 
 if compart:
@@ -121,5 +123,3 @@ if m.outputs['completed']:
   plt.xlabel('$x$')
   plt.ylabel('$y$')
   plt.savefig(workdir + label + '_fields.pdf')
-
-
