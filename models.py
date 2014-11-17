@@ -3,7 +3,7 @@ from abapy.mesh import RegularQuadMesh
 from abapy.materials import VonMises, Hollomon
 from abapy.misc import load
 import numpy as np
-import os, time, subprocess, pickle
+import os, time, subprocess, pickle, copy
 
 
 class Simulation(object):
@@ -68,7 +68,7 @@ class CuboidTest(Simulation):
   Performs various tests on cuboids
   """
   def __init__(self, **kwargs):
-    defaultArgs = {"Nx":10, "Ny":10, "lx":1., "ly":1., "disp":.25, "thickness":1.}
+    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25}
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     super(CuboidTest, self).__init__(**kwargs)
@@ -102,7 +102,7 @@ class CuboidTest(Simulation):
 ** BOUNDARY CONDITIONS
 *Boundary
 iSample.Bottom, 2, 2
-iSample.BottomLeft, 1, 1
+iSample.BottomLeft, 1, 1#3DBOUNDARY
 iSample.Top,    2, 2, #DISP
 ** RESTART OPTIONS 
 *Restart, write, frequency=0
@@ -129,13 +129,16 @@ EVOL
 *End Step
   """
     
-    Nx , Ny = self.Nx, self.Ny
-    lx, ly = self.lx, self.ly
+    Nx , Ny, Nz = self.Nx, self.Ny, self.Nz
+    lx, ly, lz = self.lx, self.ly, self.lz
     elType = self.elType
     material = self.material
     disp = self.disp
     nFrames = self.nFrames
-    Ne = Nx * Ny
+    if self.is_3D:
+      Ne = Nx * Ny * Nz
+    else:  
+      Ne = Nx * Ny
     sections = ""
     matinp = ""
     if self.compart:
@@ -147,15 +150,24 @@ EVOL
     else:
       section_pattern = "*SOLID SECTION, ELSET = ALLELEMENTS, MATERIAL = {0}\n{1}"  
       label = material.labels[0]
-      sections = section_pattern.format(label, self.thickness)
+      sections = section_pattern.format(label, self.lz)
       matinp = material.dump2inp() 
     m = RegularQuadMesh(Nx, Ny, l1= lx, l2 = ly, name = elType)
     m.add_set(label = "AllElements", elements = m.labels)
+    nsets = copy.copy(m.nodes.sets) 
+    if self.is_3D: 
+       m = m.extrude(N = Nz, l = lz)
+       m.nodes.sets['bottomleft'] = nsets['bottomleft']
+       m.nodes.sets['bottomright'] = nsets['bottomright']
     pattern = pattern.replace("#MESH", m.dump2inp())
     pattern = pattern.replace("#SECTIONS", sections[:-1])
     pattern = pattern.replace("#MATERIALS", matinp[:-1])
     pattern = pattern.replace("#DISP", str(disp))
     pattern = pattern.replace("#FRAME_DURATION", str(1./nFrames))
+    if self.is_3D:
+      pattern = pattern.replace("#3DBOUNDARY", "\niSample.BottomLeft, 3, 3\niSample.BottomRight, 3, 3")
+    else:  
+      pattern = pattern.replace("#3DBOUNDARY", "")
     f = open(self.workdir + self.label + '.inp', 'wb')
     f.write(pattern)
     f.close()
