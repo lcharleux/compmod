@@ -468,11 +468,11 @@ ALLSE
 *NODE OUTPUT, NSET=I_PLATE.REFNODE
 RF2, U2
 *END STEP"""
-    Nr , Nt = self.Nr, self.Nt
+    Nr , Nt, Na = self.Nr, self.Nt, self.Na
     if self.is_3D:
-      Ne = Nx * Ny * Nz
+      Ne = Nr * Nt * Na
     else:  
-      Ne = Nx * Ny
+      Ne = Nr * Nt
     material = self.material
     sections = ""
     matinp = ""

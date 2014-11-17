@@ -1,5 +1,5 @@
 from compmod.models import RingCompression
-from abapy.materials import Hollomon
+from abapy import materials
 from abapy.misc import load
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,18 +7,26 @@ import pickle, copy
 import platform
 
 #PAREMETERS
-inner_radius, outer_radius = 1. , 2.
-Nt, Nr, Na = 5, 5, 5 
-disp = .25
+inner_radius, outer_radius = 45.18 , 50.36
+Nt, Nr, Na = 10, 2, 4 
+Ne = Nt * Nr * Na
+disp = 10
 nFrames = 100
-sy = .01
-E = 1.
-nu = .3
-n = .1
-thickness = 1.
+thickness = 20.02
+E  = 120000. * np.ones(Ne) # Young's modulus
+nu = .3 * np.ones(Ne) # Poisson's ratio
+Ssat =1000 * np.ones(Ne)
+n = 200 * np.ones(Ne)
+sy_mean = 200.
+
+ray_param = sy_mean/1.253314
+sy = np.random.rayleigh(ray_param, Ne)
+labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
+material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
+
 workdir = "workdir/"
-label = "ringCompression"
-elType = "CPS4"
+label = "ringCompression3DCompart"
+elType = "CPE4"
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -32,10 +40,7 @@ run_sim = True
 plot = True
 
 #MODEL DEFINITION
-material = Hollomon(
-  labels = "SAMPLE_MAT",
-  E = E, nu = nu,
-  sy = sy, n = n)
+
 m = RingCompression( material = material , 
   inner_radius = inner_radius, 
   outer_radius = outer_radius, 
@@ -49,6 +54,7 @@ m = RingCompression( material = material ,
   label = label, 
   elType = elType,
   abqlauncher = abqlauncher,
+  compart = True,
   is_3D = True)
 
 # SIMULATION
