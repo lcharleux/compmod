@@ -11,9 +11,11 @@ class Simulation(object):
   Numerical model meta class.
   """
   def __init__(self, **kwargs):
-    defaultArgs = {"abqlauncher":None, "material": VonMises(), "label": "simulation",  "workdir": "", "compart":False, "nFrames": 100, "elType": "CPS4"}
+    defaultArgs = {"abqlauncher":None, "material": VonMises(), "label": "simulation",  "workdir": "", "compart":False, "nFrames": 100, "elType": "CPS4", "is_3D": False}
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
+    if self.is_3D: 
+      self.elType = 'C3D8'
     
   def Run(self, deleteOldFiles = True):
     '''
@@ -306,13 +308,16 @@ class RingCompression(Simulation):
     :type Nr: int
     :param Nt: Number of elements in the orthoradial direction
     :type Nt: int
+    :param Na: Number of elements in the axial direction. Used only if the is_3D option is active.
+    :type Na: int
     """
     defaultArgs = {
       "inner_radius": 1., 
       "inner_radius": 2.,  
       "thickness": 1.,
       "Nr":10, 
-      "Nt":10, 
+      "Nt":10,
+      "Na":10, 
       "disp": .5,
       }
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
@@ -321,12 +326,16 @@ class RingCompression(Simulation):
     
   def MakeMesh(self):
     """
+    Builds the mesh
     """
     Ri = self.inner_radius
     Ro = self.outer_radius
-    mesh = RegularQuadMesh(self.Nt, self.Nr, .25, Ro - Ri, name = self.elType)
+    thickness = self.thickness
+    Nr, Nt, Na = self.Nr, self.Nt, self.Na
+    mesh = RegularQuadMesh(Nt, Nr, .25, Ro - Ri, name = self.elType)
     mesh.nodes.add_set_by_func('left_nodes', lambda x, y, z, labels: x == 0.)
     mesh.nodes.add_set_by_func('right_nodes', lambda x, y, z, labels: x == .25)
+       
     def function(x, y, z, labels):
       theta = 2 * np.pi * (.25 - x)
       r = y + Ri
@@ -338,13 +347,14 @@ class RingCompression(Simulation):
     mesh.nodes.apply_displacement(vectorField)
     nodes = mesh.nodes
     for i in xrange(len(nodes.labels)):
-      if nodes.x[i] < 0.: nodes.x[i] = 0. 
-    Nr, Nt = self.Nr, self.Nt
-    Ne = Nt * Nr
+      if nodes.x[i] < 0.: 
+        nodes.x[i] = 0. 
+    
     mesh.add_set('all_elements', mesh.labels)
     mesh.add_set('surface_elements',range( Nt * (Nr-1)+1, Nt*Nr+1  ))
     mesh.add_surface('surface_faces',[ ('surface_elements',3) ])
-    
+    if self.is_3D:
+       mesh = mesh.extrude(N = Na, l = thickness, mapping = {self.elType: self.elType})  
     self.mesh = mesh
   
   def MakeInp(self):
@@ -373,7 +383,7 @@ class RingCompression(Simulation):
 *INSTANCE, NAME = I_PLATE, PART= P_PLATE
 *NODE, NSET=REFNODE
   1, 0., 0., 0.
-*SURFACE, TYPE=SEGMENTS, NAME=SURFACE
+*SURFACE, TYPE=#SURFTYPE, NAME=SURFACE
   START, #OUTER_RADIUS, #OUTER_RADIUS
   LINE,  0., #OUTER_RADIUS         
 *RIGID BODY, REF NODE=REFNODE, ANALYTICAL SURFACE=SURFACE
@@ -470,6 +480,10 @@ RF2, U2
     pattern = pattern.replace('#FRAME_DURATION', str(1. / self.nFrames))
     pattern = pattern.replace('#SECTIONS', sections)
     pattern = pattern.replace('#MATERIALS', matinp)
+    if self.is_3D: 
+      pattern = pattern.replace('#SURFTYPE', "CYLINDER")
+    else:
+      pattern = pattern.replace('#SURFTYPE', "SEGMENTS")  
     f =open(self.workdir + self.label + ".inp", 'w')
     f.write(pattern)
     f.close()
