@@ -469,7 +469,10 @@ ALLSE
 RF2, U2
 *END STEP"""
     Nr , Nt = self.Nr, self.Nt
-    Ne = Nr * Nt
+    if self.is_3D:
+      Ne = Nx * Ny * Nz
+    else:  
+      Ne = Nx * Ny
     material = self.material
     sections = ""
     matinp = ""
