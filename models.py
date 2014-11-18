@@ -97,8 +97,8 @@ class CuboidTest(Simulation):
 **----------------------------------
 ** STEPS
 *Step, Name=Loading0, Nlgeom=YES, Inc=1000000
-*Static, direct
-#FRAME_DURATION, 1.
+*Static
+#FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
 ** BOUNDARY CONDITIONS
 *Boundary
 iSample.Bottom, 2, 2
