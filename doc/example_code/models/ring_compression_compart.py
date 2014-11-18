@@ -54,6 +54,7 @@ m = RingCompression( material = material ,
   label = label, 
   elType = elType,
   abqlauncher = abqlauncher,
+  cpus = cpus,
   compart = True)
 
 # SIMULATION
