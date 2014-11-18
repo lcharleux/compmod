@@ -15,9 +15,9 @@ node = platform.node()
 settings = {}
 settings['file_name'] = 'test_exp.txt'
 settings['inner_radius'], settings['outer_radius'] = 45.18 , 50.36
-settings['Nt'], settings['Nr'] = 80, 8
-settings['Ne'] =  settings['Nt']*settings['Nr']
-settings['displacement'] = 45.
+settings['Nt'], settings['Nr'], settings['Na'] = 40, 5, 10
+settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
+settings['displacement'] = 35.
 settings['nFrames'] = 100
 settings['E'] = 74.e3 * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
@@ -25,15 +25,16 @@ settings['iteration'] = 10
 settings['thickness'] = 20.02
 
 
-if node ==  'lcharleux':      
-  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
-  workdir = "workdir/"
+if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
+if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
-  workdir = "workdir/"
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+workdir = "workdir/"
 label = "ringCompressionOptiCompart"
 elType = "CPS4"
-cpus = 1
+cpus = 12
 
 
 
@@ -82,6 +83,7 @@ class Simulation(object):
     nFrames = self.settings['nFrames']
     Nr = self.settings['Nr']
     Nt = self.settings['Nt']
+    Na = self.settings['Na']
     Ne = self.settings['Ne']
     thickness = self.settings['thickness']
     
@@ -110,6 +112,7 @@ class Simulation(object):
       elType = elType,
       abqlauncher = abqlauncher,
       cpus = cpus,
+      is_3D = True,
       compart = True)
   
     # SIMULATION
@@ -190,7 +193,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(1000., 200., 200., settings)
+O = Opti(1100., 220., 180., settings)
 O.Optimize()
 
 
@@ -205,7 +208,7 @@ for i in range(1, settings['iteration']):
 #plt.plot(disp.data[1], force.data[1], 'b-', label = 'Unloading', linewidth = 2.)  
 plt.legend(loc="upper left")
 plt.grid()
-plt.xlabel('Diplacement, $U$')
+plt.xlabel('Displacement, $U$')
 plt.ylabel('Force, $F$')
 plt.savefig(workdir + label + '_load-vs-disp.pdf')
 

@@ -125,7 +125,7 @@ if outputs['completed']:
   plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
   plt.legend(loc="upper left")
   plt.grid()
-  plt.xlabel('Diplacement, $U$')
+  plt.xlabel('Displacement, $U$')
   plt.ylabel('Force, $F$')
   plt.savefig(workdir + label + '_load-vs-disp.pdf')
   
