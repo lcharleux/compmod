@@ -31,6 +31,7 @@ if node ==  'epua-pd47':
   workdir = "D:/Simulations/Dossier_travail_Abaqus/"
 label = "ringCompressionOpti"
 elType = "CPS4"
+cpus = 1
 
 
 def read_file(file_name):
@@ -93,7 +94,8 @@ class Simulation(object):
       workdir = workdir,
       label = label, 
       elType = elType,
-      abqlauncher = abqlauncher)
+      abqlauncher = abqlauncher,
+      cpus = cpus)
   
     # SIMULATION
     m.MakeMesh()

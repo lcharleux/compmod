@@ -11,7 +11,7 @@ class Simulation(object):
   Numerical model meta class.
   """
   def __init__(self, **kwargs):
-    defaultArgs = {"abqlauncher":None, "material": VonMises(), "label": "simulation",  "workdir": "", "compart":False, "nFrames": 100, "elType": "CPS4", "is_3D": False}
+    defaultArgs = {"abqlauncher":None, "material": VonMises(), "label": "simulation",  "workdir": "", "compart":False, "nFrames": 100, "elType": "CPS4", "is_3D": False, "cpus" : 1}
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     if self.is_3D: 
@@ -24,7 +24,7 @@ class Simulation(object):
     if deleteOldFiles: self.DeleteOldFiles()
     t0 = time.time()
     print '< Running simulation {0} in Abaqus>'.format(self.label) 
-    p = subprocess.Popen( '{0} job={1} input={1}.inp interactive'.format(self.abqlauncher, self.label), cwd = self.workdir, shell=True, stdout = subprocess.PIPE)
+    p = subprocess.Popen( '{0} job={1} input={1}.inp cpus={2} interactive'.format(self.abqlauncher, self.label, self.cpus), cwd = self.workdir, shell=True, stdout = subprocess.PIPE)
     trash = p.communicate()
     print trash[0]
     t1 = time.time()
@@ -468,11 +468,11 @@ ALLSE
 *NODE OUTPUT, NSET=I_PLATE.REFNODE
 RF2, U2
 *END STEP"""
-    Nr , Nt = self.Nr, self.Nt
+    Nr , Nt, Na = self.Nr, self.Nt, self.Na
     if self.is_3D:
-      Ne = Nx * Ny * Nz
+      Ne = Nr * Nt * Na
     else:  
-      Ne = Nx * Ny
+      Ne = Nr * Nt
     material = self.material
     sections = ""
     matinp = ""
