@@ -26,6 +26,7 @@ material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = 
 
 workdir = "workdir/"
 label = "ringCompression"
+cpus = 2
 elType = "CPE4"
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
