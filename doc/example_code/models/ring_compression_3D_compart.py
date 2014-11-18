@@ -8,7 +8,7 @@ import platform
 
 #PAREMETERS
 inner_radius, outer_radius = 45.18 , 50.36
-Nt, Nr, Na = 10, 2, 4 
+Nt, Nr, Na = 20, 4, 8 
 Ne = Nt * Nr * Na
 disp = 10
 nFrames = 100
@@ -27,6 +27,7 @@ material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = 
 workdir = "workdir/"
 label = "ringCompression3DCompart"
 elType = "CPE4"
+cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -54,6 +55,7 @@ m = RingCompression( material = material ,
   label = label, 
   elType = elType,
   abqlauncher = abqlauncher,
+  cpus = cpus,
   compart = True,
   is_3D = True)
 

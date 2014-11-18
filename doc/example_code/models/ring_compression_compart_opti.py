@@ -33,6 +33,7 @@ if node ==  'epua-pd47':
   workdir = "workdir/"
 label = "ringCompressionOptiCompart"
 elType = "CPS4"
+cpus = 1
 
 
 
@@ -108,6 +109,7 @@ class Simulation(object):
       label = label, 
       elType = elType,
       abqlauncher = abqlauncher,
+      cpus = cpus,
       compart = True)
   
     # SIMULATION

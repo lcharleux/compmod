@@ -17,6 +17,7 @@ nFrames = 20
 workdir = "workdir/"
 label = "cuboidTest"
 elType = "CPE4"
+cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
@@ -43,7 +44,7 @@ else:
   labels = 'SAMPLE_MAT'
   material = materials.VonMises(labels = labels, E = E, nu = nu, sy = sy)
 
-m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True)
+m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus =cpus, material = material, compart = compart, disp = disp, elType = elType, is_3D = True)
 
 m.MakeInp()
 m.Run()

@@ -19,6 +19,7 @@ thickness = 1.
 workdir = "workdir/"
 label = "ringCompression"
 elType = "CPS4"
+cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -45,6 +46,7 @@ m = RingCompression( material = material ,
   workdir = workdir,
   label = label, 
   elType = elType,
+  cpus = cpus,
   abqlauncher = abqlauncher)
 
 # SIMULATION
