@@ -7,19 +7,19 @@ import pickle, copy
 import platform
 
 #PAREMETERS
-inner_radius, outer_radius = 1. , 2.
-Nt, Nr, Na = 5, 5, 5 
-disp = .25
+inner_radius, outer_radius = 45.18 , 50.36
+Nt, Nr, Na = 80, 8, 20 
+disp = 35.
 nFrames = 100
-sy = .01
-E = 1.
+sy = 150.
+E = 74000.
 nu = .3
 n = .1
-thickness = 1.
+thickness =20.02
 workdir = "workdir/"
 label = "ringCompression"
-elType = "CPS4"
-cpus = 1
+elType = "CPE4"
+cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux

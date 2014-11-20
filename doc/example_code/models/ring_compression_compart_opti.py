@@ -21,7 +21,7 @@ settings['displacement'] = 35.
 settings['nFrames'] = 100
 settings['E'] = 74.e3 * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
-settings['iteration'] = 10
+settings['iteration'] =10
 settings['thickness'] = 20.02
 
 
@@ -34,7 +34,7 @@ if node ==  'SERV3-MS-SYMME':
 workdir = "workdir/"
 label = "ringCompressionOptiCompart"
 elType = "CPS4"
-cpus = 12
+cpus = 6
 
 
 
@@ -193,7 +193,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(1100., 220., 180., settings)
+O = Opti(800., 200., 200., settings)
 O.Optimize()
 
 
@@ -202,7 +202,9 @@ plt.clf()
 
 plt.plot(O.disp, O.force_exp, 'k-', label = 'experimental curve', linewidth = 2.)
 plt.plot(O.disp, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
-plt.plot(O.disp, O.force_sim[-1], 'r-', label = 'optimized curve', linewidth = 2.)
+a = O.err
+index = np.argmin(a)
+plt.plot(O.disp, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
 for i in range(1, settings['iteration']):
   plt.plot(O.disp, O.force_sim[i], 'b-', linewidth = .2)
 #plt.plot(disp.data[1], force.data[1], 'b-', label = 'Unloading', linewidth = 2.)  

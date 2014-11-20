@@ -17,10 +17,10 @@ settings['file_name'] = 'test_exp.txt'
 settings['inner_radius'], settings['outer_radius'] = 45.18 , 50.36
 settings['Nt'], settings['Nr'] = 80, 8 
 settings['displacement'] = 45.
-settings['nFrames'] = 10000
+settings['nFrames'] = 100
 settings['E'] = 74.e3
 settings['nu'] = .3
-settings['iteration'] = 10
+settings['iteration'] = 15
 settings['thickness'] = 20.02
 
 if node ==  'lcharleux':      
@@ -30,8 +30,8 @@ if node ==  'epua-pd47':
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
   workdir = "D:/Simulations/Dossier_travail_Abaqus/"
 label = "ringCompressionOpti"
-elType = "CPS4"
-cpus = 1
+elType = "CPE4"
+cpus = 6
 
 
 def read_file(file_name):
@@ -170,7 +170,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(100., 0.1, settings)
+O = Opti(130., 0.1, settings)
 O.Optimize()
 
 
@@ -179,13 +179,15 @@ plt.clf()
 
 plt.plot(O.disp, O.force_exp, 'k-', label = 'experimental curve', linewidth = 2.)
 plt.plot(O.disp, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
-plt.plot(O.disp, O.force_sim[-1], 'r-', label = 'optimized curve', linewidth = 2.)
+a = O.err
+index = np.argmin(a)
+plt.plot(O.disp, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
 for i in range(1, settings['iteration']):
   plt.plot(O.disp, O.force_sim[i], 'b-', linewidth = .2)
 #plt.plot(disp.data[1], force.data[1], 'b-', label = 'Unloading', linewidth = 2.)  
-plt.legend(loc="upper left")
+plt.legend(loc="lower right")
 plt.grid()
-plt.xlabel('Diplacement, $U$')
+plt.xlabel('Displacement, $U$')
 plt.ylabel('Force, $F$')
 plt.savefig(workdir + label + '_load-vs-disp.pdf')
 
