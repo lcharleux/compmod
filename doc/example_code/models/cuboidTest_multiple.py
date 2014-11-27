@@ -12,9 +12,9 @@ from scipy import interpolate
 
 
 #PARAMETERS
-Ns = 20 # Number of simulations to run
+Ns = 8 # Number of simulations to run
 lx, ly = 1., 1.
-Nx, Ny = 40, 40 
+Nx, Ny = 32, 32 
 Ne = Nx * Ny
 disp = .1
 nFrames = 20
