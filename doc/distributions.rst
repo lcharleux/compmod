@@ -1,4 +1,5 @@
 Distributions
 ================
 
-It's empty here...
+.. autofunction:: compmod.distributions.Triangular
+
