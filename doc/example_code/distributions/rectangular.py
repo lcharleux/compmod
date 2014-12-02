@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov 28 13:22:39 2014
 
-@author: issackm
-"""
 import numpy as np
 import matplotlib.pyplot as plt
 from compmod.distributions import Rectangular
@@ -19,7 +14,6 @@ plt.figure()
 plt.clf()
 plt.hist(data, bins = int(N**.5), histtype='step', normed = True, label = "Generated Random Numbers")
 
-plt.plot(x,y, "g-", label = "Probability Density Function")
+plt.plot(x,y, "r-", label = "Probability Density Function")
 plt.grid()
 plt.legend(loc = "best")
-plt.show()
