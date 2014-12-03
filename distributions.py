@@ -54,4 +54,11 @@ def Rectangular(mean = 1., stdev = 1.):
    width = np.sqrt(3) * stdev 
    return stats.uniform(loc = mean - width, scale = 2.*width)
    
+def Rayleigh(mean = 1):
+   """
+   A Rayleigh distribution
    
+   ...
+   """
+   return stats.rayleigh(mean-1)
+      
