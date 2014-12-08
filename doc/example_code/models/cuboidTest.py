@@ -14,8 +14,8 @@ Nx, Ny = 20, 20
 Ne = Nx * Ny
 disp = .1
 nFrames = 20
-workdir = "workdir/"
-label = "cuboidTest"
+workdir = "D:\donnees_pyth/workdir/"
+label = "cuboidTest2D"
 elType = "CPE4"
 cpus = 1
 node = platform.node()
@@ -54,10 +54,7 @@ m.RunPostProc()
 
 # Plotting results
 if m.outputs['completed']:
-  
-
-  # History Outputs
-  disp =  np.array(m.outputs['history']['disp'].values()[0].data[0])
+    disp =  np.array(m.outputs['history']['disp'].values()[0].data[0])
   force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
   volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
   length = ly + disp

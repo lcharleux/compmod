@@ -1,3 +1,7 @@
+'''
+Models
+=========
+'''
 # A repository for compartmentalized models compatible simulation models.
 from abapy.mesh import RegularQuadMesh
 from abapy.materials import VonMises, Hollomon
@@ -66,9 +70,82 @@ class Simulation(object):
 class CuboidTest(Simulation):
   """
   Performs various tests on cuboids
+    :param E: Young's modulus.
+    :type E: float, list, array.array
+    :param nu: Poisson's ratio.
+    :type nu: float, list, array.array
+    :param sy: Yield stress.
+    :type sy: float, list, array.array
+    
+  .. note:: 
+     All inputs must have the same length or an exception will be raised.
+         
   """
   def __init__(self, **kwargs):
     defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25}
+    '''
+    >>> from compmod.models import CuboidTest
+    >>> from abapy import materials
+    >>> from abapy.misc import load
+    >>> import matplotlib.pyplot as plt
+    >>> import numpy as np
+    >>> import pickle, copy
+    >>> import platform
+    >>> lx, ly = 1., 1.
+    >>> Nx, Ny = 20, 20 
+    >>> Ne = Nx * Ny
+    >>> disp = .1
+    >>> nFrames = 20
+    >>> workdir = "D:\donnees_pyth/workdir/"
+    >>> label = "cuboidTest2D"
+    >>> elType = "CPE4"
+    >>> cpus = 1
+    >>> node = platform.node()
+    >>> if node ==  'epua-pd45': 
+    ...   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
+    ... 
+    >>> compart = True
+    >>> if compart:
+    ...   E  = 1. * np.ones(Ne) # Young's modulus
+    ...   nu = .3 * np.ones(Ne) # Poisson's ratio
+    ...   sy_mean = .01
+    ...   sy = np.random.rayleigh(sy_mean, Ne)
+    ...   labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
+    ...   material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i]) for i in xrange(Ne)]
+    ... 
+    >>> m = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType)
+    >>> m.MakeInp()
+    >>> m.Run()
+    < Running simulation cuboidTest2D in Abaqus>
+    >>> m.MakePostProc()
+    >>> m.RunPostProc()
+    >>> if m.outputs['completed']:
+    ...     disp =  np.array(m.outputs['history']['disp'].values()[0].data[0])
+    ...     force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
+    ...     volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
+    ...     length = ly + disp
+    ...     surface = volume / length
+    ...     logstrain = np.log10(1. + disp / ly)
+    ...     linstrain = disp/ly
+    ...     strain = linstrain
+    ...     stress = force / surface 
+    ...    
+    ...     fig = plt.figure(0)
+    ...     plt.clf()
+    ...     sp1 = fig.add_subplot(2, 1, 1)
+    ...     plt.plot(disp, force, 'ok-')
+    ...     plt.xlabel('Displacement, $U$')
+    ...     plt.ylabel('Force, $F$')
+    ...     plt.grid()
+    ...     sp1 = fig.add_subplot(2, 1, 2)
+    ...     plt.plot(strain, stress, 'ok-')
+    ...     plt.xlabel('Tensile Strain, $\epsilon$')
+    ...     plt.ylabel(' Tensile Stress $\sigma$')
+    ...     plt.grid()
+    ...     plt.savefig(workdir + label + 'history.pdf')
+    ... 
+    
+    '''
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     super(CuboidTest, self).__init__(**kwargs)
@@ -128,7 +205,7 @@ COOR1
 EVOL
 *End Step
   """
-    
+   
     Nx , Ny, Nz = self.Nx, self.Ny, self.Nz
     lx, ly, lz = self.lx, self.ly, self.lz
     elType = self.elType
@@ -171,7 +248,7 @@ EVOL
     f = open(self.workdir + self.label + '.inp', 'wb')
     f.write(pattern)
     f.close()
-
+   
   def MakePostProc(self):
     """
     Makes the post-proc script

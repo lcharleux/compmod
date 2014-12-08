@@ -56,9 +56,24 @@ def Rectangular(mean = 1., stdev = 1.):
    
 def Rayleigh(mean = 1):
    """
-   A Rayleigh distribution
-   
-   ...
+   A Rayleigh distribution function that returns a frozen distribution of the `scipy.stats.rv_continuous <http://http://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.rayleigh.html#scipy.stats.rayleigh.html>`_ class.
+
+    :param mean: mean value
+    :type mean: float
+    :rtype: scipy.stats.rv_continuous instance
+
+
+    >>> import compmod 
+    >>> ray = compmod.distributions.Rayleigh
+    >>> ray = compmod.distributions.Rayleigh(5.)
+    >>> ray.rvs(15)
+    array([ 4.46037568,  4.80288465,  5.37309281,  4.80523501,  5.39211872,
+        4.50159587,  4.99945365,  4.96324001,  5.48935765,  6.3571905 ,
+        5.01412849,  4.37768037,  5.99915989,  4.71909481,  5.25259294])
+        
+        
+    .. plot:: example_code/distributions/rayleigh.py
+     :include-source:
    """
    return stats.rayleigh(mean-1)
       
