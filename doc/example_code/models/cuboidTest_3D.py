@@ -10,11 +10,11 @@ import platform
 
 #PARAMETERS
 lx, ly, lz = 1., 1., 1.
-Nx, Ny, Nz = 10, 10, 10 
+Nx, Ny, Nz = 10, 10, 25 
 Ne = Nx * Ny * Nz
 disp = .1
 nFrames = 20
-workdir = "workdir/"
+workdir = "D:\donnees_pyth/workdir/"
 label = "cuboidTest"
 elType = "CPE4"
 cpus = 1

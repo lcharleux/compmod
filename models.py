@@ -79,73 +79,29 @@ class CuboidTest(Simulation):
     
   .. note:: 
      All inputs must have the same length or an exception will be raised.
-         
+
+  Let see the results of a simulation with 2500 elements and try to compare with the next
+  
+  .. plot:: example_code/models/cuboidTest.py
+     :include-source:
+     
+  Try to see the results of a simulation (displacement curves and shape of the tensile stress/ tensile strain) 2500 elements of a sudden and comparing with the results of a simulation 625 elements (tensile stress/strain curves)launched 4 times.   
+
+  cuboidTest_multiple
+  
+  .. plot:: example_code/models/cuboidTest_multiple.py
+     :include-source:
+     
+  Then, we can make a second script that is made to work in 3D with 2500 elements
+  
+  cuboidTest_3D
+    
+  .. plot:: example_code/models/cuboidTest_3D.py
+     :include-source:
+ 
   """
   def __init__(self, **kwargs):
     defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25}
-    '''
-    >>> from compmod.models import CuboidTest
-    >>> from abapy import materials
-    >>> from abapy.misc import load
-    >>> import matplotlib.pyplot as plt
-    >>> import numpy as np
-    >>> import pickle, copy
-    >>> import platform
-    >>> lx, ly = 1., 1.
-    >>> Nx, Ny = 20, 20 
-    >>> Ne = Nx * Ny
-    >>> disp = .1
-    >>> nFrames = 20
-    >>> workdir = "D:\donnees_pyth/workdir/"
-    >>> label = "cuboidTest2D"
-    >>> elType = "CPE4"
-    >>> cpus = 1
-    >>> node = platform.node()
-    >>> if node ==  'epua-pd45': 
-    ...   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
-    ... 
-    >>> compart = True
-    >>> if compart:
-    ...   E  = 1. * np.ones(Ne) # Young's modulus
-    ...   nu = .3 * np.ones(Ne) # Poisson's ratio
-    ...   sy_mean = .01
-    ...   sy = np.random.rayleigh(sy_mean, Ne)
-    ...   labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
-    ...   material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i]) for i in xrange(Ne)]
-    ... 
-    >>> m = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType)
-    >>> m.MakeInp()
-    >>> m.Run()
-    < Running simulation cuboidTest2D in Abaqus>
-    >>> m.MakePostProc()
-    >>> m.RunPostProc()
-    >>> if m.outputs['completed']:
-    ...     disp =  np.array(m.outputs['history']['disp'].values()[0].data[0])
-    ...     force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
-    ...     volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
-    ...     length = ly + disp
-    ...     surface = volume / length
-    ...     logstrain = np.log10(1. + disp / ly)
-    ...     linstrain = disp/ly
-    ...     strain = linstrain
-    ...     stress = force / surface 
-    ...    
-    ...     fig = plt.figure(0)
-    ...     plt.clf()
-    ...     sp1 = fig.add_subplot(2, 1, 1)
-    ...     plt.plot(disp, force, 'ok-')
-    ...     plt.xlabel('Displacement, $U$')
-    ...     plt.ylabel('Force, $F$')
-    ...     plt.grid()
-    ...     sp1 = fig.add_subplot(2, 1, 2)
-    ...     plt.plot(strain, stress, 'ok-')
-    ...     plt.xlabel('Tensile Strain, $\epsilon$')
-    ...     plt.ylabel(' Tensile Stress $\sigma$')
-    ...     plt.grid()
-    ...     plt.savefig(workdir + label + 'history.pdf')
-    ... 
-    
-    '''
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     super(CuboidTest, self).__init__(**kwargs)

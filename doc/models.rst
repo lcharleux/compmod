@@ -10,3 +10,7 @@ cuboidTest
 
 
 .. automethod:: compmod.models.CuboidTest.MakeInp
+
+
+
+.. automethod:: compmod.models.CuboidTest.MakePostProc

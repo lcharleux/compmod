@@ -10,12 +10,12 @@ import platform
 
 #PARAMETERS
 lx, ly = 1., 1.
-Nx, Ny = 20, 20 
+Nx, Ny = 50, 50 
 Ne = Nx * Ny
 disp = .1
 nFrames = 20
 workdir = "D:\donnees_pyth/workdir/"
-label = "cuboidTest2D"
+label = "cuboidTest"
 elType = "CPE4"
 cpus = 1
 node = platform.node()
@@ -55,39 +55,39 @@ m.RunPostProc()
 # Plotting results
 if m.outputs['completed']:
     disp =  np.array(m.outputs['history']['disp'].values()[0].data[0])
-  force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
-  volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
-  length = ly + disp
-  surface = volume / length
-  logstrain = np.log10(1. + disp / ly)
-  linstrain = disp/ly
-  strain = linstrain
-  stress = force / surface 
+    force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
+    volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
+    length = ly + disp
+    surface = volume / length
+    logstrain = np.log10(1. + disp / ly)
+    linstrain = disp/ly
+    strain = linstrain
+    stress = force / surface 
    
-  fig = plt.figure(0)
-  plt.clf()
-  sp1 = fig.add_subplot(2, 1, 1)
-  plt.plot(disp, force, 'ok-')
-  plt.xlabel('Displacement, $U$')
-  plt.ylabel('Force, $F$')
-  plt.grid()
-  sp1 = fig.add_subplot(2, 1, 2)
-  plt.plot(strain, stress, 'ok-')
-  plt.xlabel('Tensile Strain, $\epsilon$')
-  plt.ylabel(' Tensile Stress $\sigma$')
-  plt.grid()
-  plt.savefig(workdir + label + 'history.pdf')
+    fig = plt.figure(0)
+    plt.clf()
+    sp1 = fig.add_subplot(2, 1, 1)
+    plt.plot(disp, force, 'ok-')
+    plt.xlabel('Displacement, $U$')
+    plt.ylabel('Force, $F$')
+    plt.grid()
+    sp1 = fig.add_subplot(2, 1, 2)
+    plt.plot(strain, stress, 'ok-')
+    plt.xlabel('Tensile Strain, $\epsilon$')
+    plt.ylabel(' Tensile Stress $\sigma$')
+    plt.grid()
+    plt.savefig(workdir + label + 'history.pdf')
   
   # Field Outputs
    
-  def field_func(outputs, step):
+def field_func(outputs, step):
     """
     A function that defines the scalar field you want to plot
     """
     epsilon = np.array(outputs['field']['LE'][step].get_component(22).data)
     return (epsilon - max_strain) / max_strain
   
-  def plot_mesh(ax, mesh, outputs, step, field_func =None, cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
+def plot_mesh(ax, mesh, outputs, step, field_func =None, cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
     """
     A function that plots the deformed mesh with a given field on it.
     """
@@ -108,16 +108,16 @@ if m.outputs['completed']:
         bar.set_label(cbar_label)
       
   
-  outputs = m.outputs
-  mesh = outputs['mesh']
-  max_strain = strain.max()
-  fig = plt.figure("Fields")
-  plt.clf()
-  ax = fig.add_subplot(1, 1, 1)
-  ax.set_aspect('equal')
-  plt.grid()
-  plot_mesh(ax, mesh, outputs, 0, field_func, cbar_label = r'Relative Tensile Strain, $\frac{\epsilon - \epsilon_{av}}{\epsilon_{av}}$')
+outputs = m.outputs
+mesh = outputs['mesh']
+max_strain = strain.max()
+fig = plt.figure("Fields")
+plt.clf()
+ax = fig.add_subplot(1, 1, 1)
+ax.set_aspect('equal')
+plt.grid()
+plot_mesh(ax, mesh, outputs, 0, field_func, cbar_label = r'Relative Tensile Strain, $\frac{\epsilon - \epsilon_{av}}{\epsilon_{av}}$')
   #plot_mesh(ax, mesh, outputs, 0, field_func = None, cbar = False, disp = False)
-  plt.xlabel('$x$')
-  plt.ylabel('$y$')
-  plt.savefig(workdir + label + '_fields.pdf')
+plt.xlabel('$x$')
+plt.ylabel('$y$')
+plt.savefig(workdir + label + '_fields.pdf')

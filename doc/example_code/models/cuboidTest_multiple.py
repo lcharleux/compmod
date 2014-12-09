@@ -12,13 +12,13 @@ from scipy import interpolate
 
 
 #PARAMETERS
-Ns = 8 # Number of simulations to run
+Ns = 4 # Number of simulations to run
 lx, ly = 1., 1.
-Nx, Ny = 32, 32 
+Nx, Ny = 25, 25 
 Ne = Nx * Ny
 disp = .1
 nFrames = 20
-workdir = "workdir/"
+workdir = "D:\donnees_pyth/workdir/"
 label = "cuboidTest"
 elType = "CPE4"
 cpus = 1
