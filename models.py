@@ -341,7 +341,10 @@ dump(data, file_name+'.pckl')"""
   
 class RingCompression(Simulation):
   """
- Ring compression test.
+ RingCompression_3D compart
+    
+  .. plot:: example_code/models/ring_compression_3D_compart.py
+     :include-source:
   """
   def __init__(self, **kwargs):
     """

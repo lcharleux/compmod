@@ -24,7 +24,7 @@ sy = np.random.rayleigh(ray_param, Ne)
 labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
 material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
 
-workdir = "workdir/"
+workdir = "D:\donnees_pyth/workdir/"
 label = "ringCompression3DCompart"
 elType = "CPE4"
 cpus = 6
@@ -35,6 +35,8 @@ if node ==  'epua-pd47':
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
 
 #TASKS
 run_sim = True
@@ -71,7 +73,7 @@ mesh = m.mesh
 outputs = load(workdir + label + '.pckl')
 
 if outputs['completed']:
-  '''
+  
   # Fields
   def field_func(outputs, step):
     """
@@ -114,11 +116,9 @@ if outputs['completed']:
   plt.xlabel('$x$')
   plt.ylabel('$y$')
   plt.savefig(workdir + label + '_fields.pdf')
-  '''
   # Load vs disp
   force = -2. * outputs['history']['force']
   disp = -2. * outputs['history']['disp']
-  
   fig = plt.figure('Load vs. disp')
   plt.clf()
   plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
