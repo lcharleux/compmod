@@ -99,9 +99,9 @@ class CuboidTest(Simulation):
   .. plot:: example_code/models/cuboidTest_3D.py
      :include-source:
 
-   Models with bilinear Class
+  Models with bilinear Class
 
-   Model CuboidTest with distribution Rayleigh and Bilinear Class
+  Model CuboidTest with distribution Rayleigh and Bilinear Class
    
   .. plot:: example_code/models/Cuboid_Test_3D_Ssat.py
      :include-source:

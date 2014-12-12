@@ -1,17 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 26 09:22:58 2014
-
-@author: issackm
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Nov 25 15:35:38 2014
-
-@author: issackm
-"""
-
 from compmod.models import CuboidTest
 from abapy import materials
 from abapy.misc import load
