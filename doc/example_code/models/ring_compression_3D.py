@@ -8,7 +8,7 @@ import platform
 
 #PAREMETERS
 inner_radius, outer_radius = 45.18 , 50.36
-Nt, Nr, Na = 80, 8, 20 
+Nt, Nr, Na = 40, 8, 16 
 disp = 35.
 nFrames = 100
 sy = 150.
@@ -16,10 +16,10 @@ E = 74000.
 nu = .3
 n = .1
 thickness =20.02
-workdir = "workdir/"
+workdir = "D:\donnees_pyth/workdir/"
 label = "ringCompression"
 elType = "CPE4"
-cpus = 6
+cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -27,7 +27,9 @@ if node ==  'epua-pd47':
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
-
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus' 
+  
 #TASKS
 run_sim = True
 plot = True
@@ -50,7 +52,7 @@ m = RingCompression( material = material ,
   label = label, 
   elType = elType,
   abqlauncher = abqlauncher,
-  cpus =cpus,
+  cpus =1,
   is_3D = True)
 
 # SIMULATION
@@ -65,18 +67,18 @@ mesh = m.mesh
 outputs = load(workdir + label + '.pckl')
 
 if outputs['completed']:
-  '''
+  
   # Fields
   def field_func(outputs, step):
     """
     A function that defines the scalar field you want to plot
     """
     return outputs['field']['S'][step].vonmises()
-  
+  """
   def plot_mesh(ax, mesh, outputs, step, field_func =None, zone = 'upper right', cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
-    """
+    
     A function that plots the deformed mesh with a given field on it.
-    """
+    
     mesh2 = copy.deepcopy(mesh)
     if disp:
       U = outputs['field']['U'][step]
@@ -108,11 +110,10 @@ if outputs['completed']:
   plt.xlabel('$x$')
   plt.ylabel('$y$')
   plt.savefig(workdir + label + '_fields.pdf')
-  '''
+  """
   # Load vs disp
   force = -2. * outputs['history']['force']
   disp = -2. * outputs['history']['disp']
-  
   fig = plt.figure('Load vs. disp')
   plt.clf()
   plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
@@ -122,9 +123,7 @@ if outputs['completed']:
   plt.xlabel('Displacement, $U$')
   plt.ylabel('Force, $F$')
   plt.savefig(workdir + label + '_load-vs-disp.pdf')
-  
-else: 
-  print 'Simulation not completed'
+
 
 
 

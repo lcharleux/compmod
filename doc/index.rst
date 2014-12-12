@@ -6,8 +6,6 @@
 CompMod Documentation
 ===================================
 
-This page is pretty unfinished yet...
-
 Contents:
 
 .. toctree::

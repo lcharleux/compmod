@@ -31,10 +31,12 @@ if node ==  'epua-pd47':
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
-workdir = "workdir/"
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
+workdir = "D:\donnees_pyth/workdir/"
 label = "ringCompressionOptiCompart"
 elType = "CPS4"
-cpus = 6
+cpus = 1
 
 
 

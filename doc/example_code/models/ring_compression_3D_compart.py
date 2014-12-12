@@ -27,7 +27,7 @@ material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = 
 workdir = "D:\donnees_pyth/workdir/"
 label = "ringCompression3DCompart"
 elType = "CPE4"
-cpus = 6
+cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -44,8 +44,7 @@ plot = True
 
 #MODEL DEFINITION
 
-m = RingCompression( material = material , 
-  inner_radius = inner_radius, 
+m = RingCompression( material = material,inner_radius = inner_radius, 
   outer_radius = outer_radius, 
   disp = disp/2,
   thickness = thickness,
@@ -53,11 +52,11 @@ m = RingCompression( material = material ,
   Nr = Nr, 
   Nt = Nt, 
   Na = Na,
-  workdir = workdir,
+  workdir = "D:\donnees_pyth/workdir/",
   label = label, 
   elType = elType,
   abqlauncher = abqlauncher,
-  cpus = cpus,
+  cpus = 1,
   compart = True,
   is_3D = True)
 
@@ -71,7 +70,6 @@ if run_sim:
 # SOME PLOTS
 mesh = m.mesh
 outputs = load(workdir + label + '.pckl')
-
 if outputs['completed']:
   
   # Fields
@@ -80,11 +78,11 @@ if outputs['completed']:
     A function that defines the scalar field you want to plot
     """
     return outputs['field']['S'][step].vonmises()
-  
+  """
   def plot_mesh(ax, mesh, outputs, step, field_func =None, zone = 'upper right', cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
-    """
+    
     A function that plots the deformed mesh with a given field on it.
-    """
+    
     mesh2 = copy.deepcopy(mesh)
     if disp:
       U = outputs['field']['U'][step]
@@ -116,6 +114,8 @@ if outputs['completed']:
   plt.xlabel('$x$')
   plt.ylabel('$y$')
   plt.savefig(workdir + label + '_fields.pdf')
+  
+  """
   # Load vs disp
   force = -2. * outputs['history']['force']
   disp = -2. * outputs['history']['disp']
@@ -129,8 +129,7 @@ if outputs['completed']:
   plt.ylabel('Force, $F$')
   plt.savefig(workdir + label + '_load-vs-disp.pdf')
   
-else: 
-  print 'Simulation not completed'
+
 
 
 

@@ -341,9 +341,16 @@ dump(data, file_name+'.pckl')"""
   
 class RingCompression(Simulation):
   """
- RingCompression_3D compart
+ let see 2 kind of RingCompression , one homogenous and the second compartmentalized
+ 
+ RingCompression_3D
     
-  .. plot:: example_code/models/ring_compression_3D_compart.py
+ .. plot:: example_code/models/ring_compression_3D.py
+     :include-source:
+     
+ RingCompression_3D compartimentalized
+
+ .. plot:: example_code/models/ring_compression_3D_compart.py
      :include-source:
   """
   def __init__(self, **kwargs):
