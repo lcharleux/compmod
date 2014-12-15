@@ -19,10 +19,10 @@ import sys, os, matplotlib
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.append('sphinxext/')
-path = os.path.abspath("")
+path = os.path.abspath("") +"/../../"
 print path
 print os.listdir(path)
-sys.path.append(path+"/../") # import gathernews
+sys.path.append(path) # import gathernews
 
 # -- General configuration -----------------------------------------------------
 
