@@ -19,11 +19,11 @@ import sys, os, matplotlib
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.append('sphinxext/')
-path = os.path.dirname(os.path.realpath(__file__))
-print "GGGHHHHHTHTTT"
+path = os.path.abspath("")
 print path
-print os.getcwd()
-sys.path.append(path + '../')
+print os.lisdir(path)
+sys.path.append(path+"../") # import gathernews
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
