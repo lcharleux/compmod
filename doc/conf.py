@@ -11,23 +11,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+import sys, os, matplotlib
 
-
-if on_rtd: 
-  import mock
-  MOCK_MODULES = [
-    'matplotlib',
-    'matplotlib.pyplot',
-    'scipy.statistics',
-    'scipy.interpolate',
-    'scipy.constants',
-    'scipy.optimize',
-   
-    ]
-  for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
