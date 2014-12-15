@@ -12,8 +12,10 @@
 # serve to show the default.
 
 import sys, os
+
 import mock
- 
+
+
 MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', "matplotlib.sphinxext"]
 for mod_name in MOCK_MODULES:
   sys.modules[mod_name] = mock.Mock()
@@ -38,7 +40,7 @@ extensions = ['sphinx.ext.autodoc',
 'sphinx.ext.viewcode',
 'sphinx.ext.doctest',
 #'matplotlib.sphinxext.mathmpl',
-'matplotlib.sphinxext.only_directives',
+#'matplotlib.sphinxext.only_directives',
 'matplotlib.sphinxext.plot_directive',
 'ipython_directive',
 'sphinx.ext.autodoc',
