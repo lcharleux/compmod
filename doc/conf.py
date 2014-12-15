@@ -19,13 +19,7 @@ import sys, os, matplotlib
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.append('sphinxext/')
-def find(name, path):
-    for root, dirs, files in os.walk(path):
-        if name in dirs:
-            return os.path.join(root, name)
-path = find("compmod", "./")
-print path
-sys.path.append(path) # import gathernews
+sys.path.append("./") 
 
 # -- General configuration -----------------------------------------------------
 
