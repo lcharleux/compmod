@@ -11,8 +11,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 import sys, os
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
 
 if on_rtd: 
   import mock
