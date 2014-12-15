@@ -20,7 +20,7 @@ import sys, os, matplotlib
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append('sphinxext/')
 #sys.path.append("./") 
-print os.listdir("/usr")
+print os.listdir("/home")
 
 # -- General configuration -----------------------------------------------------
 
