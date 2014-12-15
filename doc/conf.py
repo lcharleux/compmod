@@ -23,7 +23,7 @@ def find(name, path):
     for root, dirs, files in os.walk(path):
         if name in dirs:
             return os.path.join(root, name)
-path = find("compmod")
+path = find("compmod", "./")
 sys.path.append(root) # import gathernews
 
 # -- General configuration -----------------------------------------------------
