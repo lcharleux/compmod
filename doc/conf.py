@@ -21,7 +21,7 @@ import sys, os, matplotlib
 sys.path.append('sphinxext/')
 path = os.path.abspath("")
 print path
-print os.lisdir(path)
+print os.listdir(path)
 sys.path.append(path+"../") # import gathernews
 
 # -- General configuration -----------------------------------------------------
