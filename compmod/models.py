@@ -66,6 +66,12 @@ class Simulation(object):
     self.MakePostProc()
     self.RunPostProc()
   
+  def LoadResults(self):
+    """
+    Loads the results from a pickle file.
+    """
+    self.outputs = load(self.workdir + self.label + ".pckl")
+    
     
 class CuboidTest(Simulation):
   """

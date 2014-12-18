@@ -5,3 +5,5 @@
 tests/*
 doc/example_code/models/workdir/*
 doc/_build/*
+
+!/doc/example_code/models/workdir/cuboidTest.pckl

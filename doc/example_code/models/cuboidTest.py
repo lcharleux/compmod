@@ -14,7 +14,7 @@ Nx, Ny = 50, 50
 Ne = Nx * Ny
 disp = .1
 nFrames = 20
-workdir = "D:\donnees_pyth/workdir/"
+workdir = "workdir/"
 label = "cuboidTest"
 elType = "CPE4"
 cpus = 1
@@ -28,7 +28,7 @@ if node ==  'epua-pd47':
 if node ==  'epua-pd45': 
   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
 compart = True
-
+run_simulation = False
 
 if compart:
   E  = 1. * np.ones(Ne) # Young's modulus
@@ -45,12 +45,12 @@ else:
   material = materials.VonMises(labels = labels, E = E, nu = nu, sy = sy)
 
 m = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType)
-
-m.MakeInp()
-m.Run()
-m.MakePostProc()
-
-m.RunPostProc()
+if run_simulation:
+  m.MakeInp()
+  m.Run()
+  m.PostProc()
+else:
+  m.LoadResults()
 
 # Plotting results
 if m.outputs['completed']:
@@ -120,4 +120,5 @@ plot_mesh(ax, mesh, outputs, 0, field_func, cbar_label = r'Relative Tensile Stra
   #plot_mesh(ax, mesh, outputs, 0, field_func = None, cbar = False, disp = False)
 plt.xlabel('$x$')
 plt.ylabel('$y$')
-plt.savefig(workdir + label + '_fields.pdf')
+#plt.savefig(workdir + label + '_fields.pdf')
+plt.show()
