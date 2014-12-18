@@ -64,7 +64,7 @@ if m.outputs['completed']:
     linstrain = disp/ly
     strain = linstrain
     stress = force / surface 
-   
+    """
     fig = plt.figure(0)
     plt.clf()
     sp1 = fig.add_subplot(2, 1, 1)
@@ -78,7 +78,7 @@ if m.outputs['completed']:
     plt.ylabel(' Tensile Stress $\sigma$')
     plt.grid()
     plt.savefig(workdir + label + 'history.pdf')
-  
+    """
   # Field Outputs
    
 def field_func(outputs, step):
