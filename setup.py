@@ -2,18 +2,16 @@ from setuptools import setup
 
 setup(name='compmod',
       version='0.1',
-      description="Oh please please please, let me compile sphinx",
+      description="Compmod project",
       long_description="",
-      author='Ludovic Charleux',
+      author='Ludovic Charleux, Moustapha Issack, Laurent Bizet',
       author_email='ludovic.charleux@univ-savoie.fr',
-      license='GPL',
+      license='GPL v2',
       packages=['compmod'],
       zip_safe=False,
       install_requires=[
           'numpy',
           'scipy'
-          # 'Sphinx',
-          # ^^^ Not sure if this is needed on readthedocs.org
-          # 'something else?',
+          
           ],
       )
