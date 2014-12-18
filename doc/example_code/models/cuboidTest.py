@@ -18,6 +18,7 @@ workdir = "workdir/"
 label = "cuboidTest"
 elType = "CPE4"
 cpus = 1
+abqlauncher = None
 node = platform.node()
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
