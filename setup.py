@@ -11,7 +11,7 @@ setup(name='compmod',
       zip_safe=False,
       install_requires=[
           'numpy',
-          'scipy'
-          
+          'scipy',
+          'matplotlib'
           ],
       )
