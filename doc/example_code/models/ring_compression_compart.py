@@ -7,13 +7,13 @@ import pickle, copy
 import platform
 
 #PAREMETERS
-inner_radius, outer_radius = 45.18 , 50.36
+inner_radius, outer_radius = 20. , 50.
 Nt, Nr = 80, 20 
 Ne = Nt * Nr
-disp = 35
+disp = 10
 nFrames = 100
-thickness = 20.02
-E  = 74000. * np.ones(Ne) # Young's modulus
+thickness = 1.
+E  = 120000. * np.ones(Ne) # Young's modulus
 nu = .3 * np.ones(Ne) # Poisson's ratio
 Ssat =1000 * np.ones(Ne)
 n = 200 * np.ones(Ne)
@@ -27,7 +27,7 @@ material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = 
 workdir = "workdir/"
 label = "ringCompression"
 cpus = 2
-elType = "CPS4"
+elType = "CPE4"
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -122,7 +122,7 @@ if outputs['completed']:
   plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
   plt.legend(loc="upper left")
   plt.grid()
-  plt.xlabel('Displacement, $U$')
+  plt.xlabel('Diplacement, $U$')
   plt.ylabel('Force, $F$')
   plt.savefig(workdir + label + '_load-vs-disp.pdf')
   
