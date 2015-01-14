@@ -54,7 +54,7 @@ def Rectangular(mean = 1., stdev = 1.):
    width = np.sqrt(3) * stdev 
    return stats.uniform(loc = mean - width, scale = 2.*width)
    
-def Rayleigh(mean = 1):
+def Rayleigh(mean = 1.):
    """
    A Rayleigh distribution function that returns a frozen distribution of the `scipy.stats.rv_continuous <http://http://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.rayleigh.html#scipy.stats.rayleigh.html>`_ class.
 
@@ -75,5 +75,5 @@ def Rayleigh(mean = 1):
     .. plot:: example_code/distributions/rayleigh.py
      :include-source:
    """
-   return stats.rayleigh(mean-1)
+   return stats.rayleigh(scale = mean * (2./np.pi)**.5)
       
