@@ -1,4 +1,5 @@
 from compmod.models import CuboidTest
+from compmod.distributions import Triangular 
 from abapy import materials
 from abapy.misc import load
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ import platform
 
 #PARAMETERS
 lx, ly, lz = 1., 1., 1.
-Nx, Ny, Nz = 10, 10, 25 
+Nx, Ny, Nz = 10, 10, 10 
 Ne = Nx * Ny * Nz
 disp = .1
 nFrames = 20
@@ -36,20 +37,18 @@ if compart:
   sy_mean = .01
   sy = np.random.rayleigh(sy_mean, Ne)
   labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
-  material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i]) for i in xrange(Ne)]
+  material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i])for i in xrange(Ne)]
 else:
   E = 1.
   nu =.3
   sy = .01
   labels = 'SAMPLE_MAT'
   material = materials.VonMises(labels = labels, E = E, nu = nu, sy = sy)
-
-m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus =cpus, material = material, compart = compart, disp = disp, elType = elType, is_3D = True)
-
+      
+m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True)
 m.MakeInp()
 m.Run()
 m.MakePostProc()
-
 m.RunPostProc()
 
 # Plotting results
@@ -80,11 +79,12 @@ if m.outputs['completed']:
   plt.ylabel(' Tensile Stress $\sigma$')
   plt.grid()
   plt.savefig(workdir + label + 'history.pdf')
-'''
+  
+  '''
   # Field Outputs
    
   def field_func(outputs, step):
-    """
+    
     A function that defines the scalar field you want to plot
     """
     epsilon = np.array(outputs['field']['LE'][step].get_component(22).data)
