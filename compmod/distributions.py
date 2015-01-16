@@ -51,8 +51,10 @@ def Rectangular(mean = 1., stdev = 1.):
   .. plot:: example_code/distributions/rectangular.py
      :include-source:
    """
-   width = np.sqrt(3) * stdev 
-   return stats.uniform(loc = mean - width, scale = 2.*width)
+   width =  np.sqrt(3.) * stdev
+   a = mean - width
+   b = mean + width
+   return stats.uniform(loc = a, scale = b -a )
    
 def Rayleigh(mean = 1.):
    """
