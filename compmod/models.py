@@ -111,7 +111,6 @@ class CuboidTest(Simulation):
    
   .. plot:: example_code/models/Cuboid_Test_3D_Ssat.py
      :include-source:
- 
   """
   def __init__(self, **kwargs):
     defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25}
@@ -174,7 +173,6 @@ COOR1
 EVOL
 *End Step
   """
-   
     Nx , Ny, Nz = self.Nx, self.Ny, self.Nz
     lx, ly, lz = self.lx, self.ly, self.lz
     elType = self.elType
@@ -183,7 +181,7 @@ EVOL
     nFrames = self.nFrames
     if self.is_3D:
       Ne = Nx * Ny * Nz
-    else:  
+    else:
       Ne = Nx * Ny
     sections = ""
     matinp = ""
@@ -217,7 +215,6 @@ EVOL
     f = open(self.workdir + self.label + '.inp', 'wb')
     f.write(pattern)
     f.close()
-   
   def MakePostProc(self):
     """
     Makes the post-proc script
