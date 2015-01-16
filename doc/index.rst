@@ -14,6 +14,7 @@ Contents:
    models
    materials
    distributions
+   rheology
 
 
 Indices and tables
