@@ -15,7 +15,8 @@ node = platform.node()
 settings = {}
 settings['file_name'] = 'test_exp.txt'
 settings['inner_radius'], settings['outer_radius'] = 45.18 , 50.36
-settings['Nt'], settings['Nr'] = 80, 8 
+settings['Nt'], settings['Nr'], settings['Na'] = 20, 4, 5
+settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
 settings['E'] = 74.e3
@@ -31,7 +32,7 @@ if node ==  'epua-pd47':
   workdir = "D:/Simulations/Dossier_travail_Abaqus/"
 label = "ringCompressionOpti"
 elType = "CPE4"
-cpus = 6
+cpus = 1
 
 
 def read_file(file_name):
@@ -76,26 +77,47 @@ class Simulation(object):
     nFrames = self.settings['nFrames']
     Nr = self.settings['Nr']
     Nt = self.settings['Nt']
+    Na = self.settings['Na']
+    Ne = self.settings['Ne']
     thickness = self.settings['thickness']
     print E, nu, sy, n
+#    material = Hollomon(
+#      labels = "SAMPLE_MAT",
+#      E = E, nu = nu,
+#      sy = sy, n = n)
+#    m = RingCompression(
+#      material = material , 
+#      inner_radius = inner_radius, 
+#      outer_radius = outer_radius, 
+#      disp = disp, 
+#      nFrames = nFrames,
+#      thickness = thickness,
+#      Nr = Nr, 
+#      Nt = Nt, 
+#      workdir = workdir,
+#      label = label, 
+#      elType = elType,
+#      abqlauncher = abqlauncher,
+#      cpus = cpus)
     material = Hollomon(
       labels = "SAMPLE_MAT",
       E = E, nu = nu,
       sy = sy, n = n)
-    m = RingCompression(
-      material = material , 
+    m = RingCompression( material = material , 
       inner_radius = inner_radius, 
       outer_radius = outer_radius, 
-      disp = disp, 
-      nFrames = nFrames,
+      disp = disp,
       thickness = thickness,
+      nFrames = nFrames, 
       Nr = Nr, 
       Nt = Nt, 
+      Na = Na,
       workdir = workdir,
       label = label, 
       elType = elType,
       abqlauncher = abqlauncher,
-      cpus = cpus)
+      cpus = cpus,
+      is_3D = False)
   
     # SIMULATION
     m.MakeMesh()
@@ -104,7 +126,7 @@ class Simulation(object):
     m.PostProc()
     outputs = m.outputs
     force = -2. * outputs['history']['force']
-    disp = -2 * outputs['history']['disp']
+    disp = -2. * outputs['history']['disp']
     
     self.disp = disp
     self.force = force

@@ -8,7 +8,7 @@ import platform
 
 #PAREMETERS
 inner_radius, outer_radius = 1. , 2.
-Nt, Nr = 20, 5 
+Nt, Nr = 40, 10 
 disp = .25
 nFrames = 100
 sy = .01

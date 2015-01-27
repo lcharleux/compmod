@@ -25,15 +25,19 @@ settings['iteration'] =10
 settings['thickness'] = 20.02
 
 
-if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
+if node ==  'lcharleux':      
+  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
+  workdir = "workdir/"
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+  workdir = "D:/Simulations/Dossier_travail_Abaqus/"
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+  workdir = "workdir/"
 if node ==  'epua-pd45': 
   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
-workdir = "D:\donnees_pyth/workdir/"
+
 label = "ringCompressionOptiCompart"
 elType = "CPS4"
 cpus = 1
