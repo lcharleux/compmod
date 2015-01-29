@@ -13,16 +13,16 @@ node = platform.node()
 
 #FIXED PAREMETERS
 settings = {}
-settings['file_name'] = 'test_exp.txt'
-settings['inner_radius'], settings['outer_radius'] = 45.18 , 50.36
-settings['Nt'], settings['Nr'], settings['Na'] = 20, 4, 5
+settings['file_name'] = 'test_expD2.txt'
+settings['inner_radius'], settings['outer_radius'] = 45.2 , 48.26
+settings['Nt'], settings['Nr'], settings['Na'] = 50, 8, 5
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
-settings['E'] = 74.e3
+settings['E'] = 71413.
 settings['nu'] = .3
 settings['iteration'] = 15
-settings['thickness'] = 20.02
+settings['thickness'] = 14.92
 
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
@@ -31,7 +31,7 @@ if node ==  'epua-pd47':
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
   workdir = "D:/Simulations/Dossier_travail_Abaqus/"
 label = "ringCompressionOpti"
-elType = "CPE4"
+elType = "CPS4"
 cpus = 1
 
 
@@ -81,24 +81,7 @@ class Simulation(object):
     Ne = self.settings['Ne']
     thickness = self.settings['thickness']
     print E, nu, sy, n
-#    material = Hollomon(
-#      labels = "SAMPLE_MAT",
-#      E = E, nu = nu,
-#      sy = sy, n = n)
-#    m = RingCompression(
-#      material = material , 
-#      inner_radius = inner_radius, 
-#      outer_radius = outer_radius, 
-#      disp = disp, 
-#      nFrames = nFrames,
-#      thickness = thickness,
-#      Nr = Nr, 
-#      Nt = Nt, 
-#      workdir = workdir,
-#      label = label, 
-#      elType = elType,
-#      abqlauncher = abqlauncher,
-#      cpus = cpus)
+    
     material = Hollomon(
       labels = "SAMPLE_MAT",
       E = E, nu = nu,
@@ -192,7 +175,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(130., 0.1, settings)
+O = Opti(160., 0.1, settings)
 O.Optimize()
 
 

@@ -7,19 +7,19 @@ import pickle, copy
 import platform
 
 #PAREMETERS
-inner_radius, outer_radius = 45.18 , 50.36
-Nt, Nr, Na = 40, 8, 16 
-disp = 35.
+inner_radius, outer_radius = 45.2 , 48.26
+Nt, Nr, Na = 80, 8, 20 
+displacement = 35.
 nFrames = 100
-sy = 150.
-E = 74000.
+sy = 131.241
+E = 71413.
 nu = .3
-n = .1
-thickness =20.02
+n = .0973
+thickness =14.92
 workdir = "workdir/"
 label = "ringCompression_3D"
 elType = "CPE4"
-cpus = 1
+cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -35,6 +35,7 @@ run_sim = True
 plot = True
 
 #MODEL DEFINITION
+disp = displacement/2
 material = Hollomon(
   labels = "SAMPLE_MAT",
   E = E, nu = nu,
@@ -42,7 +43,7 @@ material = Hollomon(
 m = RingCompression( material = material , 
   inner_radius = inner_radius, 
   outer_radius = outer_radius, 
-  disp = disp/2,
+  disp = disp,
   thickness = thickness,
   nFrames = nFrames, 
   Nr = Nr, 

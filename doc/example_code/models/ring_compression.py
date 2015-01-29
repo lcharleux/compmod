@@ -7,15 +7,15 @@ import pickle, copy
 import platform
 
 #PAREMETERS
-inner_radius, outer_radius = 1. , 2.
-Nt, Nr = 40, 10 
-disp = .25
+inner_radius, outer_radius = 45.2 , 48.26
+Nt, Nr, Na = 80, 8, 20 
+displacement = 35.
 nFrames = 100
-sy = .01
-E = 1.
+sy = 147.558899
+E = 71413.
 nu = .3
-n = .1
-thickness = 1.
+n = 0.10251
+thickness = 14.92
 workdir = "workdir/"
 label = "ringCompression"
 elType = "CPS4"
@@ -31,23 +31,26 @@ run_sim = True
 plot = True
 
 #MODEL DEFINITION
+disp = displacement/2
 material = Hollomon(
   labels = "SAMPLE_MAT",
   E = E, nu = nu,
   sy = sy, n = n)
 m = RingCompression( material = material , 
-  inner_radius = inner_radius, 
-  outer_radius = outer_radius, 
-  disp = disp/2,
-  thickness = thickness,
-  nFrames = nFrames, 
-  Nr = Nr, 
-  Nt = Nt, 
-  workdir = workdir,
-  label = label, 
-  elType = elType,
-  cpus = cpus,
-  abqlauncher = abqlauncher)
+      inner_radius = inner_radius, 
+      outer_radius = outer_radius, 
+      disp = disp,
+      thickness = thickness,
+      nFrames = nFrames, 
+      Nr = Nr, 
+      Nt = Nt, 
+      Na = Na,
+      workdir = workdir,
+      label = label, 
+      elType = elType,
+      abqlauncher = abqlauncher,
+      cpus = cpus,
+      is_3D = False)
 
 # SIMULATION
 m.MakeMesh()
