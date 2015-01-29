@@ -24,10 +24,24 @@ sy = np.random.rayleigh(ray_param, Ne)
 labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
 material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
 
-workdir = "D:\donnees_pyth/workdir/"
-label = "ringCompression3DCompart"
+#workdir = "D:\donnees_pyth/workdir/"
+#label = "ringCompression3DCompart"
+#elType = "CPE4"
+#cpus = 1
+#node = platform.node()
+#if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
+#if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
+#if node ==  'epua-pd47': 
+#  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+#if node ==  'SERV3-MS-SYMME': 
+#  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+#if node ==  'epua-pd45': 
+#  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
+
+workdir = "workdir/"
+label = "ringCompression_3D_compart"
 elType = "CPE4"
-cpus = 1
+cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -36,7 +50,8 @@ if node ==  'epua-pd47':
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
 if node ==  'epua-pd45': 
-  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus' 
+  
 
 #TASKS
 run_sim = True

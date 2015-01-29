@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle, copy
 import platform
-node = platform.node()
+
 
 
 #FIXED PAREMETERS
@@ -24,16 +24,22 @@ settings['nu'] = .3
 settings['iteration'] = 15
 settings['thickness'] = 14.92
 
-if node ==  'lcharleux':      
-  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
-  workdir = "workdir/"
+
+
+workdir = "workdir/"
+label = "ringCompression_opti"
+elType = "CPE4"
+cpus = 6
+node = platform.node()
+if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
+if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
-  workdir = "D:/Simulations/Dossier_travail_Abaqus/"
-label = "ringCompressionOpti"
-elType = "CPS4"
-cpus = 1
-
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus' 
+  
 
 def read_file(file_name):
   '''

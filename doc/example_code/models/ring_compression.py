@@ -16,15 +16,30 @@ E = 71413.
 nu = .3
 n = 0.10251
 thickness = 14.92
+#workdir = "workdir/"
+#label = "ringCompression"
+#elType = "CPS4"
+#cpus = 1
+#node = platform.node()
+#if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
+#if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
+#if node ==  'epua-pd47': 
+#  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+
 workdir = "workdir/"
 label = "ringCompression"
-elType = "CPS4"
-cpus = 1
+elType = "CPE4"
+cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus' 
+  
 
 #TASKS
 run_sim = True
