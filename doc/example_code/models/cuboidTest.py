@@ -38,7 +38,7 @@ def plot_mesh(ax, mesh, outputs, step, field_func =None, cbar = True, cbar_label
 
 #PARAMETERS
 lx, ly = 1., 1.
-Nx, Ny = 50, 50 
+Nx, Ny = 20, 20 
 Ne = Nx * Ny
 disp = .1
 nFrames = 20
@@ -112,14 +112,14 @@ if m.outputs['completed']:
           
       
 
-    mesh = outputs['mesh']
+    mesh = m.outputs['mesh']
     max_strain = strain.max()
     fig = plt.figure("Fields")
     plt.clf()
     ax = fig.add_subplot(1, 1, 1)
     ax.set_aspect('equal')
     plt.grid()
-    plot_mesh(ax, mesh, outputs, 0, field_func, cbar_label = r'Relative Tensile Strain, $\frac{\epsilon - \epsilon_{av}}{\epsilon_{av}}$')
+    plot_mesh(ax, mesh, m.outputs, 0, field_func, cbar_label = r'Relative Tensile Strain, $\frac{\epsilon - \epsilon_{av}}{\epsilon_{av}}$')
       #plot_mesh(ax, mesh, outputs, 0, field_func = None, cbar = False, disp = False)
     plt.xlabel('$x$')
     plt.ylabel('$y$')

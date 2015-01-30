@@ -117,6 +117,26 @@ class CuboidTest(Simulation):
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     super(CuboidTest, self).__init__(**kwargs)
+  
+  def MakeMesh(self):
+    """
+    Builds the mesh.
+    """
+    Nx , Ny, Nz = self.Nx, self.Ny, self.Nz
+    lx, ly, lz = self.lx, self.ly, self.lz
+    elType = self.elType
+    if self.is_3D:
+      Ne = Nx * Ny * Nz
+    else:
+      Ne = Nx * Ny
+    m = RegularQuadMesh(Nx, Ny, l1= lx, l2 = ly, name = elType)
+    m.add_set(label = "AllElements", elements = m.labels)
+    nsets = copy.copy(m.nodes.sets) 
+    if self.is_3D: 
+       m = m.extrude(N = Nz, l = lz)
+       m.nodes.sets['bottomleft'] = nsets['bottomleft']
+       m.nodes.sets['bottomright'] = nsets['bottomright']
+    self.mesh = m
     
   def MakeInp(self):
     pattern = """**----------------------------------
@@ -196,13 +216,9 @@ EVOL
       label = material.labels[0]
       sections = section_pattern.format(label, self.lz)
       matinp = material.dump2inp() 
-    m = RegularQuadMesh(Nx, Ny, l1= lx, l2 = ly, name = elType)
-    m.add_set(label = "AllElements", elements = m.labels)
-    nsets = copy.copy(m.nodes.sets) 
-    if self.is_3D: 
-       m = m.extrude(N = Nz, l = lz)
-       m.nodes.sets['bottomleft'] = nsets['bottomleft']
-       m.nodes.sets['bottomright'] = nsets['bottomright']
+    if hasattr(self, "mesh") == False:
+      self.MakeMesh()
+    m = self.mesh
     pattern = pattern.replace("#MESH", m.dump2inp())
     pattern = pattern.replace("#SECTIONS", sections[:-1])
     pattern = pattern.replace("#MATERIALS", matinp[:-1])
@@ -541,7 +557,10 @@ RF2, U2
       label = material.labels[0]
       sections = section_pattern.format(label, self.thickness)
       matinp = material.dump2inp() 
-        
+    
+    if hasattr(self, "mesh") == False:
+      self.MakeMesh()    
+    
     pattern = pattern.replace('#RING_MESH', self.mesh.dump2inp())
     pattern = pattern.replace('#OUTER_RADIUS', str(self.outer_radius))
     pattern = pattern.replace('#DISP', str(-self.disp))

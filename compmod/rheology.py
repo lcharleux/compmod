@@ -55,8 +55,45 @@ def Bilinear(epsilon, E = 1., sigmay = .01, n = .1, sigma_sat =  None):
   Loi de comportement bilinéaire saturée en traction monotone.
   """
   epsilon_y = sigmay / E
-  sigma = np.where( epsilon < epsilon_y, E * epsilon, sigmay + n * (epsilon - epsilon_y))
+  
+  if n == 0.:
+    k = 0.
+  else:
+    k = (n**-1 + E**-1)**-1  
+  sigma = np.where( epsilon < epsilon_y, E * epsilon, sigmay + k * (epsilon - epsilon_y))
   if sigma_sat != None:
     sigma = np.where( sigma < sigma_sat, sigma, sigma_sat)
   return sigma
+
+class Bilinear2(object):
+  def __init__(self, E = 1., sigma_y = 1., n = .1, sigma_sat = None, N = 1000):       
+    self.E =  E
+    self. sigma_y = sigma_y
+    self.n = n
+    self.sigma_sat = sigma_sat
+    self._epsilon = np.zeros(N)
+    self._sigma = np.zeros(N)
+    self._pos = 1
+    
+  def set_epsilon(self, epsilon):
+    pos = self._pos
+    try float(epsilon):
+      self._epsilon[pos] = epsilon
+      pos += 1
+    except:
+      epsilon = np.array(epsilon)
+      self._epsilon[pos:pos+len(epsilon)] = epsilon
+  def get_epsilon(self):
+          
+  
+  def sigma(self):
+    sigma = np.zeros_like(epsilon)
+    sigma_y = self.sigma_y
+    sigma_sat = self.sigma_sat
+    n = self.n
+    for e in epsilon:
       
+    
+    
+    
+  
