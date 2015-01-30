@@ -15,21 +15,21 @@ import platform
 settings = {}
 settings['file_name'] = 'test_expD2.txt'
 settings['inner_radius'], settings['outer_radius'] = 45.2 , 48.26
-settings['Nt'], settings['Nr'], settings['Na'] = 50, 8, 5
+settings['Nt'], settings['Nr'], settings['Na'] = 20, 4, 5
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
 settings['E'] = 71413.
 settings['nu'] = .3
 settings['iteration'] = 15
-settings['thickness'] = 14.92
+settings['thickness'] = 50
 
 
 
 workdir = "workdir/"
 label = "ringCompression_opti"
 elType = "CPE4"
-cpus = 6
+cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -155,11 +155,11 @@ class Opti(object):
     """
     sy = param[0]
     n =param[1]
-    disp = self.disp
+    disp_grid = self.disp_grid
     s = Simulation(sy, n ,self.settings)
     s.Run()
     f = s.Interp()
-    force_sim = f(disp)
+    force_sim = f(disp_grid)
     force_exp_grid = self.force_exp_grid
     
     err = np.sqrt(((force_exp_grid - force_sim)**2).sum())
