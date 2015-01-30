@@ -15,7 +15,7 @@ import platform
 settings = {}
 settings['file_name'] = 'test_expD2.txt'
 settings['inner_radius'], settings['outer_radius'] = 45.2 , 48.26
-settings['Nt'], settings['Nr'], settings['Na'] = 50, 8, 5
+settings['Nt'], settings['Nr'], settings['Na'] = 10, 4, 5
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
