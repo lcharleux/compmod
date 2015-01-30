@@ -7,47 +7,65 @@ import pickle, copy
 import platform
 
 #PAREMETERS
-inner_radius, outer_radius = 1. , 2.
-Nt, Nr = 20, 5 
-disp = .25
+inner_radius, outer_radius = 45.2 , 48.26
+Nt, Nr, Na = 80, 8, 20 
+displacement = 35.
 nFrames = 100
-sy = .01
-E = 1.
+sy = 147.558899
+E = 71413.
 nu = .3
-n = .1
-thickness = 1.
+n = 0.10251
+thickness = 14.92
+#workdir = "workdir/"
+#label = "ringCompression"
+#elType = "CPS4"
+#cpus = 1
+#node = platform.node()
+#if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
+#if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
+#if node ==  'epua-pd47': 
+#  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+
 workdir = "workdir/"
 label = "ringCompression"
-elType = "CPS4"
-cpus = 1
+elType = "CPE4"
+cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus' 
+  
 
 #TASKS
 run_sim = True
 plot = True
 
 #MODEL DEFINITION
+disp = displacement/2
 material = Hollomon(
   labels = "SAMPLE_MAT",
   E = E, nu = nu,
   sy = sy, n = n)
 m = RingCompression( material = material , 
-  inner_radius = inner_radius, 
-  outer_radius = outer_radius, 
-  disp = disp/2,
-  thickness = thickness,
-  nFrames = nFrames, 
-  Nr = Nr, 
-  Nt = Nt, 
-  workdir = workdir,
-  label = label, 
-  elType = elType,
-  cpus = cpus,
-  abqlauncher = abqlauncher)
+      inner_radius = inner_radius, 
+      outer_radius = outer_radius, 
+      disp = disp,
+      thickness = thickness,
+      nFrames = nFrames, 
+      Nr = Nr, 
+      Nt = Nt, 
+      Na = Na,
+      workdir = workdir,
+      label = label, 
+      elType = elType,
+      abqlauncher = abqlauncher,
+      cpus = cpus,
+      is_3D = False)
 
 # SIMULATION
 m.MakeMesh()

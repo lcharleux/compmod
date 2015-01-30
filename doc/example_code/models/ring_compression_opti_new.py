@@ -145,7 +145,9 @@ class Opti(object):
     g = interpolate.interp1d(disp_exp, force_exp)
     self.disp_exp = disp_exp
     self.force_exp = force_exp
-    self.g = g
+    d = self.settings['displacement']
+    self.disp_grid = np.linspace(0., d, 1000)
+    self.force_exp_grid= g(self.disp_grid)
 
   def Err(self, param):
     """
@@ -153,31 +155,22 @@ class Opti(object):
     """
     sy = param[0]
     n =param[1]
-   
+    disp = self.disp
     s = Simulation(sy, n ,self.settings)
     s.Run()
     f = s.Interp()
-    d = self.settings['displacement']
-    disp = np.linspace(0., d, 100)
     force_sim = f(disp)
+    force_exp_grid = self.force_exp_grid
     
-    g = self.g
-    force_exp = g(disp)
-    
-    err = np.sqrt(((force_exp - force_sim)**2).sum())
+    err = np.sqrt(((force_exp_grid - force_sim)**2).sum())
     self.sy.append(sy)
     self.n.append(n)
     self.err.append(err)
     self.force_sim.append(force_sim)
-    self.disp = disp
-    self.force_exp = force_exp
-    
-    
     return err
     
   def Optimize(self):
     p0 = [self.sy0, self.n0]
-    
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
@@ -188,13 +181,13 @@ O.Optimize()
 fig = plt.figure('Load vs. disp')
 plt.clf()
 
-plt.plot(O.disp, O.force_exp, 'k-', label = 'experimental curve', linewidth = 2.)
-plt.plot(O.disp, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
+plt.plot(O.disp_grid, O.force_exp_grid, 'k-', label = 'experimental curve', linewidth = 2.)
+plt.plot(O.disp_grid, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
 a = O.err
 index = np.argmin(a)
-plt.plot(O.disp, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
+plt.plot(O.disp_grid, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
 for i in range(1, settings['iteration']):
-  plt.plot(O.disp, O.force_sim[i], 'b-', linewidth = .2)
+  plt.plot(O.disp_grid, O.force_sim[i], 'b-', linewidth = .2)
 #plt.plot(disp.data[1], force.data[1], 'b-', label = 'Unloading', linewidth = 2.)  
 plt.legend(loc="lower right")
 plt.grid()
@@ -202,13 +195,6 @@ plt.xlabel('Displacement, $U$')
 plt.ylabel('Force, $F$')
 plt.savefig(workdir + label + '_load-vs-disp.pdf')
 
-
-#print s.force.data[0]
-"""
-f = s.Interp()
-x = np.arange(0., 49., 0.1)
-print f(x)
-"""
 
 
 
