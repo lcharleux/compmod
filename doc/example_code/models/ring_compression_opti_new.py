@@ -15,20 +15,20 @@ import platform
 settings = {}
 settings['file_name'] = 'test_expD2.txt'
 settings['inner_radius'], settings['outer_radius'] = 45.2 , 48.26
-settings['Nt'], settings['Nr'], settings['Na'] = 20, 4, 5
+settings['Nt'], settings['Nr'], settings['Na'] = 100, 10, 5
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
 settings['E'] = 71413.
 settings['nu'] = .3
-settings['iteration'] = 15
-settings['thickness'] = 50
+settings['iteration'] = 1
+settings['thickness'] = 14.92
 
 
 
 workdir = "workdir/"
 label = "ringCompression_opti"
-elType = "CPE4"
+elType = "CPS4"
 cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
@@ -92,6 +92,7 @@ class Simulation(object):
       labels = "SAMPLE_MAT",
       E = E, nu = nu,
       sy = sy, n = n)
+      
     m = RingCompression( material = material , 
       inner_radius = inner_radius, 
       outer_radius = outer_radius, 
@@ -174,7 +175,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(160., 0.1, settings)
+O = Opti(150., 0.1, settings)
 O.Optimize()
 
 

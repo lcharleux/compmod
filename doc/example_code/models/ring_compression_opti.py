@@ -145,7 +145,9 @@ class Opti(object):
     g = interpolate.interp1d(disp_exp, force_exp)
     self.disp_exp = disp_exp
     self.force_exp = force_exp
-    self.g = g
+    d = self.settings['displacement']
+    self.disp_grid = np.linspace(0., d, 1000)
+    self.force_exp_grid= g(self.disp_grid)
 
   def Err(self, param):
     """
@@ -176,8 +178,7 @@ class Opti(object):
     return err
     
   def Optimize(self):
-    p0 = [self.sy0, self.n0]
-    
+    p0 = [self.sy0, self.n0] 
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
@@ -188,13 +189,13 @@ O.Optimize()
 fig = plt.figure('Load vs. disp')
 plt.clf()
 
-plt.plot(O.disp, O.force_exp, 'k-', label = 'experimental curve', linewidth = 2.)
-plt.plot(O.disp, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
+plt.plot(O.disp_grid, O.force_exp_grid, 'k-', label = 'experimental curve', linewidth = 2.)
+plt.plot(O.disp_grid, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
 a = O.err
 index = np.argmin(a)
-plt.plot(O.disp, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
+plt.plot(O.disp_grid, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
 for i in range(1, settings['iteration']):
-  plt.plot(O.disp, O.force_sim[i], 'b-', linewidth = .2)
+  plt.plot(O.disp_grid, O.force_sim[i], 'b-', linewidth = .2)
 #plt.plot(disp.data[1], force.data[1], 'b-', label = 'Unloading', linewidth = 2.)  
 plt.legend(loc="lower right")
 plt.grid()
