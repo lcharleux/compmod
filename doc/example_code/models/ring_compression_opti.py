@@ -15,7 +15,7 @@ import platform
 settings = {}
 settings['file_name'] = 'test_expD2.txt'
 settings['inner_radius'], settings['outer_radius'] = 45.2 , 48.26
-settings['Nt'], settings['Nr'], settings['Na'] = 50, 8, 5
+settings['Nt'], settings['Nr'], settings['Na'] = 80, 8, 15
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
@@ -25,10 +25,10 @@ settings['iteration'] = 15
 settings['thickness'] = 14.92
 
 
-
+is_3D = True
 workdir = "workdir/"
 label = "ringCompression_opti"
-elType = "CPE4"
+elType = "C3D8"
 cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
@@ -106,7 +106,7 @@ class Simulation(object):
       elType = elType,
       abqlauncher = abqlauncher,
       cpus = cpus,
-      is_3D = False)
+      is_3D = is_3D)
   
     # SIMULATION
     m.MakeMesh()
@@ -155,26 +155,18 @@ class Opti(object):
     """
     sy = param[0]
     n =param[1]
-   
+    disp_grid = self.disp_grid
     s = Simulation(sy, n ,self.settings)
     s.Run()
     f = s.Interp()
-    d = self.settings['displacement']
-    disp = np.linspace(0., d, 100)
-    force_sim = f(disp)
+    force_sim = f(disp_grid)
+    force_exp_grid = self.force_exp_grid
     
-    g = self.g
-    force_exp = g(disp)
-    
-    err = np.sqrt(((force_exp - force_sim)**2).sum())
+    err = np.sqrt(((force_exp_grid - force_sim)**2).sum())
     self.sy.append(sy)
     self.n.append(n)
     self.err.append(err)
     self.force_sim.append(force_sim)
-    self.disp = disp
-    self.force_exp = force_exp
-    
-    
     return err
     
   def Optimize(self):

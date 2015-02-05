@@ -107,7 +107,7 @@ class Simulation(object):
       elType = elType,
       abqlauncher = abqlauncher,
       cpus = cpus,
-      is_3D = False)
+      is_3D =True)
   
     # SIMULATION
     m.MakeMesh()

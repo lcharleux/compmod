@@ -7,14 +7,15 @@ import pickle, copy
 import platform
 
 #PAREMETERS
+is_3D = False
 inner_radius, outer_radius = 45.2 , 48.26
 Nt, Nr, Na = 100, 10, 20 
 displacement = 45.
 nFrames = 100
-sy = 147.558899
+sy = 126.8125
 E = 71413.
 nu = .3
-n = 0.10251
+n = 0.1015820312
 thickness = 14.92
 #workdir = "workdir/"
 #label = "ringCompression"
@@ -85,7 +86,7 @@ m = RingCompression( material = material ,
       elType = elType,
       abqlauncher = abqlauncher,
       cpus = cpus,
-      is_3D = False)
+      is_3D = is_3D)
 
 # SIMULATION
 m.MakeMesh()
