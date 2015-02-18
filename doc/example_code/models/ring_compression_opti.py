@@ -1,6 +1,6 @@
 # SOME OPTIMIZATION WITH RING COMPRESSION
 
-from abapy.materials import Hollomon
+from abapy.materials import Ludwig
 from compmod.models import RingCompression
 from scipy import interpolate
 from scipy.optimize import minimize
@@ -13,23 +13,23 @@ import platform
 
 #FIXED PAREMETERS
 settings = {}
-settings['file_name'] = 'test_expD2.txt'
-settings['inner_radius'], settings['outer_radius'] = 45.2 , 48.26
-settings['Nt'], settings['Nr'], settings['Na'] = 80, 8, 15
+settings['file_name'] = 'test_expA1.txt'
+settings['inner_radius'], settings['outer_radius'] = 100.72/2-5.18 , 100.72/2
+settings['Nt'], settings['Nr'], settings['Na'] = 100, 10, 15
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
-settings['E'] = 71413.
+settings['E'] = 72469.
 settings['nu'] = .3
 settings['iteration'] = 15
-settings['thickness'] = 14.92
+settings['thickness'] = 20.02
 
 
-is_3D = True
+is_3D = False
 workdir = "workdir/"
 label = "ringCompression_opti"
-elType = "C3D8"
-cpus = 6
+elType = "CPS4"
+cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -72,7 +72,7 @@ class Simulation(object):
     Runs a simulation for a given couple (sy, n) and returns the (disp, force) couple.
     """
     #MODEL DEFINITION
-    sy = self.sy
+    K = self.K
     n = self.n
   
     E = self.settings['E']
@@ -86,12 +86,12 @@ class Simulation(object):
     Na = self.settings['Na']
     Ne = self.settings['Ne']
     thickness = self.settings['thickness']
-    print E, nu, sy, n
+    print E, nu, K, n
     
-    material = Hollomon(
+    material = Ludwig(
       labels = "SAMPLE_MAT",
-      E = E, nu = nu,
-      sy = sy, n = n)
+      E = E, nu = nu, sy = 150.,
+      K = K, n = n)
     m = RingCompression( material = material , 
       inner_radius = inner_radius, 
       outer_radius = outer_radius, 
@@ -132,12 +132,12 @@ class Simulation(object):
 
 class Opti(object):
   
-  def __init__(self, sy0, n0, settings):
+  def __init__(self, K0, n0, settings):
     
-    self.sy0 = sy0
+    self.K0 = K0
     self.n0 = n0
     self.settings = settings
-    self.sy = []
+    self.K = []
     self.n = []
     self.err = []
     self.force_sim = []
@@ -153,28 +153,28 @@ class Opti(object):
     """
     Compute the residual error between experimental and simulated curve
     """
-    sy = param[0]
+    K = param[0]
     n =param[1]
     disp_grid = self.disp_grid
-    s = Simulation(sy, n ,self.settings)
+    s = Simulation(K, n ,self.settings)
     s.Run()
     f = s.Interp()
     force_sim = f(disp_grid)
     force_exp_grid = self.force_exp_grid
     
     err = np.sqrt(((force_exp_grid - force_sim)**2).sum())
-    self.sy.append(sy)
+    self.K.append(K)
     self.n.append(n)
     self.err.append(err)
     self.force_sim.append(force_sim)
     return err
     
   def Optimize(self):
-    p0 = [self.sy0, self.n0] 
+    p0 = [self.K0, self.n0] 
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(160., 0.1, settings)
+O = Opti(10., 0.1, settings)
 O.Optimize()
 
 

@@ -1,5 +1,5 @@
 from compmod.models import RingCompression
-from abapy.materials import Hollomon
+from abapy.materials import Ludwig
 from abapy.misc import load
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,9 +12,10 @@ inner_radius, outer_radius = 45.2 , 48.26
 Nt, Nr, Na = 100, 10, 20 
 displacement = 45.
 nFrames = 100
-sy = 126.8125
+K = 5.
 E = 71413.
 nu = .3
+sy = 150.
 n = 0.1015820312
 thickness = 14.92
 #workdir = "workdir/"
@@ -68,10 +69,10 @@ disp_exp, force_exp = read_file(filename)
 
 #MODEL DEFINITION
 disp = displacement/2
-material = Hollomon(
+material = Ludwig(
   labels = "SAMPLE_MAT",
-  E = E, nu = nu,
-  sy = sy, n = n)
+  E = E, nu = nu, sy = sy,
+  K = K, n = n)
 m = RingCompression( material = material , 
       inner_radius = inner_radius, 
       outer_radius = outer_radius, 
