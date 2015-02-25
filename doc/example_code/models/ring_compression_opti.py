@@ -21,7 +21,7 @@ settings['displacement'] = 45.
 settings['nFrames'] = 100
 settings['E'] = 72469.
 settings['nu'] = .3
-settings['iteration'] = 15
+settings['iteration'] = 30
 settings['thickness'] = 20.02
 
 
@@ -61,9 +61,10 @@ def read_file(file_name):
 
 class Simulation(object):
   
-  def __init__(self, sy, n, settings):
-    self.sy = sy
+  def __init__(self, sy, K, n, settings):
+    self.K = K
     self.n = n
+    self.sy = sy
     self.settings = settings
     
     
@@ -74,6 +75,7 @@ class Simulation(object):
     #MODEL DEFINITION
     K = self.K
     n = self.n
+    sy = self.sy
   
     E = self.settings['E']
     nu = self.settings['nu']
@@ -86,11 +88,11 @@ class Simulation(object):
     Na = self.settings['Na']
     Ne = self.settings['Ne']
     thickness = self.settings['thickness']
-    print E, nu, K, n
+    print E, nu, sy, K, n
     
     material = Ludwig(
       labels = "SAMPLE_MAT",
-      E = E, nu = nu, sy = 150.,
+      E = E, nu = nu, sy = sy,
       K = K, n = n)
     m = RingCompression( material = material , 
       inner_radius = inner_radius, 
@@ -132,11 +134,14 @@ class Simulation(object):
 
 class Opti(object):
   
-  def __init__(self, K0, n0, settings):
+  def __init__(self, sy0, K0, n0, settings):
     
+    self.sy0 = sy0    
     self.K0 = K0
     self.n0 = n0
+    
     self.settings = settings
+    self.sy = []
     self.K = []
     self.n = []
     self.err = []
@@ -153,28 +158,31 @@ class Opti(object):
     """
     Compute the residual error between experimental and simulated curve
     """
-    K = param[0]
-    n =param[1]
+    sy = param[0]    
+    K = param[1]
+    n =param[2]
+    
     disp_grid = self.disp_grid
-    s = Simulation(K, n ,self.settings)
+    s = Simulation(sy, K, n ,self.settings)
     s.Run()
     f = s.Interp()
     force_sim = f(disp_grid)
     force_exp_grid = self.force_exp_grid
     
     err = np.sqrt(((force_exp_grid - force_sim)**2).sum())
+    self.sy.append(sy)
     self.K.append(K)
-    self.n.append(n)
+    self.n.append(n) 
     self.err.append(err)
     self.force_sim.append(force_sim)
     return err
     
   def Optimize(self):
-    p0 = [self.K0, self.n0] 
+    p0 = [self.sy0, self.K0, self.n0] 
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(10., 0.1, settings)
+O = Opti(150., 100., 0.5, settings)
 O.Optimize()
 
 

@@ -18,15 +18,6 @@ nu = .3
 sy = 150.
 n = 0.1015820312
 thickness = 14.92
-#workdir = "workdir/"
-#label = "ringCompression"
-#elType = "CPS4"
-#cpus = 1
-#node = platform.node()
-#if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
-#if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
-#if node ==  'epua-pd47': 
-#  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
 
 workdir = "workdir/"
 label = "ringCompression"

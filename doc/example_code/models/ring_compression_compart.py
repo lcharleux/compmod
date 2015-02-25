@@ -7,34 +7,64 @@ import pickle, copy
 import platform
 
 #PAREMETERS
-inner_radius, outer_radius = 20. , 50.
-Nt, Nr = 80, 20 
-Ne = Nt * Nr
-disp = 10
+is_3D = False
+inner_radius, outer_radius = 100.72/2-5.18 , 100.72/2
+Nt, Nr, Na = 100, 10, 20 
+#Ne = Nt * Nr
+if is_3D == False :
+  Ne = Nt * Nr
+else:
+  Ne = Nt * Nr * Na
+disp = 45.
 nFrames = 100
-thickness = 1.
-E  = 120000. * np.ones(Ne) # Young's modulus
+thickness = 20.02
+E  = 72469. * np.ones(Ne) # Young's modulus
 nu = .3 * np.ones(Ne) # Poisson's ratio
-Ssat =1000 * np.ones(Ne)
-n = 200 * np.ones(Ne)
-sy_mean = 200.
+Ssat =1178 * np.ones(Ne)
+n = 205 * np.ones(Ne)
+sy_mean = 215.
 
 ray_param = sy_mean/1.253314
 sy = np.random.rayleigh(ray_param, Ne)
 labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
 material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
 
+
 workdir = "workdir/"
 label = "ringCompression"
-cpus = 2
-elType = "CPE4"
+cpus = 1
+elType = "CPS4"
+filename = 'test_expA1.txt'
+
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
 
 
+def read_file(file_name):
+  '''
+  Read a two rows data file and converts it to numbers
+  '''
+  f = open(file_name, 'r') # Opening the file
+  lignes = f.readlines() # Reads all lines one by one and stores them in a list
+  f.close() # Closing the file
+#    lignes.pop(0) # Delete le saut de ligne for each lines
+  force_exp, disp_exp = [],[]
+
+  for ligne in lignes:
+      data = ligne.split() # Lines are splitted
+      disp_exp.append(float(data[0]))
+      force_exp.append(float(data[1]))
+  return -np.array(disp_exp), -np.array(force_exp)
+
+
+disp_exp, force_exp = read_file(filename)
 
 #TASKS
 run_sim = True
@@ -50,11 +80,13 @@ m = RingCompression( material = material ,
   nFrames = nFrames, 
   Nr = Nr, 
   Nt = Nt, 
+  Na = Na,
   workdir = workdir,
   label = label, 
   elType = elType,
   abqlauncher = abqlauncher,
   cpus = cpus,
+  is_3D = is_3D,
   compart = True)
 
 # SIMULATION
@@ -120,6 +152,7 @@ if outputs['completed']:
   plt.clf()
   plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
   plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
+  plt.plot(disp_exp, force_exp, 'k-', label = 'Exp', linewidth = 2.)
   plt.legend(loc="upper left")
   plt.grid()
   plt.xlabel('Displacement, $U$')
@@ -130,5 +163,12 @@ else:
   print 'Simulation not completed'
 
 
+g = open('tutu2.txt', 'w')
+
+
+for i in range(0, len(disp.data[0])): 
+  line = g.write(repr(disp.data[0][i]) + '\t' + repr(force.data[0][i]))
+  line = g.write('\n')
+g.close()
 
 
