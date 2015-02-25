@@ -13,15 +13,15 @@ node = platform.node()
 
 #FIXED PAREMETERS
 settings = {}
-settings['file_name'] = 'test_exp.txt'
-settings['inner_radius'], settings['outer_radius'] = 45.18 , 50.36
-settings['Nt'], settings['Nr'], settings['Na'] = 40, 5, 10
+settings['file_name'] = 'test_expA1.txt'
+settings['inner_radius'], settings['outer_radius'] = 100.72/2-5.18 , 100.72/2
+settings['Nt'], settings['Nr'], settings['Na'] = 100, 10, 15
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 35.
 settings['nFrames'] = 100
-settings['E'] = 74.e3 * np.ones(settings['Ne'])
+settings['E'] =72469. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
-settings['iteration'] =10
+settings['iteration'] = 15
 settings['thickness'] = 20.02
 
 
@@ -41,7 +41,7 @@ if node ==  'epua-pd45':
 label = "ringCompressionOptiCompart"
 elType = "CPS4"
 cpus = 1
-
+is_3D = False
 
 
 
@@ -118,7 +118,7 @@ class Simulation(object):
       elType = elType,
       abqlauncher = abqlauncher,
       cpus = cpus,
-      is_3D = True,
+      is_3D = is_3D,
       compart = True)
   
     # SIMULATION

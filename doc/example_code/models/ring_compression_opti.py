@@ -14,7 +14,7 @@ import platform
 #FIXED PAREMETERS
 settings = {}
 settings['file_name'] = 'test_expA1.txt'
-settings['inner_radius'], settings['outer_radius'] = 100.72/2-5.18 , 100.72/2
+settings['inner_radius'], settings['outer_radius'] = 45.18 , 100.72/2
 settings['Nt'], settings['Nr'], settings['Na'] = 100, 10, 15
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
@@ -61,7 +61,11 @@ def read_file(file_name):
 
 class Simulation(object):
   
+<<<<<<< HEAD
   def __init__(self, sy, K, n, settings):
+=======
+  def __init__(self, K, n, settings):
+>>>>>>> origin/master
     self.K = K
     self.n = n
     self.sy = sy
