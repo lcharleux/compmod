@@ -404,7 +404,8 @@ class RingCompression(Simulation):
       "Nt":10,
       "Na":10, 
       "disp": .5,
-      "unloading": True
+      "unloading": True,
+      "export_fields":True
       }
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
