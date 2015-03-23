@@ -1,5 +1,5 @@
 from compmod.models import RingCompression
-from abapy.materials import Hollomon
+from abapy.materials import Ludwig
 from abapy.misc import load
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,29 +25,28 @@ def read_file(file_name):
 
 
 #PAREMETERS
+is_3D = False
 inner_radius, outer_radius = 45.2 , 48.26
+<<<<<<< HEAD
 Nt, Nr, Na = 40, 8, 20 
 displacement = 35.
+=======
+Nt, Nr, Na = 100, 10, 20 
+displacement = 45.
+>>>>>>> bc2225581408566e3337ede72bd1e0ab32aa5c44
 nFrames = 100
-sy = 147.558899
+K = 5.
 E = 71413.
 nu = .3
-n = 0.10251
+sy = 150.
+n = 0.1015820312
 thickness = 14.92
-#workdir = "workdir/"
-#label = "ringCompression"
-#elType = "CPS4"
-#cpus = 1
-#node = platform.node()
-#if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
-#if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
-#if node ==  'epua-pd47': 
-#  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
 
 workdir = "workdir/"
 label = "ringCompression"
-elType = "CPE4"
-cpus = 6
+elType = "CPS4"
+filename = 'test_expD2.txt'
+cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -63,12 +62,31 @@ if node ==  'epua-pd45':
 run_sim = False
 plot = True
 
+def read_file(file_name):
+  '''
+  Read a two rows data file and converts it to numbers
+  '''
+  f = open(file_name, 'r') # Opening the file
+  lignes = f.readlines() # Reads all lines one by one and stores them in a list
+  f.close() # Closing the file
+#    lignes.pop(0) # Delete le saut de ligne for each lines
+  force_exp, disp_exp = [],[]
+
+  for ligne in lignes:
+      data = ligne.split() # Lines are splitted
+      disp_exp.append(float(data[0]))
+      force_exp.append(float(data[1]))
+  return -np.array(disp_exp), -np.array(force_exp)
+
+
+disp_exp, force_exp = read_file(filename)
+
 #MODEL DEFINITION
 disp = displacement/2
-material = Hollomon(
+material = Ludwig(
   labels = "SAMPLE_MAT",
-  E = E, nu = nu,
-  sy = sy, n = n)
+  E = E, nu = nu, sy = sy,
+  K = K, n = n)
 m = RingCompression( material = material , 
       inner_radius = inner_radius, 
       outer_radius = outer_radius, 
@@ -83,7 +101,7 @@ m = RingCompression( material = material ,
       elType = elType,
       abqlauncher = abqlauncher,
       cpus = cpus,
-      is_3D = False)
+      is_3D = is_3D)
 
 # SIMULATION
 m.MakeMesh()
@@ -151,6 +169,7 @@ if outputs['completed']:
   plt.plot(disp_exp, force_exp, "gs-", label = "Experimental data", linewidth = 2.)
   plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
   plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
+  plt.plot(disp_exp, force_exp, 'k-', label = 'Exp', linewidth = 2.)
   plt.legend(loc="upper left")
   plt.grid()
   plt.xlabel('Displacement, $U$')

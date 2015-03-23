@@ -7,18 +7,20 @@ import pickle, copy
 import platform
 
 #PAREMETERS
+is_3D = True
 inner_radius, outer_radius = 45.2 , 48.26
-Nt, Nr, Na = 80, 8, 20 
-displacement = 35.
+Nt, Nr, Na = 20, 3, 5
+displacement = 45.
 nFrames = 100
-sy = 131.241
+sy = 126.8125
 E = 71413.
 nu = .3
-n = .0973
+n = 0.1015820312
 thickness =14.92
 workdir = "workdir/"
 label = "ringCompression_3D"
-elType = "CPE4"
+elType = "C3D8"
+filename = 'test_expD2.txt'
 cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
@@ -33,6 +35,25 @@ if node ==  'epua-pd45':
 #TASKS
 run_sim = True
 plot = True
+
+def read_file(file_name):
+  '''
+  Read a two rows data file and converts it to numbers
+  '''
+  f = open(file_name, 'r') # Opening the file
+  lignes = f.readlines() # Reads all lines one by one and stores them in a list
+  f.close() # Closing the file
+#    lignes.pop(0) # Delete le saut de ligne for each lines
+  force_exp, disp_exp = [],[]
+
+  for ligne in lignes:
+      data = ligne.split() # Lines are splitted
+      disp_exp.append(float(data[0]))
+      force_exp.append(float(data[1]))
+  return -np.array(disp_exp), -np.array(force_exp)
+
+
+disp_exp, force_exp = read_file(filename)
 
 #MODEL DEFINITION
 disp = displacement/2
@@ -53,8 +74,8 @@ m = RingCompression( material = material ,
   label = label, 
   elType = elType,
   abqlauncher = abqlauncher,
-  cpus =1,
-  is_3D = True)
+  cpus = cpus,
+  is_3D = is_3D)
 
 # SIMULATION
 m.MakeMesh()
@@ -119,6 +140,7 @@ if outputs['completed']:
   plt.clf()
   plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
   plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
+  plt.plot(disp_exp, force_exp, 'k-', label = 'Exp', linewidth = 2.)
   plt.legend(loc="upper left")
   plt.grid()
   plt.xlabel('Displacement, $U$')

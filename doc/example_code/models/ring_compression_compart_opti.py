@@ -13,15 +13,15 @@ node = platform.node()
 
 #FIXED PAREMETERS
 settings = {}
-settings['file_name'] = 'test_exp.txt'
-settings['inner_radius'], settings['outer_radius'] = 45.18 , 50.36
-settings['Nt'], settings['Nr'], settings['Na'] = 40, 5, 10
+settings['file_name'] = 'test_expA1.txt'
+settings['inner_radius'], settings['outer_radius'] = 100.72/2-5.18 , 100.72/2
+settings['Nt'], settings['Nr'], settings['Na'] = 100, 10, 15
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 35.
 settings['nFrames'] = 100
-settings['E'] = 74.e3 * np.ones(settings['Ne'])
+settings['E'] =72469. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
-settings['iteration'] =10
+settings['iteration'] = 30
 settings['thickness'] = 20.02
 
 
@@ -38,10 +38,10 @@ if node ==  'SERV3-MS-SYMME':
 if node ==  'epua-pd45': 
   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
 
-label = "ringCompressionOptiCompart"
+label = "ringCompressionOptiCompart1"
 elType = "CPS4"
 cpus = 1
-
+is_3D = False
 
 
 
@@ -97,7 +97,9 @@ class Simulation(object):
     run_sim = True
     plot = True
     
-    print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
+#    print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
+    print E[0], nu[0], n[0], sy_mean[0]
+
   
     ray_param = sy_mean/1.253314
     sy = np.random.rayleigh(ray_param, Ne)
@@ -118,7 +120,7 @@ class Simulation(object):
       elType = elType,
       abqlauncher = abqlauncher,
       cpus = cpus,
-      is_3D = True,
+      is_3D = is_3D,
       compart = True)
   
     # SIMULATION
@@ -146,15 +148,16 @@ class Simulation(object):
 
 class Opti(object):
   
-  def __init__(self, Ssat0, n0, sy_mean0, settings):
+#  def __init__(self, Ssat0, n0, sy_mean0, settings):
+  def __init__(self, n0, sy_mean0, settings):
     
     self.sy_mean0 = sy_mean0
     self.n0 = n0
-    self.Ssat0 = Ssat0
+#    self.Ssat0 = Ssat0
     self.settings = settings
     self.sy_mean = []
     self.n = []
-    self.Ssat = []
+#    self.Ssat = []
     self.err = []
     self.force_sim = []
     disp_exp, force_exp = read_file(self.settings['file_name'])
@@ -167,9 +170,12 @@ class Opti(object):
     """
     Compute the residual error between experimental and simulated curve
     """
-    n =param[1]
-    Ssat = param[0]
-    sy_mean = param[2]
+#    n =param[1]
+#    Ssat = param[0]
+#    sy_mean = param[2]
+    n =param[0]
+    sy_mean = param[1]
+    Ssat = 1178.
    
     s = Simulation(Ssat, n , sy_mean, self.settings)
     s.Run()
@@ -184,7 +190,7 @@ class Opti(object):
     err = np.sqrt(((force_exp - force_sim)**2).sum())
     self.sy_mean.append(sy_mean)
     self.n.append(n)
-    self.Ssat.append(Ssat)
+#    self.Ssat.append(Ssat)
     self.err.append(err)
     self.force_sim.append(force_sim)
     self.disp = disp
@@ -194,12 +200,14 @@ class Opti(object):
     return err
     
   def Optimize(self):
-    p0 = [self.Ssat0, self.n0, self.sy_mean0]
+#    p0 = [self.Ssat0, self.n0, self.sy_mean0]
+    p0 = [self.n0, self.sy_mean0]
     
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(800., 200., 200., settings)
+#O = Opti(1150., 200., 240., settings)
+O = Opti(200., 240. , settings)
 O.Optimize()
 
 
