@@ -1,6 +1,6 @@
 # SOME OPTIMIZATION WITH RING COMPRESSION
 
-from abapy.materials import Ludwig
+from abapy.materials import Hollomon
 from compmod.models import RingCompression
 from scipy import interpolate
 from scipy.optimize import minimize
@@ -21,7 +21,7 @@ settings['displacement'] = 45.
 settings['nFrames'] = 100
 settings['E'] = 72469.
 settings['nu'] = .3
-settings['iteration'] = 30
+settings['iteration'] = 50
 settings['thickness'] = 20.02
 
 
@@ -60,13 +60,9 @@ def read_file(file_name):
 
 
 class Simulation(object):
-  
-<<<<<<< HEAD
-  def __init__(self, sy, K, n, settings):
-=======
-  def __init__(self, K, n, settings):
->>>>>>> origin/master
-    self.K = K
+
+  def __init__(self, sy, n, settings):
+
     self.n = n
     self.sy = sy
     self.settings = settings
@@ -77,7 +73,6 @@ class Simulation(object):
     Runs a simulation for a given couple (sy, n) and returns the (disp, force) couple.
     """
     #MODEL DEFINITION
-    K = self.K
     n = self.n
     sy = self.sy
   
@@ -92,12 +87,12 @@ class Simulation(object):
     Na = self.settings['Na']
     Ne = self.settings['Ne']
     thickness = self.settings['thickness']
-    print E, nu, sy, K, n
+    print E, nu, sy, n
     
-    material = Ludwig(
+    material = Hollomon(
       labels = "SAMPLE_MAT",
       E = E, nu = nu, sy = sy,
-      K = K, n = n)
+      n = n)
     m = RingCompression( material = material , 
       inner_radius = inner_radius, 
       outer_radius = outer_radius, 
@@ -138,15 +133,13 @@ class Simulation(object):
 
 class Opti(object):
   
-  def __init__(self, sy0, K0, n0, settings):
+  def __init__(self, sy0, n0, settings):
     
     self.sy0 = sy0    
-    self.K0 = K0
     self.n0 = n0
     
     self.settings = settings
     self.sy = []
-    self.K = []
     self.n = []
     self.err = []
     self.force_sim = []
@@ -163,11 +156,10 @@ class Opti(object):
     Compute the residual error between experimental and simulated curve
     """
     sy = param[0]    
-    K = param[1]
-    n =param[2]
+    n =param[1]
     
     disp_grid = self.disp_grid
-    s = Simulation(sy, K, n ,self.settings)
+    s = Simulation(sy, n ,self.settings)
     s.Run()
     f = s.Interp()
     force_sim = f(disp_grid)
@@ -175,18 +167,17 @@ class Opti(object):
     
     err = np.sqrt(((force_exp_grid - force_sim)**2).sum())
     self.sy.append(sy)
-    self.K.append(K)
     self.n.append(n) 
     self.err.append(err)
     self.force_sim.append(force_sim)
     return err
     
   def Optimize(self):
-    p0 = [self.sy0, self.K0, self.n0] 
+    p0 = [self.sy0, self.n0] 
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(150., 100., 0.5, settings)
+O = Opti(180., 0.15, settings)
 O.Optimize()
 
 
