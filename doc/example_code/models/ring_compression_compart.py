@@ -9,18 +9,20 @@ import platform
 #PAREMETERS
 is_3D = False
 inner_radius, outer_radius = 100.72/2-5.18 , 100.72/2
-Nt, Nr, Na = 100, 10, 20 
+Nt, Nr, Na = 20, 2, 3
 #Ne = Nt * Nr
 if is_3D == False :
   Ne = Nt * Nr
+  elType = "CPS4"
 else:
   Ne = Nt * Nr * Na
+  elType = "C3D8"
 disp = 45.
 nFrames = 100
 thickness = 20.02
 E  = 72469. * np.ones(Ne) # Young's modulus
 nu = .3 * np.ones(Ne) # Poisson's ratio
-Ssat =1178 * np.ones(Ne)
+Ssat = 1178 * np.ones(Ne)
 n = 205 * np.ones(Ne)
 sy_mean = 215.
 
@@ -31,7 +33,7 @@ material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = 
 
 
 workdir = "workdir/"
-label = "ringCompression"
+label = "ringCompression_compart"
 cpus = 1
 elType = "CPS4"
 filename = 'test_expA1.txt'
@@ -101,69 +103,70 @@ mesh = m.mesh
 outputs = load(workdir + label + '.pckl')
 
 if outputs['completed']:
-  # Fields
-  def field_func(outputs, step):
-    """
-    A function that defines the scalar field you want to plot
-    """
-    return outputs['field']['LE'][step].vonmises()
-  
-  def plot_mesh(ax, mesh, outputs, step, field_func =None, zone = 'upper right', cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
-    """
-    A function that plots the deformed mesh with a given field on it.
-    """
-    mesh2 = copy.deepcopy(mesh)
-    if disp:
-      U = outputs['field']['U'][step]
-      mesh2.nodes.apply_displacement(U)
-    X,Y,Z,tri = mesh2.dump2triplot()
-    xb,yb,zb = mesh2.get_border() 
-    xe, ye, ze = mesh2.get_edges()
-    if zone == "upper right": kx, ky = 1., 1.
-    if zone == "upper left": kx, ky = -1., 1.
-    if zone == "lower right": kx, ky = 1., -1.
-    if zone == "lower left": kx, ky = -1., -1.
-    ax.plot(kx * xb, ky * yb,'k-', linewidth = 2.)
-    ax.plot(kx * xe, ky * ye,'k-', linewidth = .5)
-    if field_func != None:
-      field = field_func(outputs, step)
-      grad = ax.tricontourf(kx * X, ky * Y, tri, field.data)
-      if cbar :
-        bar = plt.colorbar(grad, orientation = cbar_orientation)
-        bar.set_label(cbar_label)
+    
+    # Load vs disp
+    force = -2. * outputs['history']['force']
+    disp = -2. * outputs['history']['disp']
       
-  
-  fig = plt.figure("Fields")
-  plt.clf()
-  ax = fig.add_subplot(1, 1, 1)
-  ax.set_aspect('equal')
-  plt.grid()
-  plot_mesh(ax, mesh, outputs, 0, field_func, cbar_label = '$\epsilon_{eq}$')
-  plot_mesh(ax, mesh, outputs, 0, field_func = None, cbar = False, disp = False)
-  plt.xlabel('$x$')
-  plt.ylabel('$y$')
-  plt.savefig(workdir + label + '_fields.pdf')
-  
-  # Load vs disp
-  force = -2. * outputs['history']['force']
-  disp = -2. * outputs['history']['disp']
-  
-  fig = plt.figure('Load vs. disp')
-  plt.clf()
-  plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
-  plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
-  plt.plot(disp_exp, force_exp, 'k-', label = 'Exp', linewidth = 2.)
-  plt.legend(loc="upper left")
-  plt.grid()
-  plt.xlabel('Displacement, $U$')
-  plt.ylabel('Force, $F$')
-  plt.savefig(workdir + label + '_load-vs-disp.pdf')
+    fig = plt.figure('Load vs. disp')
+    plt.clf()
+    plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
+    #plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
+    plt.plot(disp_exp, force_exp, 'k-', label = 'Exp', linewidth = 2.)
+    plt.legend(loc="upper left")
+    plt.grid()
+    plt.xlabel('Displacement, $U$')
+    plt.ylabel('Force, $F$')
+    plt.savefig(workdir + label + '_load-vs-disp.pdf')
+    
+    if is_3D == False :
+        # Fields
+        def field_func(outputs, step):
+            """
+            A function that defines the scalar field you want to plot
+            """
+            return outputs['field']['LE'][step].vonmises()
+          
+        def plot_mesh(ax, mesh, outputs, step, field_func =None, zone = 'upper right', cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
+            """
+            A function that plots the deformed mesh with a given field on it.
+            """
+            mesh2 = copy.deepcopy(mesh)
+            if disp:
+              U = outputs['field']['U'][step]
+              mesh2.nodes.apply_displacement(U)
+            X,Y,Z,tri = mesh2.dump2triplot()
+            xb,yb,zb = mesh2.get_border() 
+            xe, ye, ze = mesh2.get_edges()
+            if zone == "upper right": kx, ky = 1., 1.
+            if zone == "upper left": kx, ky = -1., 1.
+            if zone == "lower right": kx, ky = 1., -1.
+            if zone == "lower left": kx, ky = -1., -1.
+            ax.plot(kx * xb, ky * yb,'k-', linewidth = 2.)
+            ax.plot(kx * xe, ky * ye,'k-', linewidth = .5)
+            if field_func != None:
+              field = field_func(outputs, step)
+              grad = ax.tricontourf(kx * X, ky * Y, tri, field.data)
+              if cbar :
+                bar = plt.colorbar(grad, orientation = cbar_orientation)
+                bar.set_label(cbar_label)
+                
+        fig = plt.figure("Fields")
+        plt.clf()
+        ax = fig.add_subplot(1, 1, 1)
+        ax.set_aspect('equal')
+        plt.grid()
+        plot_mesh(ax, mesh, outputs, 0, field_func, cbar_label = '$\sigma_{eq}$')
+        plot_mesh(ax, mesh, outputs, 0, field_func = None, cbar = False, disp = False)
+        plt.xlabel('$x$')
+        plt.ylabel('$y$')
+        plt.savefig(workdir + label + '_fields.pdf') 
   
 else: 
   print 'Simulation not completed'
 
 
-g = open('tutu2.txt', 'w')
+g = open('tutu.txt', 'w')
 
 
 for i in range(0, len(disp.data[0])): 
