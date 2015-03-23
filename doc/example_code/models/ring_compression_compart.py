@@ -8,6 +8,7 @@ import platform
 
 #PAREMETERS
 is_3D = False
+unloading = False
 inner_radius, outer_radius = 100.72/2-5.18 , 100.72/2
 Nt, Nr, Na = 20, 2, 3
 #Ne = Nt * Nr
@@ -83,6 +84,7 @@ m = RingCompression( material = material ,
   Nr = Nr, 
   Nt = Nt, 
   Na = Na,
+  unloading = unloading,
   workdir = workdir,
   label = label, 
   elType = elType,
