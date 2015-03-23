@@ -93,7 +93,7 @@ class CuboidTest(Simulation):
      
   Try to see the results of a simulation (displacement curves and shape of the tensile stress/ tensile strain) 2500 elements of a sudden and comparing with the results of a simulation 625 elements (tensile stress/strain curves)launched 4 times.   
 
-  cuboidTest_multiple
+  CuboidTest_multiple
   
   .. plot:: example_code/models/cuboidTest_multiple.py
      :include-source:
@@ -105,12 +105,16 @@ class CuboidTest(Simulation):
   .. plot:: example_code/models/cuboidTest_3D.py
      :include-source:
 
-  Models with bilinear Class
-
-  Model CuboidTest with distribution Rayleigh and Bilinear Class
+ Model CuboidTest with distribution Rayleigh and Bilinear Class
    
   .. plot:: example_code/models/Cuboid_Test_3D_Ssat.py
      :include-source:
+ 
+ CuboidTest with microstructure generated using Voronoi cells : 
+ 
+ * Source: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.py>`.
+ * VTK output: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.vtk>`.
+ 
   """
   def __init__(self, **kwargs):
     defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25}
@@ -400,6 +404,7 @@ class RingCompression(Simulation):
       "Nt":10,
       "Na":10, 
       "disp": .5,
+      "unloading": True
       }
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
@@ -511,8 +516,10 @@ ALLPD
 ALLSE
 *NODE OUTPUT, NSET=I_PLATE.REFNODE
 RF2, U2
-*END STEP
-*STEP, NAME = UNLOADING, NLGEOM = YES, INC=1000
+*END STEP"""
+    
+    if self.unloading:
+      pattern += """*STEP, NAME = UNLOADING, NLGEOM = YES, INC=1000
 *Static
 #FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
 *BOUNDARY

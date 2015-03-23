@@ -15,14 +15,14 @@ import platform
 settings = {}
 settings['file_name'] = 'test_expD2.txt'
 settings['inner_radius'], settings['outer_radius'] = 45.2 , 48.26
-settings['Nt'], settings['Nr'], settings['Na'] = 20, 4, 5
+settings['Nt'], settings['Nr'], settings['Na'] = 10, 4, 2
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
 settings['E'] = 71413.
 settings['nu'] = .3
-settings['iteration'] = 15
-settings['thickness'] = 50
+settings['iteration'] = 2
+settings['thickness'] = 14.92
 
 
 
@@ -106,7 +106,7 @@ class Simulation(object):
       elType = elType,
       abqlauncher = abqlauncher,
       cpus = cpus,
-      is_3D = False)
+      is_3D = True)
   
     # SIMULATION
     m.MakeMesh()

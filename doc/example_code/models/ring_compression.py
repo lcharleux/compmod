@@ -6,9 +6,27 @@ import numpy as np
 import pickle, copy
 import platform
 
+def read_file(file_name):
+  '''
+  Read a two rows data file and converts it to numbers
+  '''
+  f = open(file_name, 'r') # Opening the file
+  lignes = f.readlines() # Reads all lines one by one and stores them in a list
+  f.close() # Closing the file
+#    lignes.pop(0) # Delete le saut de ligne for each lines
+  force_exp, disp_exp = [],[]
+
+  for ligne in lignes:
+      data = ligne.split() # Lines are splitted
+      disp_exp.append(float(data[0]))
+      force_exp.append(float(data[1]))
+  return -np.array(disp_exp), -np.array(force_exp)
+
+
+
 #PAREMETERS
 inner_radius, outer_radius = 45.2 , 48.26
-Nt, Nr, Na = 80, 8, 20 
+Nt, Nr, Na = 40, 8, 20 
 displacement = 35.
 nFrames = 100
 sy = 147.558899
@@ -42,7 +60,7 @@ if node ==  'epua-pd45':
   
 
 #TASKS
-run_sim = True
+run_sim = False
 plot = True
 
 #MODEL DEFINITION
@@ -109,7 +127,9 @@ if outputs['completed']:
       if cbar :
         bar = plt.colorbar(grad, orientation = cbar_orientation)
         bar.set_label(cbar_label)
-      
+  
+  # Exp data
+  disp_exp, force_exp = read_file("test_expD2.txt")    
   
   fig = plt.figure("Fields")
   plt.clf()
@@ -128,6 +148,7 @@ if outputs['completed']:
   
   fig = plt.figure('Load vs. disp')
   plt.clf()
+  plt.plot(disp_exp, force_exp, "gs-", label = "Experimental data", linewidth = 2.)
   plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
   plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
   plt.legend(loc="upper left")
