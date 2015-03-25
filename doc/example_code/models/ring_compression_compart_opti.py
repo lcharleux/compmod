@@ -11,17 +11,30 @@ import platform
 node = platform.node()
 
 
+
+is_3D = True
+unloading = False
+export_fields = False
+label = "ringCompressionOptiCompart"
+cpus = 6
+if is_3D == False :
+  elType = "CPS4"
+else:
+  elType = "C3D8"
 #FIXED PAREMETERS
 settings = {}
 settings['file_name'] = 'test_expA1.txt'
 settings['inner_radius'], settings['outer_radius'] = 100.72/2-5.18 , 100.72/2
-settings['Nt'], settings['Nr'], settings['Na'] = 100, 10, 15
-settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
-settings['displacement'] = 35.
+settings['Nt'], settings['Nr'], settings['Na'] = 40, 4, 7
+if is_3D == True :
+    settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
+else :
+    settings['Ne'] =  settings['Nt']*settings['Nr']
+settings['displacement'] = 40.
 settings['nFrames'] = 100
 settings['E'] =72469. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
-settings['iteration'] = 30
+settings['iteration'] = 50
 settings['thickness'] = 20.02
 
 
@@ -37,13 +50,6 @@ if node ==  'SERV3-MS-SYMME':
   workdir = "workdir/"
 if node ==  'epua-pd45': 
   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
-
-label = "ringCompressionOptiCompart1"
-elType = "CPS4"
-cpus = 1
-is_3D = False
-
-
 
 def read_file(file_name):
   '''
@@ -97,8 +103,8 @@ class Simulation(object):
     run_sim = True
     plot = True
     
-#    print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
-    print E[0], nu[0], n[0], sy_mean[0]
+    print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
+    #print E[0], nu[0], n[0], sy_mean[0]
 
   
     ray_param = sy_mean/1.253314
@@ -106,23 +112,25 @@ class Simulation(object):
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
     material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
 
-    m = RingCompression(
-      material = material , 
-      inner_radius = inner_radius, 
-      outer_radius = outer_radius, 
-      disp = disp, 
-      nFrames = nFrames,
-      thickness = thickness,
-      Nr = Nr, 
-      Nt = Nt, 
-      workdir = workdir,
-      label = label, 
-      elType = elType,
-      abqlauncher = abqlauncher,
-      cpus = cpus,
-      is_3D = is_3D,
-      compart = True)
-  
+    m = RingCompression( material = material , 
+        inner_radius = inner_radius, 
+        outer_radius = outer_radius, 
+        disp = disp/2,
+        thickness = thickness,
+        nFrames = nFrames, 
+        Nr = Nr, 
+        Nt = Nt, 
+        Na = Na,
+        unloading = unloading,
+        export_fields = export_fields,
+        workdir = workdir,
+        label = label, 
+        elType = elType,
+        abqlauncher = abqlauncher,
+        cpus = cpus,
+        is_3D = is_3D,
+        compart = True)
+    
     # SIMULATION
     m.MakeMesh()
     if run_sim:
@@ -148,16 +156,16 @@ class Simulation(object):
 
 class Opti(object):
   
-#  def __init__(self, Ssat0, n0, sy_mean0, settings):
-  def __init__(self, n0, sy_mean0, settings):
+  def __init__(self, Ssat0, n0, sy_mean0, settings):
+  #def __init__(self, n0, sy_mean0, settings):
     
     self.sy_mean0 = sy_mean0
     self.n0 = n0
-#    self.Ssat0 = Ssat0
+    self.Ssat0 = Ssat0
     self.settings = settings
     self.sy_mean = []
     self.n = []
-#    self.Ssat = []
+    self.Ssat = []
     self.err = []
     self.force_sim = []
     disp_exp, force_exp = read_file(self.settings['file_name'])
@@ -170,12 +178,12 @@ class Opti(object):
     """
     Compute the residual error between experimental and simulated curve
     """
-#    n =param[1]
-#    Ssat = param[0]
-#    sy_mean = param[2]
-    n =param[0]
-    sy_mean = param[1]
-    Ssat = 1178.
+    n =param[1]
+    Ssat = param[0]
+    sy_mean = param[2]
+#    n =param[0]
+#    sy_mean = param[1]
+#    Ssat = 1178.
    
     s = Simulation(Ssat, n , sy_mean, self.settings)
     s.Run()
@@ -190,7 +198,7 @@ class Opti(object):
     err = np.sqrt(((force_exp - force_sim)**2).sum())
     self.sy_mean.append(sy_mean)
     self.n.append(n)
-#    self.Ssat.append(Ssat)
+    self.Ssat.append(Ssat)
     self.err.append(err)
     self.force_sim.append(force_sim)
     self.disp = disp
@@ -200,14 +208,14 @@ class Opti(object):
     return err
     
   def Optimize(self):
-#    p0 = [self.Ssat0, self.n0, self.sy_mean0]
-    p0 = [self.n0, self.sy_mean0]
+    p0 = [self.Ssat0, self.n0, self.sy_mean0]
+    #p0 = [self.n0, self.sy_mean0]
     
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-#O = Opti(1150., 200., 240., settings)
-O = Opti(200., 240. , settings)
+O = Opti(1000., 300., 300., settings)
+#O = Opti(200., 240. , settings)
 O.Optimize()
 
 
@@ -221,7 +229,6 @@ index = np.argmin(a)
 plt.plot(O.disp, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
 for i in range(1, settings['iteration']):
   plt.plot(O.disp, O.force_sim[i], 'b-', linewidth = .2)
-#plt.plot(disp.data[1], force.data[1], 'b-', label = 'Unloading', linewidth = 2.)  
 plt.legend(loc="upper left")
 plt.grid()
 plt.xlabel('Displacement, $U$')

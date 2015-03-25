@@ -24,7 +24,12 @@ thickness = 14.92
 
 workdir = "workdir/"
 label = "ringCompression"
-elType = "CPS4"
+if is_3D == False :
+  Ne = Nt * Nr
+  elType = "CPS4"
+else:
+  Ne = Nt * Nr * Na
+  elType = "C3D8"
 filename = 'test_expD2.txt'
 cpus = 1
 node = platform.node()

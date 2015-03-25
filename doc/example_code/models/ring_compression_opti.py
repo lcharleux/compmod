@@ -15,7 +15,7 @@ import platform
 settings = {}
 settings['file_name'] = 'test_expA1.txt'
 settings['inner_radius'], settings['outer_radius'] = 45.18 , 100.72/2
-settings['Nt'], settings['Nr'], settings['Na'] = 100, 10, 15
+settings['Nt'], settings['Nr'], settings['Na'] = 20, 2, 3
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
