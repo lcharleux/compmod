@@ -405,7 +405,7 @@ class RingCompression(Simulation):
       "Na":10, 
       "disp": .5,
       "unloading": True,
-      "export_fields":True
+      "export_fields": True
       }
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
@@ -517,7 +517,8 @@ ALLPD
 ALLSE
 *NODE OUTPUT, NSET=I_PLATE.REFNODE
 RF2, U2
-*END STEP"""
+*END STEP
+"""
     
     if self.unloading:
       pattern += """*STEP, NAME = UNLOADING, NLGEOM = YES, INC=1000
@@ -585,6 +586,9 @@ RF2, U2
 
   def MakePostProc(self):
     import os, subprocess, time, pickle
+    if self.unloading :
+        step_number = 2
+    else: step_number = 1
     pattern = """# ABQPOSTPROC.PY
 # Warning: executable only in abaqus abaqus viewer -noGUI,... not regular python.
 import sys
@@ -603,147 +607,94 @@ from abaqusConstants import JOB_STATUS_COMPLETED_SUCCESSFULLY
 file_name = '#FILE_NAME'
 odb = openOdb(file_name + '.odb')
 data = {}
+step_number= #STEP_NUMBER
 
 # Check job status:
 job_status = odb.diagnosticData.jobStatus
 
 if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
-  data['completed'] = True"""
+  data['completed'] = True
+  """
+    
     if self.export_fields : pattern += """
   # Field Outputs
-  data['field'] = {}
+  data['field'] = {"U":[], "S":[], "LE":[], "EE":[], "PE":[], "PEEQ":[]}
   fo = data['field']
-  
-  fo['U'] = [
-    gvfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 0,
-      frame = -1,
-      original_position = 'NODAL', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'U', 
-      sub_set_type = 'element', 
-      delete_report = True),
-    gvfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 1,
-      frame = -1,
-      original_position = 'NODAL', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'U', 
-      sub_set_type = 'element', 
-      delete_report = True)]
+  for i in xrange(step_number):
       
-  fo['S'] = [
-    gtfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 0,
-      frame = -1,
-      original_position = 'INTEGRATION_POINT', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'S', 
-      sub_set_type = 'element', 
-      delete_report = True),
-    gtfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 1,
-      frame = -1,
-      original_position = 'INTEGRATION_POINT', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'S', 
-      delete_report = True)]
-   
-  fo['LE'] = [
-    gtfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 0,
-      frame = -1,
-      original_position = 'INTEGRATION_POINT', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'LE', 
-      sub_set_type = 'element', 
-      delete_report = True),
-    gtfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 1,
-      frame = -1,
-      original_position = 'INTEGRATION_POINT', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'LE', 
-      sub_set_type = 'element', 
-      delete_report = True)] 
+      fo['U'].append(
+        gvfo(odb = odb, 
+          instance = 'I_SAMPLE', 
+          step = i,
+          frame = -1,
+          original_position = 'NODAL', 
+          new_position = 'NODAL', 
+          position = 'node',
+          field = 'U', 
+          sub_set_type = 'element', 
+          delete_report = True))
+        
+          
+      fo['S'].append(
+        gtfo(odb = odb, 
+          instance = 'I_SAMPLE', 
+          step = i,
+          frame = -1,
+          original_position = 'INTEGRATION_POINT', 
+          new_position = 'NODAL', 
+          position = 'node',
+          field = 'S', 
+          sub_set_type = 'element', 
+          delete_report = True))
+       
+      fo['LE'].append(
+        gtfo(odb = odb, 
+          instance = 'I_SAMPLE', 
+          step = i,
+          frame = -1,
+          original_position = 'INTEGRATION_POINT', 
+          new_position = 'NODAL', 
+          position = 'node',
+          field = 'LE', 
+          sub_set_type = 'element', 
+          delete_report = True)) 
+          
+      fo['EE'].append(
+        gtfo(odb = odb, 
+          instance = 'I_SAMPLE', 
+          step = i,
+          frame = -1,
+          original_position = 'INTEGRATION_POINT', 
+          new_position = 'NODAL', 
+          position = 'node',
+          field = 'EE', 
+          sub_set_type = 'element', 
+          delete_report = True))  
       
-  fo['EE'] = [
-    gtfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 0,
-      frame = -1,
-      original_position = 'INTEGRATION_POINT', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'EE', 
-      sub_set_type = 'element', 
-      delete_report = True),
-    gtfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 1,
-      frame = -1,
-      original_position = 'INTEGRATION_POINT', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'EE', 
-      sub_set_type = 'element', 
-      delete_report = True)]     
-  
-  fo['PE'] = [
-    gtfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 0,
-      frame = -1,
-      original_position = 'INTEGRATION_POINT', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'PE', 
-      sub_set_type = 'element', 
-      delete_report = True),
-    gtfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 1,
-      frame = -1,
-      original_position = 'INTEGRATION_POINT', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'PE', 
-      sub_set_type = 'element', 
-      delete_report = True)] 
-  
-  fo['PEEQ'] = [
-    gfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 0,
-      frame = -1,
-      original_position = 'INTEGRATION_POINT', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'PEEQ', 
-      sub_set_type = 'element', 
-      delete_report = True),
-    gfo(odb = odb, 
-      instance = 'I_SAMPLE', 
-      step = 1,
-      frame = -1,
-      original_position = 'INTEGRATION_POINT', 
-      new_position = 'NODAL', 
-      position = 'node',
-      field = 'PEEQ', 
-      sub_set_type = 'element', 
-      delete_report = True)]""" 
+      fo['PE'].append(
+        gtfo(odb = odb, 
+          instance = 'I_SAMPLE', 
+          step = i,
+          frame = -1,
+          original_position = 'INTEGRATION_POINT', 
+          new_position = 'NODAL', 
+          position = 'node',
+          field = 'PE', 
+          sub_set_type = 'element', 
+          delete_report = True))
+      
+      fo['PEEQ'].append(
+        gfo(odb = odb, 
+          instance = 'I_SAMPLE', 
+          step = i,
+          frame = -1,
+          original_position = 'INTEGRATION_POINT', 
+          new_position = 'NODAL', 
+          position = 'node',
+          field = 'PEEQ', 
+          sub_set_type = 'element', 
+          delete_report = True))
+      """ 
     pattern += """# History Outputs
   data['history'] = {} 
   ho = data['history']
@@ -762,6 +713,7 @@ else:
 odb.close()
 dump(data, file_name+'.pckl')"""  
     pattern = pattern.replace('#FILE_NAME', self.label)  
+    pattern = pattern.replace('#STEP_NUMBER', str(step_number))  
     f = open(self.workdir + self.label + '_abqpostproc.py', 'w')
     f.write(pattern)
     f.close()
