@@ -25,12 +25,12 @@ else:
 settings = {}
 settings['file_name'] = 'test_expA1.txt'
 settings['inner_radius'], settings['outer_radius'] = 100.72/2-5.18 , 100.72/2
-settings['Nt'], settings['Nr'], settings['Na'] = 40, 4, 7
+settings['Nt'], settings['Nr'], settings['Na'] = 80, 8, 15
 if is_3D == True :
     settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 else :
     settings['Ne'] =  settings['Nt']*settings['Nr']
-settings['displacement'] = 40.
+settings['displacement'] = 35.
 settings['nFrames'] = 100
 settings['E'] =72469. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
@@ -190,7 +190,7 @@ class Opti(object):
     f = s.Interp()
     d = self.settings['displacement']
     disp = np.linspace(0., d, 100)
-    force_sim = f(disp)
+    force_sim = f(disp/2)
     
     g = self.g
     force_exp = g(disp)
