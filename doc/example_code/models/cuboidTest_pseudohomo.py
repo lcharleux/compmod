@@ -38,7 +38,7 @@ def plot_mesh(ax, mesh, outputs, step, field_func =None, cbar = True, cbar_label
 
 #PARAMETERS
 lx, ly = 1., 1.
-Nx, Ny = 20, 20 
+Nx, Ny = 40, 40 
 Ne = Nx * Ny
 disp = .2
 nFrames = 20
@@ -65,16 +65,18 @@ run_simulation = True
 if compart:
   E  = 1. * np.ones(Ne) # Young's modulus
   nu = .3 * np.ones(Ne) # Poisson's ratio
+  n = 0.01 * np.ones(Ne) # Poisson's ratio
   sy_mean = .01
   sy = np.random.rayleigh(sy_mean, Ne)
   labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
-  material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i]) for i in xrange(Ne)]
+  material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i], n = n[i]) for i in xrange(Ne)]
 else:
   E = 1.
   nu =.3
   sy = .01
+  n = 0.01
   labels = 'SAMPLE_MAT'
-  material = materials.VonMises(labels = labels, E = E, nu = nu, sy = sy)
+  material = materials.Bilinear(labels = labels, E = E, nu = nu, sy = sy, n = n)
 
 m0 = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label0, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType, lateralbc = lateralbc)
 m1 = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label1, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType)
