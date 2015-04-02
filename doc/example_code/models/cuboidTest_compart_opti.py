@@ -11,7 +11,7 @@ import platform
 node = platform.node()
 
 
-
+lateralbc = { "right":"pseudohomo", "left":"pseudohomo" }
 is_3D = True
 export_fields = False
 label = "CuboidTestOptiCompart"
@@ -24,13 +24,13 @@ else:
 #FIXED PAREMETERS
 settings = {}
 settings['file_name'] = 'cuivre_cufe2p_ANR.txt'
-settings['lx'], settings['ly'], settings['lz']  = 1 , 2., 1 #ly = tension test direction
-settings['Nx'], settings['Ny'], settings['Nz'] = 5, 10, 5
+settings['lx'], settings['ly'], settings['lz']  = 0.1 , 0.1, 0.1 #ly = tension test direction
+settings['Nx'], settings['Ny'], settings['Nz'] = 10, 10, 10
 if is_3D == True :
     settings['Ne'] =  settings['Nx']*settings['Ny']*settings['Nz']
 else :
     settings['Ne'] =  settings['Nx']*settings['Ny']
-settings['displacement'] = 0.1
+settings['displacement'] = 0.05
 settings['nFrames'] = 100
 settings['E'] =72469. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
@@ -113,7 +113,7 @@ class Simulation(object):
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
     material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
     
-    m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True)
+    m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True, lateralbc = lateralbc)
     
     # SIMULATION
     m.MakeMesh()
