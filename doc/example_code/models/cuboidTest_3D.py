@@ -15,7 +15,7 @@ Nx, Ny, Nz = 10, 10, 10
 Ne = Nx * Ny * Nz
 disp = .1
 nFrames = 20
-workdir = "D:\donnees_pyth/workdir/"
+workdir = "workdir/"
 label = "cuboidTest"
 elType = "CPE4"
 cpus = 1
@@ -27,7 +27,9 @@ if node ==  'serv2-ms-symme':
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:\SIMULIA\Abaqus\6.13-1'
 if node ==  'epua-pd45': 
-  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
 compart = True
 
 

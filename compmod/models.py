@@ -117,7 +117,7 @@ class CuboidTest(Simulation):
  
   """
   def __init__(self, **kwargs):
-    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25}
+    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "export_fields": True}
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     super(CuboidTest, self).__init__(**kwargs)
@@ -353,7 +353,6 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
   ho['allpd'] =   gho(odb,'ALLPD').values()[0]
   ho['allwk'] =   gho(odb,'ALLWK').values()[0]
   ho['volume'] =  gho(odb,'EVOL')
-  
   
   # Mesh 
   data['mesh'] = GetMesh(odb, "ISAMPLE")

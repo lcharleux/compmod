@@ -1,0 +1,240 @@
+# SOME OPTIMIZATION WITH RING COMPRESSION
+
+from abapy import materials
+from compmod.models import CuboidTest
+from scipy import interpolate
+from scipy.optimize import minimize
+import matplotlib.pyplot as plt
+import numpy as np
+import pickle, copy
+import platform
+node = platform.node()
+
+
+
+is_3D = True
+export_fields = False
+label = "CuboidTestOptiCompart"
+cpus = 1
+compart = True
+if is_3D == False :
+  elType = "CPS4"
+else:
+  elType = "C3D8"
+#FIXED PAREMETERS
+settings = {}
+settings['file_name'] = 'cuivre_cufe2p_ANR.txt'
+settings['lx'], settings['ly'], settings['lz']  = 1 , 2., 1 #ly = tension test direction
+settings['Nx'], settings['Ny'], settings['Nz'] = 5, 10, 5
+if is_3D == True :
+    settings['Ne'] =  settings['Nx']*settings['Ny']*settings['Nz']
+else :
+    settings['Ne'] =  settings['Nx']*settings['Ny']
+settings['displacement'] = 0.1
+settings['nFrames'] = 100
+settings['E'] =72469. * np.ones(settings['Ne'])
+settings['nu'] = .3 * np.ones(settings['Ne'])
+settings['iteration'] = 3
+settings['thickness'] = 20.02
+
+
+if node ==  'lcharleux':      
+  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
+  workdir = "workdir/"
+if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
+if node ==  'epua-pd47': 
+  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+  workdir = "D:/Simulations/Dossier_travail_Abaqus/"
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+  workdir = "workdir/"
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
+
+def read_file(file_name):
+  '''
+  Read a two rows data file and converts it to numbers
+  '''
+  f = open(file_name, 'r') # Opening the file
+  lignes = f.readlines() # Reads all lines one by one and stores them in a list
+  f.close() # Closing the file
+#    lignes.pop(0) # Delete le saut de ligne for each lines
+  force_exp, disp_exp = [],[]
+
+  for ligne in lignes:
+      data = ligne.split() # Lines are splitted
+      disp_exp.append(float(data[0]))
+      force_exp.append(float(data[1]))
+  return np.array(disp_exp), np.array(force_exp)
+
+
+
+class Simulation(object):
+  
+  def __init__(self, Ssat, n, sy_mean, settings):
+    self.sy_mean = sy_mean
+    self.n = n
+    self.Ssat = Ssat
+    self.settings = settings
+    
+    
+  def Run(self):
+    """
+    Runs a simulation for a given couple (sy, n) and returns the (disp, force) couple.
+    """
+    #MODEL DEFINITION
+    sy_mean = self.sy_mean * np.ones(settings['Ne'])
+    n = self.n * np.ones(settings['Ne'])
+    Ssat = self.Ssat * np.ones(settings['Ne'])
+  
+    E = self.settings['E']
+    nu = self.settings['nu']
+    lx = self.settings['lx']
+    ly = self.settings['ly']
+    lz = self.settings['lz']
+    disp = self.settings['displacement']
+    nFrames = self.settings['nFrames']
+    Nx = self.settings['Nx']
+    Ny = self.settings['Ny']
+    Nz = self.settings['Nz']
+    Ne = self.settings['Ne']
+    thickness = self.settings['thickness']
+    
+    #TASKS
+    run_sim = True
+    plot = True
+    
+    print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
+    #print E[0], nu[0], n[0], sy_mean[0]
+
+  
+    ray_param = sy_mean/1.253314
+    sy = np.random.rayleigh(ray_param, Ne)
+    labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
+    material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
+    
+    m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True)
+    
+    # SIMULATION
+    m.MakeMesh()
+    if run_sim:
+      m.MakeInp()
+      m.Run()
+      m.PostProc()
+      if m.outputs['completed']:
+          # History Outputs
+          disp =  np.array(m.outputs['history']['disp'].values()[0].data[0])
+          force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
+          volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
+          length = ly + disp
+          surface = volume / length
+          logstrain = np.log10(1. + disp / ly)
+          linstrain = disp/ly
+          strain = linstrain
+          stress = force / surface 
+    
+      self.disp = disp
+      self.force = force
+    
+  
+  
+  def Interp(self):
+    """
+    Interpolate the curve Force-displacement on a known grid
+    """
+    disp, force = self.disp, self.force
+    f = interpolate.interp1d(disp, force)
+    return f
+
+class Opti(object):
+  
+  def __init__(self, Ssat0, n0, sy_mean0, settings):
+  #def __init__(self, n0, sy_mean0, settings):
+    
+    self.sy_mean0 = sy_mean0
+    self.n0 = n0
+    self.Ssat0 = Ssat0
+    self.settings = settings
+    self.sy_mean = []
+    self.n = []
+    self.Ssat = []
+    self.err = []
+    self.force_sim = []
+    disp_exp, force_exp = read_file(self.settings['file_name'])
+    g = interpolate.interp1d(disp_exp, force_exp)
+    self.disp_exp = disp_exp
+    self.force_exp = force_exp
+    self.g = g
+
+  def Err(self, param):
+    """
+    Compute the residual error between experimental and simulated curve
+    """
+    n =param[1]
+    Ssat = param[0]
+    sy_mean = param[2]
+#    n =param[0]
+#    sy_mean = param[1]
+#    Ssat = 1178.
+   
+    s = Simulation(Ssat, n , sy_mean, self.settings)
+    s.Run()
+    f = s.Interp()
+    d = self.settings['displacement']
+    disp_grid = np.linspace(0., d, 100)
+    force_sim = f(disp_grid)
+    
+    g = self.g
+    force_exp = g(disp_grid)
+    
+    err = np.sqrt(((force_exp - force_sim)**2).sum())
+    self.sy_mean.append(sy_mean)
+    self.n.append(n)
+    self.Ssat.append(Ssat)
+    self.err.append(err)
+    self.force_sim.append(force_sim)
+    self.force_exp = force_exp
+    self.disp_grid = disp_grid
+    
+    
+    return err
+    
+  def Optimize(self):
+    p0 = [self.Ssat0, self.n0, self.sy_mean0]
+    #p0 = [self.n0, self.sy_mean0]
+    
+    result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
+    self.result = result
+    
+O = Opti(1000., 300., 300., settings)
+#O = Opti(200., 240. , settings)
+O.Optimize()
+
+
+fig = plt.figure('Load vs. disp')
+plt.clf()
+
+plt.plot(O.disp_grid, O.force_exp, 'k-', label = 'experimental curve', linewidth = 2.)
+plt.plot(O.disp_grid, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
+a = O.err
+index = np.argmin(a)
+plt.plot(O.disp_grid, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
+for i in range(1, settings['iteration']):
+  plt.plot(O.disp_grid, O.force_sim[i], 'b-', linewidth = .2)
+plt.legend(loc="lower right")
+plt.grid()
+plt.xlabel('Displacement, $U$')
+plt.ylabel('Force, $F$')
+plt.savefig(workdir + label + '_load-vs-disp.pdf')
+
+
+#print s.force.data[0]
+"""
+f = s.Interp()
+x = np.arange(0., 49., 0.1)
+print f(x)
+"""
+
+
+
+
