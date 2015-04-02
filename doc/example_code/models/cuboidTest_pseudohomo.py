@@ -37,8 +37,8 @@ def plot_mesh(ax, mesh, outputs, step, field_func =None, cbar = True, cbar_label
 
 
 #PARAMETERS
-lx, ly = 1., 1.
-Nx, Ny = 10, 10 
+lx, ly = 1., 2.
+Nx, Ny = 20, 20 
 Ne = Nx * Ny
 disp = .1
 nFrames = 20
@@ -77,7 +77,7 @@ else:
 m = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType, lateralbc = lateralbc)
 if run_simulation:
   m.MakeInp()
-"""
+
   m.Run()
   m.PostProc()
 else:
@@ -128,4 +128,4 @@ if m.outputs['completed']:
     #plt.savefig(workdir + label + '_fields.pdf')
     plt.show()
     
-"""    
+ 
