@@ -117,7 +117,7 @@ class CuboidTest(Simulation):
  
   """
   def __init__(self, **kwargs):
-    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "export_fields": True}
+    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "export_fields": True, "lateralbc":{}}
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     super(CuboidTest, self).__init__(**kwargs)
@@ -153,6 +153,7 @@ class CuboidTest(Simulation):
 *Part, name = pSample
 #MESH
 #SECTIONS
+#LATERALBC
 *End part
 **----------------------------------
 ** ASSEMBLY
@@ -223,6 +224,21 @@ EVOL
     if hasattr(self, "mesh") == False:
       self.MakeMesh()
     m = self.mesh
+    lateralbc = ""
+    if len(self.lateralbc.keys()) != 0:
+      lateralbc += "*EQUATION\n"
+      lateralbc_keys = self.lateralbc.keys()
+      for lbck in lateralbc_keys:
+        if lbck == "right": 
+          direction = 1
+          nset = m.nodes.sets['right'] 
+        if lbck == "left": 
+          direction = 1
+          nset = m.nodes.sets['left']
+        for nodelabel in nset[1:]:
+          if self.lateralbc[lbck] == "pseudohomo":
+            lateralbc += "2\n{0}, 1, 1, {1}, 1, -1\n".format(nodelabel, nset[0])   
+    pattern = pattern.replace("#LATERALBC", lateralbc[:-1])  
     pattern = pattern.replace("#MESH", m.dump2inp())
     pattern = pattern.replace("#SECTIONS", sections[:-1])
     pattern = pattern.replace("#MATERIALS", matinp[:-1])
