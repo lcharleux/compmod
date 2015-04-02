@@ -13,7 +13,7 @@ def field_func(outputs, step):
     A function that defines the scalar field you want to plot
     """
     epsilon = np.array(outputs['field']['LE'][step].get_component(22).data)
-    return (epsilon - max_strain) / max_strain
+    return epsilon
   
 def plot_mesh(ax, mesh, outputs, step, field_func =None, cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
     """
@@ -37,13 +37,15 @@ def plot_mesh(ax, mesh, outputs, step, field_func =None, cbar = True, cbar_label
 
 
 #PARAMETERS
-lx, ly = 1., 2.
+lx, ly = 1., 1.
 Nx, Ny = 20, 20 
 Ne = Nx * Ny
-disp = .1
+disp = .2
 nFrames = 20
 workdir = "workdir/"
-label = "cuboidTest_homo"
+label0 = "cuboidTest_homo0"
+label1 = "cuboidTest_homo1"
+
 elType = "CPE4"
 lateralbc = { "right":"pseudohomo", "left":"pseudohomo" }
 cpus = 1
@@ -74,54 +76,85 @@ else:
   labels = 'SAMPLE_MAT'
   material = materials.VonMises(labels = labels, E = E, nu = nu, sy = sy)
 
-m = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType, lateralbc = lateralbc)
-if run_simulation:
-  m.MakeInp()
+m0 = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label0, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType, lateralbc = lateralbc)
+m1 = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label1, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType)
 
-  m.Run()
-  m.PostProc()
+if run_simulation:
+  m0.MakeInp()
+  m1.MakeInp()
+  m0.Run()
+  m1.Run()
+  m0.PostProc()
+  m1.PostProc()
 else:
-  m.LoadResults()
+  m0.LoadResults()
+  m1.LoadResults()
 
 # Plotting results
-if m.outputs['completed']:
-    disp =  np.array(m.outputs['history']['disp'].values()[0].data[0])
-    force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
-    volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
-    length = ly + disp
-    surface = volume / length
-    logstrain = np.log10(1. + disp / ly)
-    linstrain = disp/ly
-    strain = linstrain
-    stress = force / surface 
+if m0.outputs['completed'] and m1.outputs['completed']:
+    
+    disp0 =  np.array(m0.outputs['history']['disp'].values()[0].data[0])
+    force0 =  np.array(np.array(m0.outputs['history']['force'].values()).sum().data[0])
+    volume0 = np.array(np.array(m0.outputs['history']['volume'].values()).sum().data[0])
+    length0 = ly + disp0
+    surface0 = volume0 / length0
+    logstrain0 = np.log10(1. + disp0 / ly)
+    linstrain0 = disp0/ly
+    strain0 = linstrain0
+    stress0 = force0 / surface0 
+    
+    disp1 =  np.array(m1.outputs['history']['disp'].values()[0].data[0])
+    force1 =  np.array(np.array(m1.outputs['history']['force'].values()).sum().data[0])
+    volume1 = np.array(np.array(m1.outputs['history']['volume'].values()).sum().data[0])
+    length1 = ly + disp1
+    surface1 = volume1 / length1
+    logstrain1 = np.log10(1. + disp1 / ly)
+    linstrain1 = disp1/ly
+    strain1 = linstrain1
+    stress1 = force1 / surface1 
     
     fig = plt.figure(0)
     plt.clf()
     sp1 = fig.add_subplot(2, 1, 1)
-    plt.plot(disp, force, 'ok-')
+    plt.plot(disp0, force0, 'or-', label = "Pseudo-homo")
+    plt.plot(disp1, force1, 'ob-', label = "Free")
     plt.xlabel('Displacement, $U$')
     plt.ylabel('Force, $F$')
     plt.grid()
+    plt.legend()
     sp1 = fig.add_subplot(2, 1, 2)
-    plt.plot(strain, stress, 'ok-')
+    plt.plot(strain0, stress0, 'or-', label = "Pseudo-homo")
+    plt.plot(strain1, stress1, 'ob-', label = "Free")
     plt.xlabel('Tensile Strain, $\epsilon$')
     plt.ylabel(' Tensile Stress $\sigma$')
     plt.grid()
-    plt.savefig(workdir + label + 'history.pdf')
+    plt.legend()
+    #plt.savefig(workdir + label + 'history.pdf')
     
   # Field Outputs
      
           
       
 
-    mesh = m.outputs['mesh']
-    max_strain = strain.max()
+    mesh0 = m0.outputs['mesh']
+    mesh1 = m1.outputs['mesh']
+    max_strain0 = strain0.max()
+    max_strain1 = strain1.max()
     fig = plt.figure("Fields")
     plt.clf()
-    ax = fig.add_subplot(1, 1, 1)
+    ax = fig.add_subplot(1, 2, 1)
     ax.set_aspect('equal')
+    ax.axis("off")
     plt.grid()
-    plot_mesh(ax, mesh, m.outputs, 0, field_func, cbar_label = r'Relative Tensile Strain, $\frac{\epsilon - \epsilon_{av}}{\epsilon_{av}}$')
+    plot_mesh(ax, mesh0, m0.outputs, 0, field_func, cbar_label = 'Tensile Strain, $\epsilon$')
+      #plot_mesh(ax, mesh, outputs, 0, field_func = None, cbar = False, disp = False)
+    plt.xlabel('$x$')
+    plt.ylabel('$y$')
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_aspect('equal')
+    ax.axis("off")
+    plt.grid()
+    plot_mesh(ax, mesh1, m1.outputs, 0, field_func, cbar_label = r'Tensile Strain, $\epsilon$')
       #plot_mesh(ax, mesh, outputs, 0, field_func = None, cbar = False, disp = False)
     plt.xlabel('$x$')
     plt.ylabel('$y$')
