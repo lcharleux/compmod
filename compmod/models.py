@@ -279,7 +279,8 @@ data = {}
 job_status = odb.diagnosticData.jobStatus
 
 if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
-  data['completed'] = True 
+  data['completed'] = True"""
+    if self.export_fields : pattern += """
   # Field Outputs
   data['field'] = {}
   fo = data['field']
@@ -359,8 +360,9 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
       field = 'PEEQ', 
       sub_set_type = 'element', 
       delete_report = True),
-    ] 
-  # History Outputs
+    ] """
+    
+    pattern += """# History Outputs
   data['history'] = {} 
   ho = data['history']
   ho['disp'] =   gho(odb,'U2')
