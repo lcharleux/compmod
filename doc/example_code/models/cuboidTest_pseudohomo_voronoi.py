@@ -41,7 +41,7 @@ def plot_mesh(ax, mesh, outputs, step, field_func =None, cbar = True, cbar_label
 
 #PARAMETERS
 lx, ly = 1., 1.
-Nx, Ny = 40, 40 
+Nx, Ny = 20, 20 
 Ne = Nx * Ny
 disp = .5
 nFrames = 20

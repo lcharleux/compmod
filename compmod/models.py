@@ -235,9 +235,21 @@ EVOL
         if lbck == "left": 
           direction = 1
           nset = m.nodes.sets['left']
-        for nodelabel in nset[1:]:
-          if self.lateralbc[lbck] == "pseudohomo":
-            lateralbc += "2\n{0}, 1, 1, {1}, 1, -1\n".format(nodelabel, nset[0])   
+        if self.lateralbc[lbck] == "pseudohomo":
+          for nodelabel in nset[1:]:
+            lateralbc += "2\n{0}, 1, 1, {1}, 1, -1\n".format(nodelabel, nset[0])
+        """
+        if self.lateralbc[lbck] == "periodic":
+          left_nodes = m.nodes.sets['left']
+          right_nodes = m.nodes.sets['right']
+          xl = np.array([])
+          side_pairs = []
+          top_pair = []
+          bottom_pair = []
+          
+          for nl in left_nodes:
+            nlx = 
+        """       
     pattern = pattern.replace("#LATERALBC", lateralbc[:-1])  
     pattern = pattern.replace("#MESH", m.dump2inp())
     pattern = pattern.replace("#SECTIONS", sections[:-1])

@@ -1,51 +1,66 @@
-# Voronoi cells for grain boundary generation ?
-# A demo in 2D (3D is exaclty the same)
-
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from scipy import interpolate
-from compmod.models import CuboidTest
+from compmod.models import RingCompression
 from abapy import materials
 from abapy.misc import load
 from abapy.postproc import FieldOutput
+import matplotlib.pyplot as plt
+import numpy as np
 import pickle, copy
 import platform
+from scipy import interpolate
 
-
-# PLATFORM SETTINGS
-workdir = "workdir/"
-label = "cuboidTest"
-cpus = 1
-abqlauncher = None
-node = platform.node()
-if node ==  'lcharleux':      
-  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
-if node ==  'serv2-ms-symme': 
-  abqlauncher   = '/opt/abaqus/Commands/abaqus' # Local machine configuration
-if node ==  'epua-pd47': 
-  abqlauncher   = 'C:\SIMULIA\Abaqus\6.13-1'
-if node ==  'epua-pd45': 
-  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
-
-# SIMULATION SETTINGS
-run_simulation = True
-elType = "C3D8"
-lx, ly, lz = 1., 1., .2
-Nx, Ny, Nz = 20, 20, 5
-Ne = Nx * Ny * Nz
-disp = .3
-nFrames = 50
-Nseed = 20 # Number of grain seeds
+#PAREMETERS
+is_3D = True
+inner_radius, outer_radius = 30 , 40
+Nt, Nr, Na = 10, 5, 2
+Ne = Nt * Nr * Na
+displacement = 5.
+nFrames = 100
+Nseed = 400 # Number of grain seeds
 sigma_0_hp = .001
 k_hp = .001
 nu = 0.3
 n = 0.001
 E = 1.
-compart = True
+thickness =10.
+workdir = "workdir/"
+label = "ringCompression_voronoi"
+elType = "C3D8"
+cpus = 1
+node = platform.node()
+if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
+if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
+if node ==  'epua-pd47': 
+  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus' 
+  
+#TASKS
 Run_simu = True
 
-model = CuboidTest(lx = lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus = cpus, compart = compart, disp = disp, elType = elType, is_3D = True)
+
+
+#MODEL DEFINITION
+disp = displacement/2.
+model = RingCompression( 
+  inner_radius = inner_radius, 
+  outer_radius = outer_radius, 
+  disp = disp,
+  thickness = thickness,
+  nFrames = nFrames, 
+  Nr = Nr, 
+  Nt = Nt, 
+  Na = Na,
+  workdir = workdir,
+  label = label, 
+  elType = elType,
+  abqlauncher = abqlauncher,
+  cpus = cpus,
+  is_3D = is_3D,
+  compart = True)
+
+# SIMULATION
 model.MakeMesh()
 mesh = model.mesh
 centroids = mesh.centroids()
@@ -76,9 +91,8 @@ grain_diameter = (grain_volume * 6./np.pi)**(1. / 3.)
 elem_grain_diameter = grain_diameter[elem_flags]
   
 
-# Hall-Petch
+# Hall-Petch (not mandatory)
 sy = sigma_0_hp + k_hp / elem_grain_diameter**.5
-
 E  = E * np.ones(Ne) # Young's modulus
 nu = nu * np.ones(Ne) # Poisson's ratio
 n = n * np.ones(Ne)
@@ -88,6 +102,7 @@ labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
 material = [materials.Bilinear(labels = labels[i],E = E[i], nu = nu[i], n = n[i],sy = sy[i]) for i in xrange(Ne)]
 model.material = material
 sy_field = FieldOutput(labels = mesh.labels, data = sy, position = "element")
+
 
 if Run_simu:
   model.MakeInp()
@@ -100,35 +115,24 @@ else:
 if model.outputs['completed']:
   U = model.outputs['field']['U'][0]
   mesh.nodes.apply_displacement(U)
-  f = open("cuboidTest_voronoi.vtk", "w")
+  f = open(label + ".vtk", "w")
   f.write(mesh.dump2vtk())
   f.write(sy_field.dump2vtk(name = "Yield_Stress"))
   f.write( model.outputs['field']['S'][0].vonmises().dump2vtk(name = "Von_Mises_Stress"))
   f.close()
   
   # History Outputs
-  disp =  np.array(model.outputs['history']['disp'].values()[0].data[0])
-  force =  np.array(np.array(model.outputs['history']['force'].values()).sum().data[0])
-  volume = np.array(np.array(model.outputs['history']['volume'].values()).sum().data[0])
-  length = ly + disp
-  surface = volume / length
-  logstrain = np.log10(1. + disp / ly)
-  linstrain = disp/ly
-  strain = linstrain
-  stress = force / surface 
+  force = -2. * model.outputs['history']['force']
+  disp = -2. * model.outputs['history']['disp']
+ 
    
   fig = plt.figure(0)
   plt.clf()
-  sp1 = fig.add_subplot(2, 1, 1)
-  plt.plot(disp, force, 'ok-')
+  sp1 = fig.add_subplot(1, 1, 1)
+  plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
+  plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
+  plt.legend(loc="upper left")
   plt.xlabel('Displacement, $U$')
   plt.ylabel('Force, $F$')
   plt.grid()
-  sp1 = fig.add_subplot(2, 1, 2)
-  plt.plot(strain, stress, 'ok-')
-  plt.xlabel('Tensile Strain, $\epsilon$')
-  plt.ylabel(' Tensile Stress $\sigma$')
-  plt.grid()
   plt.savefig(workdir + label + 'history.pdf')
-
-
