@@ -10,6 +10,22 @@ import pickle, copy
 import platform
 node = platform.node()
 
+def read_file(file_name):
+  '''
+  Read a two rows data file and converts it to numbers
+  '''
+  f = open(file_name, 'r') # Opening the file
+  lignes = f.readlines() # Reads all lines one by one and stores them in a list
+  f.close() # Closing the file
+#    lignes.pop(0) # Delete le saut de ligne for each lines
+  strain_exp, stress_exp = [],[]
+
+  for ligne in lignes:
+      data = ligne.split() # Lines are splitted
+      strain_exp.append(float(data[0]))
+      stress_exp.append(float(data[1]))
+  return np.array(strain_exp), np.array(stress_exp)
+
 
 lateralbc = { "right":"pseudohomo", "left":"pseudohomo" }
 is_3D = True
@@ -23,16 +39,20 @@ else:
   elType = "C3D8"
 #FIXED PAREMETERS
 settings = {}
+
 settings['file_name'] = 'cuivre_cufe2p_ANR.txt'
-settings['lx'], settings['ly'], settings['lz']  = 0.1 , 0.1, 0.1 #ly = tension test direction
-settings['Nx'], settings['Ny'], settings['Nz'] = 10, 10, 10
+strain_exp, stress_exp = read_file(settings['file_name'])
+
+
+settings['lx'], settings['ly'], settings['lz']  = 0.127 , 0.127, 0.127 #ly = tension test direction
+settings['Nx'], settings['Ny'], settings['Nz'] = 3, 3, 3
 if is_3D == True :
     settings['Ne'] =  settings['Nx']*settings['Ny']*settings['Nz']
 else :
     settings['Ne'] =  settings['Nx']*settings['Ny']
-settings['displacement'] = 0.05
+settings['displacement'] = strain_exp[-1]*settings['ly']
 settings['nFrames'] = 100
-settings['E'] =72469. * np.ones(settings['Ne'])
+settings['E'] =120000. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
 settings['iteration'] = 3
 settings['thickness'] = 20.02
@@ -50,23 +70,6 @@ if node ==  'SERV3-MS-SYMME':
   workdir = "workdir/"
 if node ==  'epua-pd45': 
   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
-
-def read_file(file_name):
-  '''
-  Read a two rows data file and converts it to numbers
-  '''
-  f = open(file_name, 'r') # Opening the file
-  lignes = f.readlines() # Reads all lines one by one and stores them in a list
-  f.close() # Closing the file
-#    lignes.pop(0) # Delete le saut de ligne for each lines
-  force_exp, disp_exp = [],[]
-
-  for ligne in lignes:
-      data = ligne.split() # Lines are splitted
-      disp_exp.append(float(data[0]))
-      force_exp.append(float(data[1]))
-  return np.array(disp_exp), np.array(force_exp)
-
 
 
 class Simulation(object):
@@ -98,7 +101,7 @@ class Simulation(object):
     Ny = self.settings['Ny']
     Nz = self.settings['Nz']
     Ne = self.settings['Ne']
-    thickness = self.settings['thickness']
+    #thickness = self.settings['thickness']
     
     #TASKS
     run_sim = True
@@ -113,7 +116,7 @@ class Simulation(object):
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
     material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
     
-    m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True, lateralbc = lateralbc)
+    m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True, lateralbc = lateralbc, export_fields = export_fields)
     
     # SIMULATION
     m.MakeMesh()
@@ -135,6 +138,9 @@ class Simulation(object):
     
       self.disp = disp
       self.force = force
+      self.logstrain = logstrain
+      self.stress = stress
+      self.strain = strain
     
   
   
@@ -142,8 +148,8 @@ class Simulation(object):
     """
     Interpolate the curve Force-displacement on a known grid
     """
-    disp, force = self.disp, self.force
-    f = interpolate.interp1d(disp, force)
+    strain, stress = self.strain, self.stress
+    f = interpolate.interp1d(strain, stress)
     return f
 
 class Opti(object):
@@ -159,11 +165,11 @@ class Opti(object):
     self.n = []
     self.Ssat = []
     self.err = []
-    self.force_sim = []
-    disp_exp, force_exp = read_file(self.settings['file_name'])
-    g = interpolate.interp1d(disp_exp, force_exp)
-    self.disp_exp = disp_exp
-    self.force_exp = force_exp
+    self.stress_sim = []
+    strain_exp, stress_exp = read_file(self.settings['file_name'])
+    g = interpolate.interp1d(strain_exp, stress_exp)
+    self.strain_exp = strain_exp
+    self.stress_exp = stress_exp
     self.g = g
 
   def Err(self, param):
@@ -181,20 +187,21 @@ class Opti(object):
     s.Run()
     f = s.Interp()
     d = self.settings['displacement']
-    disp_grid = np.linspace(0., d, 100)
-    force_sim = f(disp_grid)
+    ly = self.settings['ly']
+    strain_grid = np.linspace(0., d, 100)/ly
+    stress_sim = f(strain_grid)
     
     g = self.g
-    force_exp = g(disp_grid)
+    stress_exp = g(strain_grid)
     
-    err = np.sqrt(((force_exp - force_sim)**2).sum())
+    err = np.sqrt(((stress_exp - stress_sim)**2).sum())
     self.sy_mean.append(sy_mean)
     self.n.append(n)
     self.Ssat.append(Ssat)
     self.err.append(err)
-    self.force_sim.append(force_sim)
-    self.force_exp = force_exp
-    self.disp_grid = disp_grid
+    self.stress_sim.append(stress_sim)
+    self.stress_exp = stress_exp
+    self.strain_grid = strain_grid
     
     
     return err
@@ -214,18 +221,18 @@ O.Optimize()
 fig = plt.figure('Load vs. disp')
 plt.clf()
 
-plt.plot(O.disp_grid, O.force_exp, 'k-', label = 'experimental curve', linewidth = 2.)
-plt.plot(O.disp_grid, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
+plt.plot(O.strain_grid, O.stress_exp, 'k-', label = 'experimental curve', linewidth = 2.)
+plt.plot(O.strain_grid, O.stress_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
 a = O.err
 index = np.argmin(a)
-plt.plot(O.disp_grid, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
+plt.plot(O.strain_grid, O.stress_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
 for i in range(1, settings['iteration']):
-  plt.plot(O.disp_grid, O.force_sim[i], 'b-', linewidth = .2)
+  plt.plot(O.strain_grid, O.stress_sim[i], 'b-', linewidth = .2)
 plt.legend(loc="lower right")
 plt.grid()
-plt.xlabel('Displacement, $U$')
-plt.ylabel('Force, $F$')
-plt.savefig(workdir + label + '_load-vs-disp.pdf')
+plt.xlabel('Strain, $\epsilon$ (\%)')
+plt.ylabel('Stress, $\sigma$ (Mpa)')
+plt.savefig(workdir + label + '_stress-vs-strain.pdf')
 
 
 #print s.force.data[0]
