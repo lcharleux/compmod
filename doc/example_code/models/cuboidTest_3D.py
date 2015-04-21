@@ -7,18 +7,37 @@ import numpy as np
 import pickle, copy
 import platform
 
+def read_file(file_name):
+  '''
+  Read a two rows data file and converts it to numbers
+  '''
+  f = open(file_name, 'r') # Opening the file
+  lignes = f.readlines() # Reads all lines one by one and stores them in a list
+  f.close() # Closing the file
+#    lignes.pop(0) # Delete le saut de ligne for each lines
+  strain_exp, stress_exp = [],[]
 
+  for ligne in lignes:
+      data = ligne.split() # Lines are splitted
+      strain_exp.append(float(data[0]))
+      stress_exp.append(float(data[1]))
+  return np.array(strain_exp), np.array(stress_exp)
+settings = {}
+settings['file_name'] = 'Courbe_ref_alu.txt' # experimental data
+strain_exp, stress_exp = read_file(settings['file_name'])
 
 #PARAMETERS
-lx, ly, lz = 1., 1., 1.
-Nx, Ny, Nz = 10, 10, 10 
+lx, ly, lz = 2., 10., 10.
+Nx, Ny, Nz = 10, 50, 50
 Ne = Nx * Ny * Nz
-disp = .1
+disp = strain_exp[-1] * ly
 nFrames = 20
+export_fields = False
+compart = True
 workdir = "workdir/"
-label = "cuboidTest"
-elType = "CPE4"
-cpus = 1
+label = "cuboidTest_3D"
+elType = "C3D8"
+cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
@@ -30,16 +49,19 @@ if node ==  'epua-pd45':
   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
-compart = True
+
 
 
 if compart:
-  E  = 1. * np.ones(Ne) # Young's modulus
+  E  = 72000. * np.ones(Ne) # Young's modulus
   nu = .3 * np.ones(Ne) # Poisson's ratio
-  sy_mean = .01
-  sy = np.random.rayleigh(sy_mean, Ne)
+  sy_mean = 184.791 * np.ones(Ne)
+  Ssat = 1031.394 * np.ones(Ne)
+  n = 333.485 * np.ones(Ne)
+  ray_param = sy_mean/1.253314
+  sy = np.random.rayleigh(ray_param, Ne)
   labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
-  material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i])for i in xrange(Ne)]
+  material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
 else:
   E = 1.
   nu =.3
@@ -47,7 +69,7 @@ else:
   labels = 'SAMPLE_MAT'
   material = materials.VonMises(labels = labels, E = E, nu = nu, sy = sy)
       
-m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True)
+m =CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True, cpus = cpus, export_fields = export_fields)
 m.MakeInp()
 m.Run()
 m.MakePostProc()
@@ -71,14 +93,16 @@ if m.outputs['completed']:
   fig = plt.figure(0)
   plt.clf()
   sp1 = fig.add_subplot(2, 1, 1)
-  plt.plot(disp, force, 'ok-')
+  plt.plot(strain, stress, 'k-')
   plt.xlabel('Displacement, $U$')
   plt.ylabel('Force, $F$')
   plt.grid()
   sp1 = fig.add_subplot(2, 1, 2)
-  plt.plot(strain, stress, 'ok-')
+  plt.plot(strain, stress, 'k-', label = 'simulation curve', linewidth = 2.)
+  plt.plot(strain_exp, stress_exp, 'r-', label = 'experimental curve', linewidth = 2.)
   plt.xlabel('Tensile Strain, $\epsilon$')
   plt.ylabel(' Tensile Stress $\sigma$')
+  plt.legend(loc="lower right")
   plt.grid()
   plt.savefig(workdir + label + 'history.pdf')
   

@@ -27,11 +27,11 @@ def read_file(file_name):
   return np.array(strain_exp), np.array(stress_exp)
 
 
-lateralbc = { "right":"pseudohomo", "left":"pseudohomo" }
+lateralbc = { "right":"pseudohomo", "left":"pseudohomo" } # lateral boundary conditions : "pseudohomo"--> lateral nodes have the same displacement
 is_3D = True
 export_fields = False
 label = "CuboidTestOptiCompart"
-cpus = 1
+cpus = 6
 compart = True
 if is_3D == False :
   elType = "CPS4"
@@ -40,22 +40,22 @@ else:
 #FIXED PAREMETERS
 settings = {}
 
-settings['file_name'] = 'cuivre_cufe2p_ANR.txt'
+settings['file_name'] = 'Courbe_ref_alu.txt'
 strain_exp, stress_exp = read_file(settings['file_name'])
 
 
-settings['lx'], settings['ly'], settings['lz']  = 0.127 , 0.127, 0.127 #ly = tension test direction
-settings['Nx'], settings['Ny'], settings['Nz'] = 3, 3, 3
+settings['lx'], settings['ly'], settings['lz']  = 1., 1., 1. #ly = tension test direction
+settings['Nx'], settings['Ny'], settings['Nz'] = 15, 15, 15
 if is_3D == True :
     settings['Ne'] =  settings['Nx']*settings['Ny']*settings['Nz']
 else :
     settings['Ne'] =  settings['Nx']*settings['Ny']
 settings['displacement'] = strain_exp[-1]*settings['ly']
 settings['nFrames'] = 100
-settings['E'] =120000. * np.ones(settings['Ne'])
+settings['E'] = 72000. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
-settings['iteration'] = 3
-settings['thickness'] = 20.02
+settings['iteration'] = 40
+#settings['thickness'] = 20.02
 
 
 if node ==  'lcharleux':      
@@ -116,7 +116,7 @@ class Simulation(object):
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
     material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
     
-    m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True, lateralbc = lateralbc, export_fields = export_fields)
+    m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True, lateralbc = lateralbc, export_fields = export_fields, cpus = cpus)
     
     # SIMULATION
     m.MakeMesh()
@@ -213,7 +213,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(1000., 300., 300., settings)
+O = Opti(1000., 330., 185., settings)
 #O = Opti(200., 240. , settings)
 O.Optimize()
 

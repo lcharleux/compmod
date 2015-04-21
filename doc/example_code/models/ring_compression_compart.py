@@ -11,7 +11,7 @@ is_3D = True
 unloading = False
 export_fields = False
 inner_radius, outer_radius = 100.72/2-5.18 , 100.72/2
-Nt, Nr, Na =20, 2, 3
+Nt, Nr, Na = 100, 10, 20
 #Ne = Nt * Nr
 if is_3D == False :
   Ne = Nt * Nr
@@ -24,9 +24,9 @@ nFrames = 100
 thickness = 20.02
 E  = 72469. * np.ones(Ne) # Young's modulus
 nu = .3 * np.ones(Ne) # Poisson's ratio
-Ssat = 1178 * np.ones(Ne)
-n = 205 * np.ones(Ne)
-sy_mean = 215.
+Ssat = 1031.394 * np.ones(Ne)
+n = 333.485 * np.ones(Ne)
+sy_mean = 184.79
 
 ray_param = sy_mean/1.253314
 sy = np.random.rayleigh(ray_param, Ne)
@@ -36,7 +36,7 @@ material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = 
 
 workdir = "workdir/"
 label = "ringCompression_compart"
-cpus = 1
+cpus = 6
 filename = 'test_expA1.txt'
 
 node = platform.node()
