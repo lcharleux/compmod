@@ -11,7 +11,7 @@ is_3D = True
 unloading = False
 export_fields = False
 inner_radius, outer_radius = 100.72/2-5.18 , 100.72/2
-Nt, Nr, Na = 100, 10, 20
+Nt, Nr, Na = 20, 5, 2
 #Ne = Nt * Nr
 if is_3D == False :
   Ne = Nt * Nr
