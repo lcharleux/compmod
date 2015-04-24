@@ -527,7 +527,7 @@ I_SAMPLE.SURFACE_FACES, I_PLATE.SURFACE
 #FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
 *BOUNDARY
 I_SAMPLE.LEFT_NODES, 1, 1
-I_SAMPLE.RIGHT_NODES, 2, 2
+I_SAMPLE.RIGHT_NODES, 2, 2#3DBOUNDARY
 I_PLATE.REFNODE, 2, 2, #DISP
 I_PLATE.REFNODE, 1, 1
 I_PLATE.REFNODE, 3, 6
@@ -605,9 +605,14 @@ RF2, U2
     pattern = pattern.replace('#FRAME_DURATION', str(1. / self.nFrames))
     pattern = pattern.replace('#SECTIONS', sections)
     pattern = pattern.replace('#MATERIALS', matinp)
-    if self.is_3D: 
+    if self.is_3D:
+      labels = self.mesh.nodes.sets['topleft']
+      nl = len(labels)
+      label = labels[(nl-1)/2]
+      pattern = pattern.replace("#3DBOUNDARY", "\nI_SAMPLE.{0}, 3, 3".format(label))
       pattern = pattern.replace('#SURFTYPE', "CYLINDER")
-    else:
+    else:  
+      pattern = pattern.replace("#3DBOUNDARY", "")
       pattern = pattern.replace('#SURFTYPE', "SEGMENTS")  
     f =open(self.workdir + self.label + ".inp", 'w')
     f.write(pattern)

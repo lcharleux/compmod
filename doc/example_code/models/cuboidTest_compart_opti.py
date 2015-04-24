@@ -111,7 +111,7 @@ class Simulation(object):
     #print E[0], nu[0], n[0], sy_mean[0]
 
   
-    ray_param = sy_mean/1.253314
+    ray_param = sy_mean/1.253314 #mean = sigma*sqrt(Pi/2)
     sy = np.random.rayleigh(ray_param, Ne)
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
     material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
