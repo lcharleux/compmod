@@ -1,19 +1,16 @@
 Models
 =========
-let see us two kind of model, the first model is cuboidTest,that has undergone a tensile test. the lower part is built, unless the point of origin can have a vertical displacement. While the upper part is applied to a vertical displacement. And the second is a compression ring.
+
+This section contains numerical models that can be used directly to run finite element simulations which can be compartmentalized or homogeneous.
+
 
 CuboidTest
 ~~~~~~~~~~~~~~~~~
 
 .. autoclass:: compmod.models.CuboidTest
+   :members:
+   :inherited-members:
 
-
-
-.. automethod:: compmod.models.CuboidTest.MakeInp
-
-
-
-.. automethod:: compmod.models.CuboidTest.MakePostProc
 
 
 RingCompression
@@ -21,6 +18,5 @@ RingCompression
 
 
 .. autoclass:: compmod.models.RingCompression
-
-
-.. automethod:: compmod.models.RingCompression.MakeInp
+   :members:
+   :inherited-members:

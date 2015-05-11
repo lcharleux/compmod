@@ -54,7 +54,7 @@ if node ==  'epua-pd45':
   
 
 #TASKS
-run_sim = True
+run_sim = False
 plot = True
 
 #MODEL DEFINITION
@@ -67,7 +67,7 @@ m = RingCompression( material = material,inner_radius = inner_radius,
   Nr = Nr, 
   Nt = Nt, 
   Na = Na,
-  workdir = "D:\donnees_pyth/workdir/",
+  workdir = "workdir/",
   label = label, 
   elType = elType,
   abqlauncher = abqlauncher,

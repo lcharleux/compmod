@@ -19,10 +19,9 @@ import sys, os, matplotlib
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append('sphinxext/')
-sys.path.append("/var/build/user_builds/compmod/checkouts/latest/") 
+#sys.path.append("/var/build/user_builds/compmod/checkouts/latest/") 
 #sys.path.append("./") 
-print os.listdir("/home")
-print sys.path
+
 
 # -- General configuration -----------------------------------------------------
 

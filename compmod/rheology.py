@@ -77,14 +77,15 @@ class Bilinear2(object):
     
   def set_epsilon(self, epsilon):
     pos = self._pos
-    try float(epsilon):
+    try:
+      epsilon = float(epsilon)
       self._epsilon[pos] = epsilon
       pos += 1
     except:
       epsilon = np.array(epsilon)
       self._epsilon[pos:pos+len(epsilon)] = epsilon
   def get_epsilon(self):
-          
+    pass      
   
   def sigma(self):
     sigma = np.zeros_like(epsilon)
@@ -92,6 +93,7 @@ class Bilinear2(object):
     sigma_sat = self.sigma_sat
     n = self.n
     for e in epsilon:
+      pass
       
     
     

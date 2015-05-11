@@ -12,7 +12,23 @@ import os, time, subprocess, pickle, copy
 
 class Simulation(object):
   """
-  Numerical model meta class.
+  :param abqlauncher: path to the abaqus executable.
+  :type abqlauncher: string
+  :param material: material instance from `abapy.materials`
+  :param label: label of the simulation (default: 'simulation')
+  :type label: string
+  :param workdir: path to the simulation work directory (default: '')
+  :type workdir: string
+  :param compart: indicated if the simulation homogeneous or compartimented (default: False)
+  :type compart: boolean 
+  :param nFrames: number or frames per step (default: 100)
+  :type nFrames: integer
+  :param elType: element type (default: 'CPS4')
+  :type elType: string
+  :param is_3D: indicates if the model is 2D or 3D (default: False)
+  :type is_3D: boolean 
+  :param cpus: number of CPUs to use (default: 1)
+  :type compart: integer
   """
   def __init__(self, **kwargs):
     defaultArgs = {"abqlauncher":None, "material": VonMises(), "label": "simulation",  "workdir": "", "compart":False, "nFrames": 100, "elType": "CPS4", "is_3D": False, "cpus" : 1}
@@ -24,6 +40,9 @@ class Simulation(object):
   def Run(self, deleteOldFiles = True):
     '''
     Runs the simulation.
+    
+    :param deleteOldFiles: indicates if existing simulation files are deleted before the simulation starts.
+    :type deleteOlfFiles: boolean
     '''
     if deleteOldFiles: self.DeleteOldFiles()
     t0 = time.time()
@@ -75,48 +94,42 @@ class Simulation(object):
     
 class CuboidTest(Simulation):
   """
-  Performs various tests on cuboids
-    :param E: Young's modulus.
-    :type E: float, list, array.array
-    :param nu: Poisson's ratio.
-    :type nu: float, list, array.array
-    :param sy: Yield stress.
-    :type sy: float, list, array.array
+  Performs a tensile or compressive test on an cuboid rectangular cuboid. 
+
+  
+  :param lx: length of the box along the x axis (default = 1.)
+  :type lx: float
+  :param ly: length of the box along the y axis (default = 1.)
+  :type ly: float
+  :param lz: length of the box along the z axis (default = 1.). Only used in 3D simulations.
+  :type lz: float
+  :param Nx: number of elements along the x direction.
+  :type Nx: int
+  :param Ny: number of elements along the y direction.
+  :type Ny: int
+  :param Nz: number of elements along the z direction.
+  :type Nz: int
+  :param disp: imposed displacement along the y direction (default = .25)
+  :type disp: float 
+  :param export_fields: indicates if the field outputs are exported (default = True). Can be set to False to speed up post processing.
+  :type export: boolean
+  :param lateral_bc: indicates the type of lateral boundary conditions to be used.
+  :type lateral_bc: dict
+  {0}
+  
     
-  .. note:: 
-     All inputs must have the same length or an exception will be raised.
-
-  Let see the results of a simulation with 2500 elements and try to compare with the next
-  
-  .. plot:: example_code/models/cuboidTest.py
-     :include-source:
-     
-  Try to see the results of a simulation (displacement curves and shape of the tensile stress/ tensile strain) 2500 elements of a sudden and comparing with the results of a simulation 625 elements (tensile stress/strain curves)launched 4 times.   
-
-  CuboidTest_multiple
-  
-  .. plot:: example_code/models/cuboidTest_multiple.py
-     :include-source:
-     
-  Then, we can make a second script that is made to work in 3D with 2500 elements
-  
-  cuboidTest_3D
-    
-  .. plot:: example_code/models/cuboidTest_3D.py
-     :include-source:
-
- Model CuboidTest with distribution Rayleigh and Bilinear Class
+  CuboidTest with microstructure generated using Voronoi cells : 
    
-  .. plot:: example_code/models/Cuboid_Test_3D_Ssat.py
-     :include-source:
- 
- CuboidTest with microstructure generated using Voronoi cells : 
- 
- * Source: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.py>`.
- * VTK output: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.vtk>`.
+  * Source: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.py>`.
+  * VTK output: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.vtk>`.
  
   """
+  __doc__ = __doc__.format(Simulation.__doc__)
+  
+  
   def __init__(self, **kwargs):
+    
+    
     defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "export_fields": True, "lateralbc":{}}
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
@@ -143,6 +156,9 @@ class CuboidTest(Simulation):
     self.mesh = m
     
   def MakeInp(self):
+    """
+    Writes the Abaqus INP file in the workdir.
+    """
     pattern = """**----------------------------------
 **DISTRIBUTED MECHANICAL PROPERTIES
 **----------------------------------

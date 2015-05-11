@@ -1,12 +1,7 @@
 from compmod.models import CuboidTest
-from abapy import materials
-from abapy.misc import load
 import matplotlib.pyplot as plt
 import numpy as np
-import pickle, copy
-import platform
-
-
+import pickle, copy, abapy, platform
   
 def field_func(outputs, step):
     """

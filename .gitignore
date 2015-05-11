@@ -7,4 +7,4 @@ doc/example_code/models/workdir/*
 doc/example_code/models/tutu*.txt
 doc/_build/*
 
-!/doc/example_code/models/workdir/cuboidTest.pckl
+!/doc/example_code/models/workdir/*.pckl
