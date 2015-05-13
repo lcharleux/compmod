@@ -33,15 +33,14 @@ def plot_mesh(ax, mesh, outputs, step, field_func =None, cbar = True, cbar_label
 
 #PARAMETERS
 lx, ly = 1., 1.
-Nx, Ny = 20, 20 
+Nx, Ny = 10, 10 
 Ne = Nx * Ny
 disp = .1
 nFrames = 20
 workdir = "workdir/"
 label = "cuboidTest"
-elType = "CPE4"
+elType = "CPE4" # Plane strain elements
 cpus = 1
-abqlauncher = None
 node = platform.node()
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration

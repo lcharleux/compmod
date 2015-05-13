@@ -5,7 +5,7 @@ import numpy as np
 
 class SaintVenant(object):
   """
-  A class for parallel assembly of unit cells.
+  A class for parallel assembly of unit cells exhibiting time indepedent behavior. One parameter can be distributed using the cell fu
   
   .. plot:: example_code/rheology/demo.py
      :include-source:

@@ -94,7 +94,7 @@ class Simulation(object):
     
 class CuboidTest(Simulation):
   """
-  Performs a tensile or compressive test on an cuboid rectangular cuboid. 
+  Performs a uniaxial tensile or compressive test on an cuboid rectangular cuboid along the y axis. The cuboid can be 2D or 3D. Lateral conditions can be specified as free or pseudo homogeneous. 
 
   
   :param lx: length of the box along the x axis (default = 1.)
@@ -116,6 +116,12 @@ class CuboidTest(Simulation):
   :param lateral_bc: indicates the type of lateral boundary conditions to be used.
   :type lateral_bc: dict
   {0}
+  
+  This model can be used for a wide range of problems. A few examples are given here:
+  
+  1. Simple 2D homogenous model:
+  
+  
   
     
   CuboidTest with microstructure generated using Voronoi cells : 

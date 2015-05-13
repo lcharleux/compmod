@@ -1,0 +1,3 @@
+Method	 sy_mean[MPa]	n[MPa]	sigma_sat[Mpa]
+Saint-Venant	 422.55	282.64	3280.84
+Compart	 422546318.82	282641337.68	3280844656.28

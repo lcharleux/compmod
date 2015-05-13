@@ -1,0 +1,987 @@
+1
+
+   Abaqus 6.9-EF1                                  Date 13-May-2015   Time 17:15:06
+   For use at UNIVERSITE DE SAVOIE under license from Dassault Systemes or its subsidiary.
+
+
+
+                         The Abaqus Software is a product of:
+
+                           Dassault Systemes Simulia Corp.
+                                 Rising Sun Mills
+                                 166 Valley Street
+                           Providence, RI 02909-2499, USA
+ 
+
+
+                   Available for internal use at UNIVERSITE DE SAVOIE. 
+                   The Abaqus Online Support System is accessible
+                   through the "My Support" section of the SIMULIA
+                   Home Page at http://www.simulia.com.
+
+                   Support policies for academic licenses are described
+                   on the SIMULIA web site at
+                   http://www.simulia.com/academics/academic_support.html.
+ 
+                          On machine lcharleux 
+                          you are authorized to run
+                          Abaqus/Standard until 25-Feb-2016
+
+                          Your site id is: 200000000053092 
+
+
+ 
+                    For assistance or any other information you may
+                    obtain contact information for your local office
+                    from the world wide web at:
+
+                      http://www.simulia.com/about/locations.html
+
+ 
+                * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                *                                                         * 
+                *                   *****************                     * 
+                *                   *  N O T I C E  *                     * 
+                *                   *****************                     * 
+                *                                                         * 
+                *                                                         * 
+                *                    Abaqus 6.9-EF1                       * 
+                *                                                         * 
+                *          BUILD ID: 2009_10_21-15.49.55 96721            * 
+                *                                                         * 
+                *                                                         * 
+                *  Please make sure you are using release 6.9 Extended    * 
+                *  Functionality manuals plus the notes accompanying      * 
+                *  this release.                                          * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *   This program may not be used for commercial purposes  * 
+                *           without payment of a commercial fee.          * 
+                *                                                         * 
+                * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
+
+ 
+
+
+
+     PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   *******************************************************
+
+
+     END PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   ***********************************************************
+
+
+
+
+     OPTIONS BEING PROCESSED
+   ***************************
+
+
+  *Node
+  *Element, type=C3D8
+  *Nset, nset=ASSEMBLY_ISAMPLE_ALLNODES
+  *Nset, nset=ASSEMBLY_ISAMPLE_BOTTOM
+  *Nset, nset=ASSEMBLY_ISAMPLE_BOTTOMLEFT
+  *Nset, nset=ASSEMBLY_ISAMPLE_BOTTOMRIGHT
+  *Nset, nset=ASSEMBLY_ISAMPLE_LEFT
+  *Nset, nset=ASSEMBLY_ISAMPLE_NONTRANSFORMED-1
+  *Nset, nset=ASSEMBLY_ISAMPLE_RIGHT
+  *Nset, nset=ASSEMBLY_ISAMPLE_TOP
+  *Nset, nset=ASSEMBLY_ISAMPLE_TOPLEFT
+  *Nset, nset=ASSEMBLY_ISAMPLE_TOPRIGHT
+  *Elset, elset=ASSEMBLY_ISAMPLE_ALLELEMENTS
+  *Elset, elset=ASSEMBLY_ISAMPLE_C3D8_ELEMENTS
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET1
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET10
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET100
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET101
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET102
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET103
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET104
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET105
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET106
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET107
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET108
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET109
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET11
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET110
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET111
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET112
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET113
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET114
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET115
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET116
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET117
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET118
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET119
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET12
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET120
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET121
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET122
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET123
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET124
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET125
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET13
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET14
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET15
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET16
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET17
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET18
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET19
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET2
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET20
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET21
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET22
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET23
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET24
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET25
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET26
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET27
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET28
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET29
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET3
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET30
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET31
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET32
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET33
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET34
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET35
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET36
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET37
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET38
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET39
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET4
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET40
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET41
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET42
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET43
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET44
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET45
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET46
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET47
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET48
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET49
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET5
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET50
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET51
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET52
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET53
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET54
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET55
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET56
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET57
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET58
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET59
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET6
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET60
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET61
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET62
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET63
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET64
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET65
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET66
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET67
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET68
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET69
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET7
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET70
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET71
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET72
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET73
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET74
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET75
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET76
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET77
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET78
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET79
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET8
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET80
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET81
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET82
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET83
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET84
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET85
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET86
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET87
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET88
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET89
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET9
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET90
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET91
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET92
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET93
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET94
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET95
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET96
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET97
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET98
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET99
+  *material, name=MAT_1
+  *elastic
+  *plastic
+  *material, name=MAT_2
+  *elastic
+  *plastic
+  *material, name=MAT_3
+  *elastic
+  *plastic
+  *material, name=MAT_4
+  *elastic
+  *plastic
+  *material, name=MAT_5
+  *elastic
+  *plastic
+  *material, name=MAT_6
+  *elastic
+  *plastic
+  *material, name=MAT_7
+  *elastic
+  *plastic
+  *material, name=MAT_8
+  *elastic
+  *plastic
+  *material, name=MAT_9
+  *elastic
+  *plastic
+  *material, name=MAT_10
+  *elastic
+  *plastic
+  *material, name=MAT_11
+  *elastic
+  *plastic
+  *material, name=MAT_12
+  *elastic
+  *plastic
+  *material, name=MAT_13
+  *elastic
+  *plastic
+  *material, name=MAT_14
+  *elastic
+  *plastic
+  *material, name=MAT_15
+  *elastic
+  *plastic
+  *material, name=MAT_16
+  *elastic
+  *plastic
+  *material, name=MAT_17
+  *elastic
+  *plastic
+  *material, name=MAT_18
+  *elastic
+  *plastic
+  *material, name=MAT_19
+  *elastic
+  *plastic
+  *material, name=MAT_20
+  *elastic
+  *plastic
+  *material, name=MAT_21
+  *elastic
+  *plastic
+  *material, name=MAT_22
+  *elastic
+  *plastic
+  *material, name=MAT_23
+  *elastic
+  *plastic
+  *material, name=MAT_24
+  *elastic
+  *plastic
+  *material, name=MAT_25
+  *elastic
+  *plastic
+  *material, name=MAT_26
+  *elastic
+  *plastic
+  *material, name=MAT_27
+  *elastic
+  *plastic
+  *material, name=MAT_28
+  *elastic
+  *plastic
+  *material, name=MAT_29
+  *elastic
+  *plastic
+  *material, name=MAT_30
+  *elastic
+  *plastic
+  *material, name=MAT_31
+  *elastic
+  *plastic
+  *material, name=MAT_32
+  *elastic
+  *plastic
+  *material, name=MAT_33
+  *elastic
+  *plastic
+  *material, name=MAT_34
+  *elastic
+  *plastic
+  *material, name=MAT_35
+  *elastic
+  *plastic
+  *material, name=MAT_36
+  *elastic
+  *plastic
+  *material, name=MAT_37
+  *elastic
+  *plastic
+  *material, name=MAT_38
+  *elastic
+  *plastic
+  *material, name=MAT_39
+  *elastic
+  *plastic
+  *material, name=MAT_40
+  *elastic
+  *plastic
+  *material, name=MAT_41
+  *elastic
+  *plastic
+  *material, name=MAT_42
+  *elastic
+  *plastic
+  *material, name=MAT_43
+  *elastic
+  *plastic
+  *material, name=MAT_44
+  *elastic
+  *plastic
+  *material, name=MAT_45
+  *elastic
+  *plastic
+  *material, name=MAT_46
+  *elastic
+  *plastic
+  *material, name=MAT_47
+  *elastic
+  *plastic
+  *material, name=MAT_48
+  *elastic
+  *plastic
+  *material, name=MAT_49
+  *elastic
+  *plastic
+  *material, name=MAT_50
+  *elastic
+  *plastic
+  *material, name=MAT_51
+  *elastic
+  *plastic
+  *material, name=MAT_52
+  *elastic
+  *plastic
+  *material, name=MAT_53
+  *elastic
+  *plastic
+  *material, name=MAT_54
+  *elastic
+  *plastic
+  *material, name=MAT_55
+  *elastic
+  *plastic
+  *material, name=MAT_56
+  *elastic
+  *plastic
+  *material, name=MAT_57
+  *elastic
+  *plastic
+  *material, name=MAT_58
+  *elastic
+  *plastic
+  *material, name=MAT_59
+  *elastic
+  *plastic
+  *material, name=MAT_60
+  *elastic
+  *plastic
+  *material, name=MAT_61
+  *elastic
+  *plastic
+  *material, name=MAT_62
+  *elastic
+  *plastic
+  *material, name=MAT_63
+  *elastic
+  *plastic
+  *material, name=MAT_64
+  *elastic
+  *plastic
+  *material, name=MAT_65
+  *elastic
+  *plastic
+  *material, name=MAT_66
+  *elastic
+  *plastic
+  *material, name=MAT_67
+  *elastic
+  *plastic
+  *material, name=MAT_68
+  *elastic
+  *plastic
+  *material, name=MAT_69
+  *elastic
+  *plastic
+  *material, name=MAT_70
+  *elastic
+  *plastic
+  *material, name=MAT_71
+  *elastic
+  *plastic
+  *material, name=MAT_72
+  *elastic
+  *plastic
+  *material, name=MAT_73
+  *elastic
+  *plastic
+  *material, name=MAT_74
+  *elastic
+  *plastic
+  *material, name=MAT_75
+  *elastic
+  *plastic
+  *material, name=MAT_76
+  *elastic
+  *plastic
+  *material, name=MAT_77
+  *elastic
+  *plastic
+  *material, name=MAT_78
+  *elastic
+  *plastic
+  *material, name=MAT_79
+  *elastic
+  *plastic
+  *material, name=MAT_80
+  *elastic
+  *plastic
+  *material, name=MAT_81
+  *elastic
+  *plastic
+  *material, name=MAT_82
+  *elastic
+  *plastic
+  *material, name=MAT_83
+  *elastic
+  *plastic
+  *material, name=MAT_84
+  *elastic
+  *plastic
+  *material, name=MAT_85
+  *elastic
+  *plastic
+  *material, name=MAT_86
+  *elastic
+  *plastic
+  *material, name=MAT_87
+  *elastic
+  *plastic
+  *material, name=MAT_88
+  *elastic
+  *plastic
+  *material, name=MAT_89
+  *elastic
+  *plastic
+  *material, name=MAT_90
+  *elastic
+  *plastic
+  *material, name=MAT_91
+  *elastic
+  *plastic
+  *material, name=MAT_92
+  *elastic
+  *plastic
+  *material, name=MAT_93
+  *elastic
+  *plastic
+  *material, name=MAT_94
+  *elastic
+  *plastic
+  *material, name=MAT_95
+  *elastic
+  *plastic
+  *material, name=MAT_96
+  *elastic
+  *plastic
+  *material, name=MAT_97
+  *elastic
+  *plastic
+  *material, name=MAT_98
+  *elastic
+  *plastic
+  *material, name=MAT_99
+  *elastic
+  *plastic
+  *material, name=MAT_100
+  *elastic
+  *plastic
+  *material, name=MAT_101
+  *elastic
+  *plastic
+  *material, name=MAT_102
+  *elastic
+  *plastic
+  *material, name=MAT_103
+  *elastic
+  *plastic
+  *material, name=MAT_104
+  *elastic
+  *plastic
+  *material, name=MAT_105
+  *elastic
+  *plastic
+  *material, name=MAT_106
+  *elastic
+  *plastic
+  *material, name=MAT_107
+  *elastic
+  *plastic
+  *material, name=MAT_108
+  *elastic
+  *plastic
+  *material, name=MAT_109
+  *elastic
+  *plastic
+  *material, name=MAT_110
+  *elastic
+  *plastic
+  *material, name=MAT_111
+  *elastic
+  *plastic
+  *material, name=MAT_112
+  *elastic
+  *plastic
+  *material, name=MAT_113
+  *elastic
+  *plastic
+  *material, name=MAT_114
+  *elastic
+  *plastic
+  *material, name=MAT_115
+  *elastic
+  *plastic
+  *material, name=MAT_116
+  *elastic
+  *plastic
+  *material, name=MAT_117
+  *elastic
+  *plastic
+  *material, name=MAT_118
+  *elastic
+  *plastic
+  *material, name=MAT_119
+  *elastic
+  *plastic
+  *material, name=MAT_120
+  *elastic
+  *plastic
+  *material, name=MAT_121
+  *elastic
+  *plastic
+  *material, name=MAT_122
+  *elastic
+  *plastic
+  *material, name=MAT_123
+  *elastic
+  *plastic
+  *material, name=MAT_124
+  *elastic
+  *plastic
+  *material, name=MAT_125
+  *elastic
+  *plastic
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET1, material=MAT_1
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET2, material=MAT_2
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET3, material=MAT_3
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET4, material=MAT_4
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET5, material=MAT_5
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET6, material=MAT_6
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET7, material=MAT_7
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET8, material=MAT_8
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET9, material=MAT_9
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET10, material=MAT_10
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET11, material=MAT_11
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET12, material=MAT_12
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET13, material=MAT_13
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET14, material=MAT_14
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET15, material=MAT_15
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET16, material=MAT_16
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET17, material=MAT_17
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET18, material=MAT_18
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET19, material=MAT_19
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET20, material=MAT_20
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET21, material=MAT_21
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET22, material=MAT_22
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET23, material=MAT_23
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET24, material=MAT_24
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET25, material=MAT_25
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET26, material=MAT_26
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET27, material=MAT_27
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET28, material=MAT_28
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET29, material=MAT_29
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET30, material=MAT_30
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET31, material=MAT_31
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET32, material=MAT_32
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET33, material=MAT_33
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET34, material=MAT_34
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET35, material=MAT_35
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET36, material=MAT_36
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET37, material=MAT_37
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET38, material=MAT_38
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET39, material=MAT_39
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET40, material=MAT_40
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET41, material=MAT_41
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET42, material=MAT_42
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET43, material=MAT_43
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET44, material=MAT_44
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET45, material=MAT_45
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET46, material=MAT_46
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET47, material=MAT_47
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET48, material=MAT_48
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET49, material=MAT_49
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET50, material=MAT_50
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET51, material=MAT_51
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET52, material=MAT_52
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET53, material=MAT_53
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET54, material=MAT_54
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET55, material=MAT_55
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET56, material=MAT_56
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET57, material=MAT_57
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET58, material=MAT_58
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET59, material=MAT_59
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET60, material=MAT_60
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET61, material=MAT_61
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET62, material=MAT_62
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET63, material=MAT_63
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET64, material=MAT_64
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET65, material=MAT_65
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET66, material=MAT_66
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET67, material=MAT_67
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET68, material=MAT_68
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET69, material=MAT_69
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET70, material=MAT_70
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET71, material=MAT_71
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET72, material=MAT_72
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET73, material=MAT_73
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET74, material=MAT_74
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET75, material=MAT_75
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET76, material=MAT_76
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET77, material=MAT_77
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET78, material=MAT_78
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET79, material=MAT_79
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET80, material=MAT_80
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET81, material=MAT_81
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET82, material=MAT_82
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET83, material=MAT_83
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET84, material=MAT_84
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET85, material=MAT_85
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET86, material=MAT_86
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET87, material=MAT_87
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET88, material=MAT_88
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET89, material=MAT_89
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET90, material=MAT_90
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET91, material=MAT_91
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET92, material=MAT_92
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET93, material=MAT_93
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET94, material=MAT_94
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET95, material=MAT_95
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET96, material=MAT_96
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET97, material=MAT_97
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET98, material=MAT_98
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET99, material=MAT_99
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET100, material=MAT_100
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET101, material=MAT_101
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET102, material=MAT_102
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET103, material=MAT_103
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET104, material=MAT_104
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET105, material=MAT_105
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET106, material=MAT_106
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET107, material=MAT_107
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET108, material=MAT_108
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET109, material=MAT_109
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET110, material=MAT_110
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET111, material=MAT_111
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET112, material=MAT_112
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET113, material=MAT_113
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET114, material=MAT_114
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET115, material=MAT_115
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET116, material=MAT_116
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET117, material=MAT_117
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET118, material=MAT_118
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET119, material=MAT_119
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET120, material=MAT_120
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET121, material=MAT_121
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET122, material=MAT_122
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET123, material=MAT_123
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET124, material=MAT_124
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET125, material=MAT_125
+  *transform, nset=ASSEMBLY_ISAMPLE_NONTRANSFORMED-1
+  *boundary
+  *equation
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET1, material=MAT_1
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET2, material=MAT_2
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET3, material=MAT_3
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET4, material=MAT_4
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET5, material=MAT_5
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET6, material=MAT_6
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET7, material=MAT_7
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET8, material=MAT_8
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET9, material=MAT_9
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET10, material=MAT_10
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET11, material=MAT_11
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET12, material=MAT_12
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET13, material=MAT_13
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET14, material=MAT_14
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET15, material=MAT_15
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET16, material=MAT_16
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET17, material=MAT_17
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET18, material=MAT_18
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET19, material=MAT_19
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET20, material=MAT_20
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET21, material=MAT_21
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET22, material=MAT_22
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET23, material=MAT_23
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET24, material=MAT_24
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET25, material=MAT_25
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET26, material=MAT_26
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET27, material=MAT_27
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET28, material=MAT_28
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET29, material=MAT_29
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET30, material=MAT_30
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET31, material=MAT_31
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET32, material=MAT_32
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET33, material=MAT_33
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET34, material=MAT_34
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET35, material=MAT_35
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET36, material=MAT_36
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET37, material=MAT_37
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET38, material=MAT_38
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET39, material=MAT_39
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET40, material=MAT_40
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET41, material=MAT_41
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET42, material=MAT_42
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET43, material=MAT_43
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET44, material=MAT_44
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET45, material=MAT_45
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET46, material=MAT_46
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET47, material=MAT_47
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET48, material=MAT_48
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET49, material=MAT_49
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET50, material=MAT_50
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET51, material=MAT_51
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET52, material=MAT_52
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET53, material=MAT_53
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET54, material=MAT_54
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET55, material=MAT_55
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET56, material=MAT_56
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET57, material=MAT_57
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET58, material=MAT_58
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET59, material=MAT_59
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET60, material=MAT_60
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET61, material=MAT_61
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET62, material=MAT_62
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET63, material=MAT_63
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET64, material=MAT_64
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET65, material=MAT_65
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET66, material=MAT_66
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET67, material=MAT_67
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET68, material=MAT_68
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET69, material=MAT_69
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET70, material=MAT_70
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET71, material=MAT_71
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET72, material=MAT_72
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET73, material=MAT_73
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET74, material=MAT_74
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET75, material=MAT_75
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET76, material=MAT_76
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET77, material=MAT_77
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET78, material=MAT_78
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET79, material=MAT_79
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET80, material=MAT_80
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET81, material=MAT_81
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET82, material=MAT_82
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET83, material=MAT_83
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET84, material=MAT_84
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET85, material=MAT_85
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET86, material=MAT_86
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET87, material=MAT_87
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET88, material=MAT_88
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET89, material=MAT_89
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET90, material=MAT_90
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET91, material=MAT_91
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET92, material=MAT_92
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET93, material=MAT_93
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET94, material=MAT_94
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET95, material=MAT_95
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET96, material=MAT_96
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET97, material=MAT_97
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET98, material=MAT_98
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET99, material=MAT_99
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET100, material=MAT_100
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET101, material=MAT_101
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET102, material=MAT_102
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET103, material=MAT_103
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET104, material=MAT_104
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET105, material=MAT_105
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET106, material=MAT_106
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET107, material=MAT_107
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET108, material=MAT_108
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET109, material=MAT_109
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET110, material=MAT_110
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET111, material=MAT_111
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET112, material=MAT_112
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET113, material=MAT_113
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET114, material=MAT_114
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET115, material=MAT_115
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET116, material=MAT_116
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET117, material=MAT_117
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET118, material=MAT_118
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET119, material=MAT_119
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET120, material=MAT_120
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET121, material=MAT_121
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET122, material=MAT_122
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET123, material=MAT_123
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET124, material=MAT_124
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET125, material=MAT_125
+  *output, field, frequency=999999
+  *output, history
+  *elementoutput, directions=YES
+  *elementoutput, elset=ASSEMBLY_ISAMPLE_ALLELEMENTS, directions=NO
+  *output, field, frequency=999999
+  *output, history
+  *elementoutput, directions=YES
+  *elementoutput, elset=ASSEMBLY_ISAMPLE_ALLELEMENTS, directions=NO
+  *output, field, frequency=999999
+  *output, history
+  *elementoutput, directions=YES
+  *elementoutput, elset=ASSEMBLY_ISAMPLE_ALLELEMENTS, directions=NO
+  *Step, name=Loading0, nlgeom=YES, inc=1000000
+  *output, field, frequency=999999
+  *output, history
+  *Step, name=Loading0, nlgeom=YES, inc=1000000
+  *Step, name=Loading0, nlgeom=YES, inc=1000000
+  *static
+  *boundary
+  *output, field, frequency=999999
+  *elementoutput, directions=YES
+  *output, history
+  *energyoutput
+  *elementoutput, elset=ASSEMBLY_ISAMPLE_ALLELEMENTS, directions=NO
+  *endstep
+  *Step, name=Loading0, nlgeom=YES, inc=1000000
+  *static
+  *boundary
+  *output, field, frequency=999999
+  *nodeoutput
+  *output, history
+  *nodeoutput, nset=ASSEMBLY_ISAMPLE_TOP
+  *nodeoutput, nset=ASSEMBLY_ISAMPLE_TOPLEFT
+  *nodeoutput, nset=ASSEMBLY_ISAMPLE_LEFT
+  *nodeoutput, nset=ASSEMBLY_ISAMPLE_RIGHT
+  *endstep
+
+
+
+                            P R O B L E M   S I Z E
+
+
+          NUMBER OF ELEMENTS IS                                   125
+          NUMBER OF NODES IS                                      216
+          NUMBER OF NODES DEFINED BY THE USER                     216
+          TOTAL NUMBER OF VARIABLES IN THE MODEL                  648
+          (DEGREES OF FREEDOM PLUS MAX NO. OF ANY LAGRANGE MULTIPLIER
+           VARIABLES. INCLUDE *PRINT,SOLVE=YES TO GET THE ACTUAL NUMBER.)
+
+
+
+                              END OF USER INPUT PROCESSING
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =  0.31000    
+       SYSTEM TIME (SEC)    =  2.00000E-02
+       TOTAL CPU TIME (SEC) =  0.33000    
+       WALLCLOCK TIME (SEC) =          0
+1
+
+   Abaqus 6.9-EF1                                  Date 13-May-2015   Time 17:15:07
+   For use at UNIVERSITE DE SAVOIE under license from Dassault Systemes or its subsidiary.
+
+                                                                                               STEP    1  INCREMENT    1
+                                                                                          TIME COMPLETED IN THIS STEP   0.00    
+
+
+                        S T E P       1     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                1.000E-02
+          AND A TOTAL TIME PERIOD OF                            1.00    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-08
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                1.000E-02
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+          LARGE DISPLACEMENT THEORY WILL BE USED
+  
+                   M E M O R Y   E S T I M A T E
+  
+ PROCESS      FLOATING PT       MINIMUM MEMORY        MEMORY TO
+              OPERATIONS           REQUIRED          MINIMIZE I/O
+             PER ITERATION         (MBYTES)           (MBYTES)
+  
+     1          6.51E+06               17                 25
+  
+ NOTE:
+      (1) SINCE ABAQUS DOES NOT PRE-ALLOCATE MEMORY AND ONLY ALLOCATES MEMORY AS NEEDED DURING THE ANALYSIS,
+          THE MEMORY REQUIREMENT PRINTED HERE CAN ONLY BE VIEWED AS A GENERAL GUIDELINE BASED ON THE BEST
+          KNOWLEDGE AVAILABLE AT THE BEGINNING OF A STEP BEFORE THE SOLUTION PROCESS HAS BEGUN.
+      (2) THE ESTIMATE IS NORMALLY UPDATED AT THE BEGINNING OF EVERY STEP. IT IS THE MAXIMUM VALUE OF THE
+          ESTIMATE FROM THE CURRENT STEP TO THE LAST STEP OF THE ANALYSIS, WITH UNSYMMETRIC SOLUTION TAKEN
+          INTO ACCOUNT IF APPLICABLE. 
+      (3) SINCE THE ESTIMATE IS BASED ON THE ACTIVE DEGREES OF FREEDOM IN THE FIRST ITERATION OF THE 
+          CURRENT STEP, THE MEMORY ESTIMATE MIGHT BE SIGNIFICANTLY DIFFERENT THAN ACTUAL USAGE FOR 
+          PROBLEMS WITH SUBSTANTIAL CHANGES IN ACTIVE DEGREES OF FREEDOM BETWEEN STEPS (OR EVEN WITHIN
+          THE SAME STEP). EXAMPLES ARE: PROBLEMS WITH SIGNIFICANT CONTACT CHANGES, PROBLEMS WITH MODEL
+          CHANGE, PROBLEMS WITH BOTH STATIC STEP AND STEADY STATE DYNAMIC PROCEDURES WHERE ACOUSTIC 
+          ELEMENTS WILL ONLY BE ACTIVATED IN THE STEADY STATE DYNAMIC STEPS.
+      (4) FOR MULTI-PROCESS EXECUTION, THE ESTIMATED VALUE OF FLOATING POINT OPERATIONS FOR EACH PROCESS
+          IS BASED ON AN INITIAL SCHEDULING OF OPERATIONS AND MIGHT NOT REFLECT THE ACTUAL FLOATING 
+          POINT OPERATIONS COMPLETED ON EACH PROCESS. OPERATIONS ARE DYNAMICALY BALANCED DURING EXECUTION, 
+          SO THE ACTUAL BALANCE OF OPERATIONS BETWEEN PROCESSES IS EXPECTED TO BE BETTER THAN THE ESTIMATE
+          PRINTED HERE.
+      (5) THE UPPER LIMIT OF MEMORY THAT CAN BE ALLOCATED BY ABAQUS WILL IN GENERAL DEPEND ON THE VALUE OF
+          THE "MEMORY" PARAMETER AND THE AMOUNT OF PHYSICAL MEMORY AVAILABLE ON THE MACHINE. PLEASE SEE
+          THE "ABAQUS ANALYSIS USER'S MANUAL" FOR MORE DETAILS. THE ACTUAL USAGE OF MEMORY AND OF DISK
+          SPACE FOR SCRATCH DATA WILL DEPEND ON THIS UPPER LIMIT AS WELL AS THE MEMORY REQUIRED TO MINIMIZE
+          I/O. IF THE MEMORY UPPER LIMIT IS GREATER THAN THE MEMORY REQUIRED TO MINIMIZE I/O, THEN THE ACTUAL
+          MEMORY USAGE WILL BE CLOSE TO THE ESTIMATED "MEMORY TO MINIMIZE I/O" VALUE, AND THE SCRATCH DISK
+          USAGE WILL BE CLOSE-TO-ZERO; OTHERWISE, THE ACTUAL MEMORY USED WILL BE CLOSE TO THE PREVIOUSLY
+          MENTIONED MEMORY LIMIT, AND THE SCRATCH DISK USAGE WILL BE ROUGHLY PROPORTIONAL TO THE DIFFERENCE
+          BETWEEN THE ESTIMATED "MEMORY TO MINIMIZE I/O" AND THE MEMORY UPPER LIMIT. HOWEVER ACCURATE
+          ESTIMATE OF THE SCRATCH DISK SPACE IS NOT POSSIBLE.
+      (6) USING "*RESTART, WRITE" CAN GENERATE A LARGE AMOUNT OF DATA WRITTEN IN THE WORK DIRECTORY.
+
+
+          THE ANALYSIS HAS BEEN COMPLETED
+
+
+
+                              ANALYSIS COMPLETE
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =   5.1700    
+       SYSTEM TIME (SEC)    =  0.14000    
+       TOTAL CPU TIME (SEC) =   5.3100    
+       WALLCLOCK TIME (SEC) =          5
