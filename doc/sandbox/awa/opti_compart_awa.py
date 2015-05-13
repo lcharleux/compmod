@@ -62,7 +62,7 @@ results.write("Saint-Venant\t {0:.2f}\t{1:.2f}\t{2:.2f}\n".format(sol.x[0]*1.e-6
 
 #PARAMETERS
 lx, ly, lz = 1., 1., 1.
-Nx, Ny, Nz = 5, 5, 5 
+Nx, Ny, Nz = 20, 20, 20 
 Ne = Nx * Ny * Nz
 disp = .12
 nFrames = 20
@@ -146,7 +146,7 @@ X0 = sol.x
 
 sol_compart = optimize.minimize(cost_function_compart, X0, 
     method = "Nelder-Mead", 
-    options = {"maxfev": 1, "maxiter":1})
+    options = {"maxfev": 200, "maxiter":200})
 results.write("Compart\t {0:.2f}\t{1:.2f}\t{2:.2f}\n".format(sol_compart.x[0]*1.e-6, sol_compart.x[1]*1.e-6,sol_compart.x[2]*1.e-6))
 results.close()
 
