@@ -2,6 +2,15 @@
 *.pyc
 *.pdf
 *.rpy
+*.odb
+*.msg
+*.com
+*.prt
+*.sim
+*.sta
+*.rpy*
+*.log
+
 tests/*
 doc/example_code/models/workdir/*
 doc/example_code/models/tutu*.txt
