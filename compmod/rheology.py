@@ -59,11 +59,25 @@ def Bilinear(epsilon, E = 1., sigmay = .01, n = .1, sigma_sat =  None):
   if n == 0.:
     k = 0.
   else:
-    k = (n**-1 + E**-1)**-1  
+    k = (n**-1 + E**-1)**-1
+  sigma = np.zeros_like(epsilon)    
+  deps = epsilon[1:] - epsilon[:-1]
+  for i in xrange(1, len(epsilon)):
+    de = deps[i-1]
+    sigma[i] = sigma[i-1] + E * de
+    if abs(sigma[i]) > sigmay:
+      de *= 1 - (sigmay - abs(sigma[i-1]))/E
+      sigma[i] = np.sign(sigma[i-1]) * sigmay + k * de
+      sigmay = abs(sigma[i]) 
+  return sigma 
+  """
   sigma = np.where( epsilon < epsilon_y, E * epsilon, sigmay + k * (epsilon - epsilon_y))
   if sigma_sat != None:
     sigma = np.where( sigma < sigma_sat, sigma, sigma_sat)
+  """
   return sigma
+
+
 
 class Bilinear2(object):
   def __init__(self, E = 1., sigma_y = 1., n = .1, sigma_sat = None, N = 1000):       

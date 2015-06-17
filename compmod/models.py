@@ -136,7 +136,7 @@ class CuboidTest(Simulation):
   def __init__(self, **kwargs):
     
     
-    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "export_fields": True, "lateralbc":{}}
+    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "export_fields": True, "lateralbc":{}, steps = 1}
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     super(CuboidTest, self).__init__(**kwargs)
