@@ -1,4 +1,4 @@
-from compmod.models import CuboidTest
+from compmod.models import CuboidTest_VER
 from compmod.distributions import Triangular 
 from abapy import materials
 from abapy.misc import load
@@ -27,16 +27,22 @@ settings['file_name'] = 'cuivre_cufe2p_ANR.txt' # experimental data
 strain_exp, stress_exp = read_file(settings['file_name'])
 
 #PARAMETERS
-lx, ly, lz = 2., 10., 10.
-Nx, Ny, Nz = 1, 5, 5
+lx, ly, lz = 1., 1., 1.
+Nx, Ny, Nz = 10, 10, 10
 Ne = Nx * Ny * Nz
-disp = strain_exp[-1] * ly
-nFrames = 20
+
+loading = {"force"} #"loading" : force or displacement
+#disp = strain_exp[-1] * ly
+disp = 0.1
+force = 190.
+nFrames = 30
 export_fields = False
 compart = True
-#lateralbc = { "right":"periodic", "left":"periodic" }
+unloading_reloading = False #for one cycle of loading (F), unloding (F=0) and reloading (F+20N) 
+lateralbc = {}
+#lateralbc = { "right":"pseudohomo"}
 workdir = "workdir/"
-label = "cuboidTest_3D"
+label = "cuboidTest_3D_VER"
 elType = "C3D8"
 cpus = 1
 node = platform.node()
@@ -64,13 +70,14 @@ if compart:
   labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
   material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
 else:
-  E = 1.
+  E = 70000.
   nu =.3
-  sy = .01
+  sy = 150
+  n = .1
   labels = 'SAMPLE_MAT'
-  material = materials.VonMises(labels = labels, E = E, nu = nu, sy = sy)
+  material = materials.Hollomon(labels = labels, E = E, nu = nu, sy = sy, n=n)
       
-m =CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True, cpus = cpus, export_fields = export_fields)
+m =CuboidTest_VER(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, force = force, disp = disp, loading = loading, elType = elType, is_3D = True, cpus = cpus, export_fields = export_fields, unloading_reloading = unloading_reloading, lateralbc = lateralbc)
 m.MakeInp()
 m.Run()
 m.MakePostProc()
@@ -81,26 +88,59 @@ if m.outputs['completed']:
   
 
   # History Outputs
-  disp =  np.array(m.outputs['history']['disp'].values()[0].data[0])
-  force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
-  volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
-  length = ly + disp
+  
+  if "displacement" in loading:
+    displ =  np.array(m.outputs['history']['disp'].values()[0].data[0])
+    force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
+    volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
+  if "force" in loading and unloading_reloading == False:
+    displ =  np.array(m.outputs['history']['disp'].values()[0].data[0])
+    force =  np.array(np.array(m.outputs['history']['load'].values()).sum().data[0])
+    volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
+  if "force" in loading and unloading_reloading:
+    volume_loading = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
+    volume_unloading = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[1])
+    volume_reloading = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[2])
+    displ_loading =  np.array(m.outputs['history']['disp'].values()[0].data[0])
+    displ_unloading =  np.array(m.outputs['history']['disp'].values()[0].data[1])
+    displ_reloading =  np.array(m.outputs['history']['disp'].values()[0].data[2])
+    force_loading =  np.array(np.array(m.outputs['history']['load'].values()).sum().data[0])
+    force_unloading =  np.array(np.array(m.outputs['history']['load'].values()).sum().data[1])
+    force_reloading =  np.array(np.array(m.outputs['history']['load'].values()).sum().data[2])
+    A, B, C = [],[], []
+    for i in xrange(len(displ_loading)):
+      A.append(displ_loading[i])
+      B.append(force_loading[i])
+      C.append(volume_loading[i])
+    for i in xrange(len(displ_unloading)):
+      A.append(displ_unloading[i])
+      B.append(force_unloading[i])
+      C.append(volume_unloading[i])
+    for i in xrange(len(displ_reloading)):
+      A.append(displ_reloading[i])
+      B.append(force_reloading[i])
+      C.append(volume_reloading[i])
+    displ = np.array(A)
+    force = np.array(B)
+    volume = np.array(C)
+      
+  length = ly + displ
   surface = volume / length
-  logstrain = np.log10(1. + disp / ly)
-  linstrain = disp/ly
+  logstrain = np.log10(1. + displ / ly)
+  linstrain = displ/ly
   strain = linstrain
   stress = force / surface 
    
   fig = plt.figure(0)
   plt.clf()
-  sp1 = fig.add_subplot(2, 1, 1)
-  plt.plot(strain, stress, 'k-')
-  plt.xlabel('Displacement, $U$')
-  plt.ylabel('Force, $F$')
-  plt.grid()
-  sp1 = fig.add_subplot(2, 1, 2)
+#  sp1 = fig.add_subplot(2, 1, 1)
+#  plt.plot(strain, stress, 'k-')
+#  plt.xlabel('Displacement, $U$')
+#  plt.ylabel('Force, $F$')
+#  plt.grid()
+#  sp1 = fig.add_subplot(2, 1, 2)
   plt.plot(strain, stress, 'k-', label = 'simulation curve', linewidth = 2.)
-  plt.plot(strain_exp, stress_exp, 'r-', label = 'experimental curve', linewidth = 2.)
+#  plt.plot(strain_exp, stress_exp, 'r-', label = 'experimental curve', linewidth = 2.)
   plt.xlabel('Tensile Strain, $\epsilon$')
   plt.ylabel(' Tensile Stress $\sigma$')
   plt.legend(loc="lower right")

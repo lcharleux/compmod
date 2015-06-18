@@ -29,6 +29,10 @@ class Simulation(object):
   :type is_3D: boolean 
   :param cpus: number of CPUs to use (default: 1)
   :type compart: integer
+  :param force: test in force
+  :type force: boolean
+  :param displacement: test in dispalcement
+  :type displacement: boolean
   """
   def __init__(self, **kwargs):
     defaultArgs = {"abqlauncher":None, "material": VonMises(), "label": "simulation",  "workdir": "", "compart":False, "nFrames": 100, "elType": "CPS4", "is_3D": False, "cpus" : 1}
@@ -773,8 +777,465 @@ dump(data, file_name+'.pckl')"""
     f = open(self.workdir + self.label + '_abqpostproc.py', 'w')
     f.write(pattern)
     f.close()
+
+
+   
+class CuboidTest_VER(Simulation):
+  """
+  Performs a uniaxial tensile or compressive test on an cuboid rectangular cuboid along the y axis. The cuboid can be 2D or 3D. Lateral conditions can be specified as pseudo homogeneous or periodic. 
+
+  
+  :param lx: length of the box along the x axis (default = 1.)
+  :type lx: float
+  :param ly: length of the box along the y axis (default = 1.)
+  :type ly: float
+  :param lz: length of the box along the z axis (default = 1.). Only used in 3D simulations.
+  :type lz: float
+  :param Nx: number of elements along the x direction.
+  :type Nx: int
+  :param Ny: number of elements along the y direction.
+  :type Ny: int
+  :param Nz: number of elements along the z direction.
+  :type Nz: int
+  :param disp: imposed displacement along the y direction (default = .25)
+  :type disp: float 
+  :param export_fields: indicates if the field outputs are exported (default = True). Can be set to False to speed up post processing.
+  :type export: boolean
+  :param lateral_bc: indicates the type of lateral boundary conditions to be used.
+  :type lateral_bc: dict
+  {0}
+  
+  This model can be used for a wide range of problems. A few examples are given here:
+  
+  1. Simple 2D homogenous model:
+  
+  
+  
     
-     
+  CuboidTest with microstructure generated using Voronoi cells : 
+   
+  * Source: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.py>`.
+  * VTK output: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.vtk>`.
+ 
+  """
+  __doc__ = __doc__.format(Simulation.__doc__)
+  
+  
+  def __init__(self, **kwargs):
+    
+    
+    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "force":100., "export_fields": True, "lateralbc":{}, "loading":{}, "unloading_reloading": False}
+    for key, value in defaultArgs.iteritems(): setattr(self, key, value)
+    for key, value in kwargs.iteritems(): setattr(self, key, value)
+    super(CuboidTest_VER, self).__init__(**kwargs)
+  
+  def MakeMesh(self):
+    """
+    Builds the mesh.
+    """
+    Nx , Ny, Nz = self.Nx, self.Ny, self.Nz
+    lx, ly, lz = self.lx, self.ly, self.lz
+    elType = self.elType
+    if self.is_3D:
+      Ne = Nx * Ny * Nz
+    else:
+      Ne = Nx * Ny
+    m = RegularQuadMesh(Nx, Ny, l1= lx, l2 = ly, name = elType)
+    m.add_set(label = "AllElements", elements = m.labels)
+    nsets = copy.copy(m.nodes.sets) 
+    if self.is_3D: 
+       m = m.extrude(N = Nz, l = lz)
+       m.nodes.sets['bottomleft'] = nsets['bottomleft']
+       m.nodes.sets['bottomright'] = nsets['bottomright']
+       m.nodes.add_set_by_func('front', lambda x,y,z, labels: z == 0.)
+       m.nodes.add_set_by_func('rear', lambda x,y,z, labels: z == z.max())
+       m.nodes.add_set_by_func('pilot', lambda x,y,z, labels: (y == y.max()) * (x == x.max()) * (z == z.max()) )
+      
+       
+    self.mesh = m
+    
+  def MakeInp(self):
+    """
+    Writes the Abaqus INP file in the workdir.
+    """
+    pattern = """**----------------------------------
+**DISTRIBUTED MECHANICAL PROPERTIES
+**----------------------------------
+**HEADER
+*Preprint, echo=NO, model=NO, history=NO, contact=NO
+**----------------------------------
+** PART "pSAMPLE" DEFINITION
+*Part, name = pSample
+#MESH
+#SECTIONS
+#LATERALBC
+*End part
+**----------------------------------
+** ASSEMBLY
+*Assembly, name = Assembly
+*Instance, name=iSample, part=pSample
+*End Instance
+*End Assembly
+**----------------------------------
+** MATERIALS
+#MATERIALS
+**----------------------------------
+** STEPS
+*Step, Name=Loading0, Nlgeom=YES, Inc=1000000
+*Static
+#FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
+** BOUNDARY CONDITIONS
+*Boundary
+iSample.Bottom, 2, 2
+iSample.BottomLeft, 1, 1#3DBOUNDARY
+#DISP_INIT#DISP
+** LOADS
+#LOAD_INIT#LOAD
+** RESTART OPTIONS 
+*Restart, write, frequency=0
+** FIELD OUTPUTS
+*Output, field, frequency=1
+*Node Output
+U
+*Element Output, directions=YES
+E, PE, EE, PEEQ, S
+** HYSTORY OUTPUTS
+*Output, history
+*Energy Output
+ALLPD, ALLSE, ALLWK
+*Node Output, nset=iSample.Top
+RF2
+*Node Output, nset=iSample.Top
+CF2
+*Node Output, nset=iSample.TopLeft
+U2
+*Node Output, nset=iSample.Left
+COOR1
+*Node Output, nset=iSample.Right
+COOR1
+*Element Output, elset=iSample.allElements, directions=NO
+EVOL
+*End Step
+  """
+    if self.unloading_reloading and "force" in self.loading:
+      pattern += '''** STEPS
+*Step, Name=unloading, Nlgeom=YES, Inc=1000000
+*Static
+#FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
+** BOUNDARY CONDITIONS
+*Boundary
+iSample.Bottom, 2, 2
+iSample.BottomLeft, 1, 1#3DBOUNDARY
+** LOADS
+#LOAD_INIT#LOAD0
+** RESTART OPTIONS 
+*Restart, write, frequency=0
+** FIELD OUTPUTS
+*Output, field, frequency=1
+*Node Output
+U
+*Element Output, directions=YES
+E, PE, EE, PEEQ, S
+** HYSTORY OUTPUTS
+*Output, history
+*Energy Output
+ALLPD, ALLSE, ALLWK
+*Node Output, nset=iSample.Top
+RF2
+*Node Output, nset=iSample.Top
+CF2
+*Node Output, nset=iSample.TopLeft
+U2
+*Node Output, nset=iSample.Left
+COOR1
+*Node Output, nset=iSample.Right
+COOR1
+*Element Output, elset=iSample.allElements, directions=NO
+EVOL
+*End Step
+
+** STEPS
+*Step, Name=reloading, Nlgeom=YES, Inc=1000000
+*Static
+#FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
+** BOUNDARY CONDITIONS
+*Boundary
+iSample.Bottom, 2, 2
+iSample.BottomLeft, 1, 1#3DBOUNDARY
+** LOADS
+#LOAD_INIT#LOAD1
+** RESTART OPTIONS 
+*Restart, write, frequency=0
+** FIELD OUTPUTS
+*Output, field, frequency=1
+*Node Output
+U
+*Element Output, directions=YES
+E, PE, EE, PEEQ, S
+** HYSTORY OUTPUTS
+*Output, history
+*Energy Output
+ALLPD, ALLSE, ALLWK
+*Node Output, nset=iSample.Top
+RF2
+*Node Output, nset=iSample.Top
+CF2
+*Node Output, nset=iSample.TopLeft
+U2
+*Node Output, nset=iSample.Left
+COOR1
+*Node Output, nset=iSample.Right
+COOR1
+*Element Output, elset=iSample.allElements, directions=NO
+EVOL
+*End Step
+  '''
+    Nx , Ny, Nz = self.Nx, self.Ny, self.Nz
+    lx, ly, lz = self.lx, self.ly, self.lz
+    elType = self.elType
+    material = self.material
+    disp = self.disp
+    force = self.force
+    force_fin = force + 20. #for a cyclic test, force_fin is the force that ended the test
+    nFrames = self.nFrames
+    if self.is_3D:
+      Ne = Nx * Ny * Nz
+    else:
+      Ne = Nx * Ny
+    sections = ""
+    matinp = ""
+    if self.compart:
+      section_pattern = "*Solid Section, elset=Elset{0}, material={1}\n*Elset, Elset=Elset{0}\n{0},\n"
+      labels = [mat.labels[0] for mat in material]
+      for i in xrange(Ne):
+        sections += section_pattern.format(i+1, labels[i]) 
+        matinp += material[i].dump2inp() + '\n'
+    else:
+      section_pattern = "*SOLID SECTION, ELSET = ALLELEMENTS, MATERIAL = {0}\n{1}"  
+      label = material.labels[0]
+      sections = section_pattern.format(label, self.lz)
+      matinp = material.dump2inp() 
+    if hasattr(self, "mesh") == False:
+      self.MakeMesh()
+    m = self.mesh
+    
+#Adding boundary conditions on sides with abaqus equations    
+    lateralbc = ""
+    lateralbc += "*EQUATION\n"
+    pilot_node = m.nodes.sets['pilot']
+    nset_bottom = m.nodes.sets['bottom']#applying the same displacement on Y axis for the bottom nodes
+    for nodelabel in nset_bottom[1:]:
+      lateralbc += "2\n{0}, 2, 1.0, {1}, 2, -1.0\n".format(nodelabel, nset_bottom[0])
+    nset_top = m.nodes.sets['top']#applying the same displacement on Y axis for the top nodes
+    for nodelabel in nset_top[:-1]:
+      lateralbc += "2\n{0}, 2, 1.0, {1}, 2, -1.0\n".format(nodelabel, pilot_node[0])# the pilot node pilots the displacement of all the nodes of the "top" set
+      
+    if len(self.lateralbc.keys()) != 0:      
+      lateralbc_keys = self.lateralbc.keys()
+      for lbck in lateralbc_keys:
+        if lbck == "right": 
+          direction = 1
+          nset = m.nodes.sets['right'] 
+        if lbck == "left": 
+          direction = 1
+          nset = m.nodes.sets['left']
+        if lbck == "front": 
+          direction = 3
+          nset = m.nodes.sets['front'] 
+        if lbck == "rear": 
+          direction = 3
+          nset = m.nodes.sets['rear']
+        if lbck == "top": 
+          direction = 2
+          nset = m.nodes.sets['top']
+        if lbck == "bottom": 
+          direction = 2
+          nset = m.nodes.sets['bottom']
+          
+        if self.lateralbc[lbck] == 'pseudohomo':
+          for nodelabel in nset[1:]:
+            lateralbc += "2\n{0}, 1, 1.0, {1}, 1, -1.0\n".format(nodelabel, nset[0])
+        
+        if self.lateralbc[lbck] == 'periodic' and lbck == "right":
+          associate_nset = m.nodes.sets['left']
+          for nodelabel in nset[1:]:
+            lateralbc += "2\n{0}, 1, 1, {1}, 1, -1\n".format(nodelabel, nset[0])
+            
+          '''
+          xl = np.array([])
+          side_pairs = []
+          top_pair = []
+          bottom_pair = []
+          
+          for nl in left_nodes:
+            nlx = 
+         '''    
+    loading = self.loading
+    pattern = pattern.replace("#LATERALBC", lateralbc[:-1])  
+    pattern = pattern.replace("#MESH", m.dump2inp())
+    pattern = pattern.replace("#SECTIONS", sections[:-1])
+    pattern = pattern.replace("#MATERIALS", matinp[:-1])
+    if "displacement" in loading:  #the pilot node is piloted with a displacement condition  
+      pattern = pattern.replace("#DISP_INIT", "iSample.PILOT,    2, 2," )
+      pattern = pattern.replace("#DISP", str(disp))
+      pattern = pattern.replace("#LOAD_INIT", "")
+      pattern = pattern.replace("#LOAD", "")
+    if "force" in loading and self.unloading_reloading == False: #the pilot node is piloted with a force condition and the test is not a cyclic test
+      pattern = pattern.replace("#LOAD_INIT", "*Cload\nISAMPLE.PILOT, 2,")
+      pattern = pattern.replace("#LOAD", str(force))
+      pattern = pattern.replace("#DISP_INIT", "")
+      pattern = pattern.replace("#DISP", "")
+    if "force" in loading and self.unloading_reloading:#the pilot node is piloted with a force condition and the test is a cyclic test
+      pattern = pattern.replace("#LOAD_INIT", "** Name: CFORCE-1   Type: Concentrated force\n*Cload\nISAMPLE.PILOT, 2,")    
+      pattern = pattern.replace("#LOAD0", str(0.))
+      pattern = pattern.replace("#LOAD1", str(force_fin))
+      pattern = pattern.replace("#LOAD", str(force))
+      pattern = pattern.replace("#DISP_INIT", "")
+      pattern = pattern.replace("#DISP", "")
+    
+      
+    pattern = pattern.replace("#FRAME_DURATION", str(1./nFrames))
+    if self.is_3D:
+      pattern = pattern.replace("#3DBOUNDARY", "\niSample.BottomLeft, 3, 3\niSample.BottomRight, 3, 3")
+    else:  
+      pattern = pattern.replace("#3DBOUNDARY", "")
+    f = open(self.workdir + self.label + '.inp', 'wb')
+    f.write(pattern)
+    f.close()
+  def MakePostProc(self):
+    """
+    Makes the post-proc script
+    """
+    pattern = """# ABQPOSTPROC.PY
+# Warning: executable only in abaqus abaqus viewer -noGUI,... not regular python.
+import sys
+from abapy.postproc import GetFieldOutput_byRpt as gfo
+from abapy.postproc import GetVectorFieldOutput_byRpt as gvfo
+from abapy.postproc import GetTensorFieldOutput_byRpt as gtfo
+from abapy.postproc import GetHistoryOutputByKey as gho
+from abapy.postproc import GetMesh
+from abapy.indentation import Get_ContactData
+from abapy.misc import dump
+from odbAccess import openOdb
+from abaqusConstants import JOB_STATUS_COMPLETED_SUCCESSFULLY
+
+
+
+# Odb opening  
+file_name = '#FILE_NAME'
+odb = openOdb(file_name + '.odb')
+data = {}
+
+# Check job status:
+job_status = odb.diagnosticData.jobStatus
+
+if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
+  data['completed'] = True"""
+    if self.export_fields : pattern += """
+  # Field Outputs
+  data['field'] = {}
+  fo = data['field']
+  fo['U'] = [
+    gvfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'NODAL', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'U', 
+      delete_report = True)
+      ]
+ 
+      
+  fo['S'] = [
+    gtfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'INTEGRATION_POINT', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'S', 
+      sub_set_type = 'element', 
+      delete_report = True),
+    ]
+   
+  fo['LE'] = [
+    gtfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'INTEGRATION_POINT', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'LE', 
+      sub_set_type = 'element', 
+      delete_report = True),
+    ] 
+      
+  fo['EE'] = [
+    gtfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'INTEGRATION_POINT', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'EE', 
+      sub_set_type = 'element', 
+      delete_report = True),
+    ]     
+  
+  fo['PE'] = [
+    gtfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'INTEGRATION_POINT', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'PE', 
+      sub_set_type = 'element', 
+      delete_report = True),
+    ] 
+  
+  fo['PEEQ'] = [
+    gfo(odb = odb, 
+      instance = 'ISAMPLE', 
+      step = 0,
+      frame = -1,
+      original_position = 'INTEGRATION_POINT', 
+      new_position = 'NODAL', 
+      position = 'node',
+      field = 'PEEQ', 
+      sub_set_type = 'element', 
+      delete_report = True),
+    ] """
+    
+    pattern += """# History Outputs
+  data['history'] = {} 
+  ho = data['history']
+  ho['disp'] =   gho(odb,'U2')
+  ho['force'] =   gho(odb,'RF2')
+  ho['load'] =   gho(odb,'CF2')
+  ho['allse'] =   gho(odb,'ALLSE').values()[0]
+  ho['allpd'] =   gho(odb,'ALLPD').values()[0]
+  ho['allwk'] =   gho(odb,'ALLWK').values()[0]
+  ho['volume'] =  gho(odb,'EVOL')
+  
+  # Mesh 
+  data['mesh'] = GetMesh(odb, "ISAMPLE")
+  
+else:
+  data['completed'] = False
+# Closing and dumping
+odb.close()
+dump(data, file_name+'.pckl')"""
+    pattern = pattern.replace("#FILE_NAME", self.label)
+    f = open(self.workdir + self.label + '_abqpostproc.py', 'w')
+    f.write(pattern)
+    f.close()     
     
   
   
