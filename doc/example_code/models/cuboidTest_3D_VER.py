@@ -28,22 +28,25 @@ strain_exp, stress_exp = read_file(settings['file_name'])
 
 #PARAMETERS
 lx, ly, lz = 1., 1., 1.
-Nx, Ny, Nz = 10, 10, 10
+Nx, Ny, Nz = 2, 2, 2
 Ne = Nx * Ny * Nz
-
-loading = {"force"} #"loading" : force or displacement
+is_3D = True
+loading = {"displacement"} #"loading" : force or displacement
 #disp = strain_exp[-1] * ly
-disp = 0.1
+disp = 0.2
 force = 190.
 nFrames = 30
 export_fields = False
 compart = True
 unloading_reloading = False #for one cycle of loading (F), unloding (F=0) and reloading (F+20N) 
 lateralbc = {}
-#lateralbc = { "right":"pseudohomo"}
+#lateralbc = { "right":"periodic"}
 workdir = "workdir/"
 label = "cuboidTest_3D_VER"
-elType = "C3D8"
+if is_3D:
+  elType = "C3D8"
+else:
+  elType = "CPS4"
 cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      
@@ -77,7 +80,7 @@ else:
   labels = 'SAMPLE_MAT'
   material = materials.Hollomon(labels = labels, E = E, nu = nu, sy = sy, n=n)
       
-m =CuboidTest_VER(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, force = force, disp = disp, loading = loading, elType = elType, is_3D = True, cpus = cpus, export_fields = export_fields, unloading_reloading = unloading_reloading, lateralbc = lateralbc)
+m =CuboidTest_VER(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, force = force, disp = disp, loading = loading, elType = elType, is_3D = is_3D, cpus = cpus, export_fields = export_fields, unloading_reloading = unloading_reloading, lateralbc = lateralbc)
 m.MakeInp()
 m.Run()
 m.MakePostProc()

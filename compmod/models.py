@@ -140,7 +140,7 @@ class CuboidTest(Simulation):
   def __init__(self, **kwargs):
     
     
-    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "export_fields": True, "lateralbc":{}, steps = 1}
+    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "export_fields": True, "lateralbc":{}, "steps" : 1}
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     super(CuboidTest, self).__init__(**kwargs)
@@ -842,14 +842,46 @@ class CuboidTest_VER(Simulation):
       Ne = Nx * Ny
     m = RegularQuadMesh(Nx, Ny, l1= lx, l2 = ly, name = elType)
     m.add_set(label = "AllElements", elements = m.labels)
-    nsets = copy.copy(m.nodes.sets) 
+    nsets = copy.copy(m.nodes.sets)
+    m.nodes.sets = {}
+    if self.is_3D == False:
+       m.nodes.sets['pilot'] = nsets['topright']
     if self.is_3D: 
        m = m.extrude(N = Nz, l = lz)
-       m.nodes.sets['bottomleft'] = nsets['bottomleft']
-       m.nodes.sets['bottomright'] = nsets['bottomright']
-       m.nodes.add_set_by_func('front', lambda x,y,z, labels: z == 0.)
-       m.nodes.add_set_by_func('rear', lambda x,y,z, labels: z == z.max())
-       m.nodes.add_set_by_func('pilot', lambda x,y,z, labels: (y == y.max()) * (x == x.max()) * (z == z.max()) )
+#Sets of sides definition  
+       m.nodes.add_set_by_func('rear', lambda x,y,z, labels: (z == 0.)*(x!=0)*(x!=x.max())*(y!=0)*(y!=y.max()))
+       m.nodes.add_set_by_func('front', lambda x,y,z, labels: (z == z.max())*(x!=0)*(x!=x.max())*(y!=0)*(y!=y.max()))
+       m.nodes.add_set_by_func('left', lambda x,y,z, labels: (x == 0.)*(z!=0)*(z!=z.max())*(y!=0)*(y!=y.max()))
+       m.nodes.add_set_by_func('right', lambda x,y,z, labels: (x == x.max())*(z!=0)*(z!=z.max())*(y!=0)*(y!=y.max()))
+       m.nodes.add_set_by_func('bottom', lambda x,y,z, labels: (y == 0.)*(z!=0)*(z!=z.max())*(x!=0)*(x!=y.max()))
+       m.nodes.add_set_by_func('top', lambda x,y,z, labels: (y == y.max())*(x!=0)*(x!=x.max())*(z!=0)*(z!=z.max()))
+       
+#Sets of edges definition         
+       m.nodes.add_set_by_func('topright', lambda x,y,z, labels: (x == x.max())*(y == y.max())*(z!=0)*(z!=z.max()))
+       m.nodes.add_set_by_func('toprear', lambda x,y,z, labels: (z == 0)*(y == y.max())*(x!=0)*(x!=x.max()))
+       m.nodes.add_set_by_func('topleft', lambda x,y,z, labels: (x == 0)*(y == y.max())*(z!=0)*(z!=z.max()))
+       m.nodes.add_set_by_func('topfront', lambda x,y,z, labels: (z == z.max())*(y == y.max())*(x!=0)*(x!=z.max()))
+       
+       m.nodes.add_set_by_func('bottomright', lambda x,y,z, labels: (x == x.max())*(y == 0)*(z!=0)*(z!=z.max()))
+       m.nodes.add_set_by_func('bottomrear', lambda x,y,z, labels: (z == 0)*(y == 0)*(x!=0)*(x!=x.max()))
+       m.nodes.add_set_by_func('bottomleft', lambda x,y,z, labels: (x == 0)*(y == 0)*(z!=0)*(z!=z.max()))
+       m.nodes.add_set_by_func('bottomfront', lambda x,y,z, labels: (z == z.max())*(y == 0)*(x!=0)*(x!=z.max()))
+       
+       m.nodes.add_set_by_func('frontright', lambda x,y,z, labels: (x == x.max())*(z == z.max())*(y!=0)*(y!=z.max()))
+       m.nodes.add_set_by_func('rearright', lambda x,y,z, labels: (x == x.max())*(z == 0)*(y!=0)*(y!=z.max()))
+       m.nodes.add_set_by_func('rearleft', lambda x,y,z, labels: (x == 0)*(z == 0)*(y!=0)*(y!=z.max()))
+       m.nodes.add_set_by_func('frontleft', lambda x,y,z, labels: (x == 0)*(z == z.max())*(y!=0)*(y!=z.max()))
+       
+ #Sets of summits definition       
+       m.nodes.add_set_by_func('pilot', lambda x,y,z, labels: (y == y.max()) * (x == x.max()) * (z == z.max()))
+       m.nodes.add_set_by_func('toprearright', lambda x,y,z, labels: (y == y.max()) * (x == x.max()) * (z == 0))
+       m.nodes.add_set_by_func('toprearleft', lambda x,y,z, labels: (y == y.max()) * (x == 0.) * (z == 0))
+       m.nodes.add_set_by_func('topfrontleft', lambda x,y,z, labels: (y == y.max()) * (x == 0.) * (z == z.max()))
+       
+       m.nodes.add_set_by_func('bottomfrontright', lambda x,y,z, labels: (y == 0) * (x == x.max()) * (z == z.max()))
+       m.nodes.add_set_by_func('bottomrearright', lambda x,y,z, labels: (y == 0) * (x == x.max()) * (z == 0))
+       m.nodes.add_set_by_func('origin', lambda x,y,z, labels: (y == 0) * (x == 0.) * (z == 0))
+       m.nodes.add_set_by_func('bottomfrontleft', lambda x,y,z, labels: (y == 0) * (x == 0.) * (z == z.max()))
       
        
     self.mesh = m
@@ -886,8 +918,7 @@ class CuboidTest_VER(Simulation):
 #FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
 ** BOUNDARY CONDITIONS
 *Boundary
-iSample.Bottom, 2, 2
-iSample.BottomLeft, 1, 1#3DBOUNDARY
+#2DBOUNDARY#3DBOUNDARY
 #DISP_INIT#DISP
 ** LOADS
 #LOAD_INIT#LOAD
@@ -905,7 +936,11 @@ E, PE, EE, PEEQ, S
 ALLPD, ALLSE, ALLWK
 *Node Output, nset=iSample.Top
 RF2
+*Node Output, nset=iSample.pilot
+RF2
 *Node Output, nset=iSample.Top
+CF2
+*Node Output, nset=iSample.pilot
 CF2
 *Node Output, nset=iSample.TopLeft
 U2
@@ -924,8 +959,7 @@ EVOL
 #FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
 ** BOUNDARY CONDITIONS
 *Boundary
-iSample.Bottom, 2, 2
-iSample.BottomLeft, 1, 1#3DBOUNDARY
+#2DBOUNDARY#3DBOUNDARY
 ** LOADS
 #LOAD_INIT#LOAD0
 ** RESTART OPTIONS 
@@ -942,7 +976,11 @@ E, PE, EE, PEEQ, S
 ALLPD, ALLSE, ALLWK
 *Node Output, nset=iSample.Top
 RF2
+*Node Output, nset=iSample.pilot
+RF2
 *Node Output, nset=iSample.Top
+CF2
+*Node Output, nset=iSample.pilot
 CF2
 *Node Output, nset=iSample.TopLeft
 U2
@@ -960,8 +998,7 @@ EVOL
 #FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
 ** BOUNDARY CONDITIONS
 *Boundary
-iSample.Bottom, 2, 2
-iSample.BottomLeft, 1, 1#3DBOUNDARY
+#2DBOUNDARY#3DBOUNDARY
 ** LOADS
 #LOAD_INIT#LOAD1
 ** RESTART OPTIONS 
@@ -978,7 +1015,11 @@ E, PE, EE, PEEQ, S
 ALLPD, ALLSE, ALLWK
 *Node Output, nset=iSample.Top
 RF2
+*Node Output, nset=iSample.pilot
+RF2
 *Node Output, nset=iSample.Top
+CF2
+*Node Output, nset=iSample.pilot
 CF2
 *Node Output, nset=iSample.TopLeft
 U2
@@ -1023,12 +1064,21 @@ EVOL
     lateralbc = ""
     lateralbc += "*EQUATION\n"
     pilot_node = m.nodes.sets['pilot']
-    nset_bottom = m.nodes.sets['bottom']#applying the same displacement on Y axis for the bottom nodes
-    for nodelabel in nset_bottom[1:]:
-      lateralbc += "2\n{0}, 2, 1.0, {1}, 2, -1.0\n".format(nodelabel, nset_bottom[0])
-    nset_top = m.nodes.sets['top']#applying the same displacement on Y axis for the top nodes
-    for nodelabel in nset_top[:-1]:
-      lateralbc += "2\n{0}, 2, 1.0, {1}, 2, -1.0\n".format(nodelabel, pilot_node[0])# the pilot node pilots the displacement of all the nodes of the "top" set
+    
+#same displacement for the top nodes along the Y axis
+    nset_top = m.nodes.sets['top']
+    if self.is_3D:
+      for i in xrange(Nz-1) : nset_top.append(m.nodes.sets['topright'][i])
+      for i in xrange(Nz-1) : nset_top.append(m.nodes.sets['topleft'][i])
+      for i in xrange(Nx-1) : nset_top.append(m.nodes.sets['toprear'][i])
+      for i in xrange(Nx-1) : nset_top.append(m.nodes.sets['topfront'][i])
+      nset_top.append(m.nodes.sets['toprearright'][0])
+      nset_top.append(m.nodes.sets['toprearleft'][0])
+      nset_top.append(m.nodes.sets['topfrontleft'][0])    
+    else:
+      for i in xrange(Nx-1) : nset_top.append(m.nodes.sets['topleft'][0])
+    for nodelabel in nset_top:
+      lateralbc += "2\n{0}, 2, 1.0, {1}, 2, -1.0\n".format(nodelabel, pilot_node[0])
       
     if len(self.lateralbc.keys()) != 0:      
       lateralbc_keys = self.lateralbc.keys()
@@ -1039,27 +1089,46 @@ EVOL
         if lbck == "left": 
           direction = 1
           nset = m.nodes.sets['left']
-        if lbck == "front": 
-          direction = 3
-          nset = m.nodes.sets['front'] 
-        if lbck == "rear": 
-          direction = 3
-          nset = m.nodes.sets['rear']
         if lbck == "top": 
           direction = 2
           nset = m.nodes.sets['top']
         if lbck == "bottom": 
           direction = 2
           nset = m.nodes.sets['bottom']
-          
+        if self.is_3D:
+          if lbck == "front": 
+            direction = 3
+            nset = m.nodes.sets['front'] 
+          if lbck == "rear": 
+            direction = 3
+            nset = m.nodes.sets['rear']
+            
         if self.lateralbc[lbck] == 'pseudohomo':
           for nodelabel in nset[1:]:
-            lateralbc += "2\n{0}, 1, 1.0, {1}, 1, -1.0\n".format(nodelabel, nset[0])
+            lateralbc += "2\n{0}, {1}, 1.0, {2}, {3}, -1.0\n".format(nodelabel, direction, nset[0], direction)
         
         if self.lateralbc[lbck] == 'periodic' and lbck == "right":
           associate_nset = m.nodes.sets['left']
-          for nodelabel in nset[1:]:
-            lateralbc += "2\n{0}, 1, 1, {1}, 1, -1\n".format(nodelabel, nset[0])
+          for i in xrange(len(nset)):
+              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(nset[i], associate_nset[i])# same displacement along Y for the right and left nodes
+          for i in xrange(len(nset)):
+            lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(nset[i], associate_nset[i], pilot_node[0]) # the difference of displacement between two opposite nodes along the X axis is equal to the displacement of the pilot node along X
+            
+        if self.lateralbc[lbck] == 'periodic' and lbck == "left":
+          associate_nset = m.nodes.sets['right']
+          for i in xrange(len(nset)):
+            lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(nset[i], associate_nset[i])# same displacement along Y for the right and left nodes
+          for i in xrange(len(nset)):
+            lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(nset[i], associate_nset[i], pilot_node[0]) # the difference of displacement between two opposite nodes along the X axis is equal to the displacement of the pilot node along X
+            
+        if self.lateralbc[lbck] == 'periodic' and lbck == "left" and lbck == "right":
+          associate_nset = m.nodes.sets['left']
+          nset = m.nodes.sets['right']
+          for i in xrange(len(nset)):
+            lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(nset[i], associate_nset[i])# same displacement along Y for the right and left nodes
+          for i in xrange(len(nset)):
+            lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(nset[i], associate_nset[i], pilot_node[0]) # the difference of displacement between two opposite nodes along the X axis is equal to the displacement of the pilot node along X
+
             
           '''
           xl = np.array([])
@@ -1075,6 +1144,7 @@ EVOL
     pattern = pattern.replace("#MESH", m.dump2inp())
     pattern = pattern.replace("#SECTIONS", sections[:-1])
     pattern = pattern.replace("#MATERIALS", matinp[:-1])
+    
     if "displacement" in loading:  #the pilot node is piloted with a displacement condition  
       pattern = pattern.replace("#DISP_INIT", "iSample.PILOT,    2, 2," )
       pattern = pattern.replace("#DISP", str(disp))
@@ -1092,13 +1162,17 @@ EVOL
       pattern = pattern.replace("#LOAD", str(force))
       pattern = pattern.replace("#DISP_INIT", "")
       pattern = pattern.replace("#DISP", "")
-    
       
     pattern = pattern.replace("#FRAME_DURATION", str(1./nFrames))
+    
     if self.is_3D:
-      pattern = pattern.replace("#3DBOUNDARY", "\niSample.BottomLeft, 3, 3\niSample.BottomRight, 3, 3")
-    else:  
+      pattern = pattern.replace("#2DBOUNDARY", "")
+      pattern = pattern.replace("#3DBOUNDARY", "\niSample.bottom, 2, 2\niSample.bottomright, 2, 2\niSample.bottomrear, 2,2\niSample.bottomleft, 2,2\niSample.bottomfront, 2,2\niSample.bottomfrontright, 2,2\niSample.bottomrearright, 2,2\niSample.bottomfrontleft, 2,2\niSample.origin, 2,2\niSample.origin, 1,1\niSample.origin, 3,3\niSample.bottomrearright, 3,3\niSample.bottomfrontleft, 1,1")
+    if self.is_3D == False:
+      pattern = pattern.replace("#2DBOUNDARY", "iSample.Bottom, 2, 2\niSample.BottomLeft, 1, 1")
       pattern = pattern.replace("#3DBOUNDARY", "")
+
+    
     f = open(self.workdir + self.label + '.inp', 'wb')
     f.write(pattern)
     f.close()
