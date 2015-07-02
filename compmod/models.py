@@ -845,7 +845,19 @@ class CuboidTest_VER(Simulation):
     nsets = copy.copy(m.nodes.sets)
     m.nodes.sets = {}
     if self.is_3D == False:
-       m.nodes.sets['pilot'] = nsets['topright']
+#Sets of edges definition  
+       m.nodes.add_set_by_func_2D('left', lambda x,y, labels: (x == 0.)*(y!=0)*(y!=y.max()))
+       m.nodes.add_set_by_func_2D('right', lambda x,y, labels: (x == x.max())*(y!=0)*(y!=y.max()))
+       m.nodes.add_set_by_func_2D('bottom', lambda x,y, labels: (y == 0.)*(x!=0)*(x!=x.max()))
+       m.nodes.add_set_by_func_2D('top', lambda x,y, labels: (y == y.max())*(x!=0)*(x!=x.max()))
+       
+#Sets of summits definition       
+       m.nodes.add_set_by_func_2D('pilot', lambda x,y, labels: (y == y.max()) * (x == x.max()))
+       m.nodes.add_set_by_func_2D('origin', lambda x,y, labels: (y == 0) * (x == 0))
+       m.nodes.add_set_by_func_2D('topleft', lambda x,y, labels: (y == y.max()) * (x == 0.))
+       m.nodes.add_set_by_func_2D('bottomright', lambda x,y, labels: (y == 0) * (x == x.max()))
+      
+       
     if self.is_3D: 
        m = m.extrude(N = Nz, l = lz)
 #Sets of sides definition  
@@ -1063,71 +1075,178 @@ EVOL
 #Adding boundary conditions on sides with abaqus equations    
     lateralbc = ""
     lateralbc += "*EQUATION\n"
-    pilot_node = m.nodes.sets['pilot']
-    
-#same displacement for the top nodes along the Y axis
-    nset_top = m.nodes.sets['top']
-    if self.is_3D:
-      for i in xrange(Nz-1) : nset_top.append(m.nodes.sets['topright'][i])
-      for i in xrange(Nz-1) : nset_top.append(m.nodes.sets['topleft'][i])
-      for i in xrange(Nx-1) : nset_top.append(m.nodes.sets['toprear'][i])
-      for i in xrange(Nx-1) : nset_top.append(m.nodes.sets['topfront'][i])
-      nset_top.append(m.nodes.sets['toprearright'][0])
-      nset_top.append(m.nodes.sets['toprearleft'][0])
-      nset_top.append(m.nodes.sets['topfrontleft'][0])    
-    else:
-      for i in xrange(Nx-1) : nset_top.append(m.nodes.sets['topleft'][0])
-    for nodelabel in nset_top:
-      lateralbc += "2\n{0}, 2, 1.0, {1}, 2, -1.0\n".format(nodelabel, pilot_node[0])
       
     if len(self.lateralbc.keys()) != 0:      
       lateralbc_keys = self.lateralbc.keys()
       for lbck in lateralbc_keys:
         if lbck == "right": 
           direction = 1
-          nset = m.nodes.sets['right'] 
+          nset = m.nodes.sets['right']
+          n = len(nset)
         if lbck == "left": 
           direction = 1
           nset = m.nodes.sets['left']
+          n = len(nset)
         if lbck == "top": 
           direction = 2
           nset = m.nodes.sets['top']
+          n = len(nset)
         if lbck == "bottom": 
           direction = 2
           nset = m.nodes.sets['bottom']
+          n = len(nset)
         if self.is_3D:
           if lbck == "front": 
             direction = 3
             nset = m.nodes.sets['front'] 
+            n = len(nset)
           if lbck == "rear": 
             direction = 3
             nset = m.nodes.sets['rear']
+            n = len(nset)
             
-        if self.lateralbc[lbck] == 'pseudohomo':
-          for nodelabel in nset[1:]:
-            lateralbc += "2\n{0}, {1}, 1.0, {2}, {3}, -1.0\n".format(nodelabel, direction, nset[0], direction)
-        
-        if self.lateralbc[lbck] == 'periodic' and lbck == "right":
-          associate_nset = m.nodes.sets['left']
-          for i in xrange(len(nset)):
-              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(nset[i], associate_nset[i])# same displacement along Y for the right and left nodes
-          for i in xrange(len(nset)):
-            lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(nset[i], associate_nset[i], pilot_node[0]) # the difference of displacement between two opposite nodes along the X axis is equal to the displacement of the pilot node along X
+        if self.lateralbc[lbck] == 'pseudohomo' and lbck == "top":
+          nset_top = m.nodes.sets['top']
+          if self.is_3D:
+            for i in xrange(Nz-1) : nset_top.append(m.nodes.sets['topright'][i])
+            for i in xrange(Nz-1) : nset_top.append(m.nodes.sets['topleft'][i])
+            for i in xrange(Nx-1) : nset_top.append(m.nodes.sets['toprear'][i])
+            for i in xrange(Nx-1) : nset_top.append(m.nodes.sets['topfront'][i])
+            nset_top.append(m.nodes.sets['toprearright'][0])
+            nset_top.append(m.nodes.sets['toprearleft'][0])
+            nset_top.append(m.nodes.sets['topfrontleft'][0])    
+          else:
+            nset_top.append(m.nodes.sets['topleft'][0])
+          for nodelabel in nset_top:
+            lateralbc += "2\n{0}, 2, 1.0, {1}, 2, -1.0\n".format(nodelabel, m.nodes.sets['pilot'][0])
+
+#        if self.lateralbc[lbck] == 'periodic' and lbck == "left":
+#          if self.is_3D:#for 3D models
+########### For Sides
+########### BC for the nodes of right/left sides            
+#            for i in xrange(n):
+#              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(m.nodes.sets['left'][i], m.nodes.sets['right'][i])# same displacement along Y for the right and left nodes
+#              lateralbc += "2\n{0}, 3, 1., {1}, 3, -1.\n".format(m.nodes.sets['left'][i], m.nodes.sets['right'][i])# same displacement along Z for the right and left nodes
+#            for i in xrange(n):
+#              lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(m.nodes.sets['right'][i], m.nodes.sets['left'][i], m.nodes.sets['pilot'][0]) # the difference of displacement between two opposite right/left nodes along the X axis is equal to the displacement of the pilot node along X
+#
+#              
+########### For edges            
+########### BC for the nodes of topright/topleft edge            
+##            for i in xrange(len(m.nodes.sets['topright'])):
+##              lateralbc += "2\n{0}, 3, 1., {1}, 3, -1.\n".format(m.nodes.sets['topleft'][i], m.nodes.sets['topright'][i])# same displacement along Z for the topright and topleft nodes
+#            for i in xrange(len(m.nodes.sets['topright'])):
+#              lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(m.nodes.sets['topright'][i], m.nodes.sets['topleft'][i], m.nodes.sets['pilot'][0])# the difference of displacement between two opposite nodes for topright/topleft nodes along the X axis is equal to the displacement of the associate pilot node along X
+#              
+########### BC for the nodes of bottomright/bottomleft edge               
+##            for i in xrange(len(m.nodes.sets['bottomright'])):
+##              lateralbc += "2\n{0}, 3, 1., {1}, 3, -1.\n".format(m.nodes.sets['bottomleft'][i], m.nodes.sets['bottomright'][i])# same displacement along Z for the bottomright and bottomleft nodes
+#            for i in xrange(len(m.nodes.sets['bottomright'])):
+#              lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(m.nodes.sets['bottomright'][i], m.nodes.sets['bottomleft'][i], m.nodes.sets['pilot'][0])# the difference of displacement between two opposite nodes for bottomright/bottomleft nodes along the X axis is equal to the displacement of the associate pilot node along X
+#              
+########### BC for the nodes of rearright/rearleft edge            
+##            for i in xrange(len(m.nodes.sets['rearright'])):
+##              lateralbc += "2\n{0}, 3, 1., {1}, 3, -1.\n".format(m.nodes.sets['rearright'][i], m.nodes.sets['rearleft'][i])# same displacement along Z for the rearright and rearleft nodes
+#            for i in xrange(len(m.nodes.sets['rearright'])):
+#              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(m.nodes.sets['rearright'][i], m.nodes.sets['rearleft'][i])# same displacement along Y for the rearright and rearleft nodes
+#            for i in xrange(len(m.nodes.sets['rearright'])):
+#              lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(m.nodes.sets['rearright'][i], m.nodes.sets['rearleft'][i], m.nodes.sets['pilot'][0])# the difference of displacement between two opposite nodes for rearright/rearleft nodes along the X axis is equal to the displacement of the associate pilot node along X
+#              
+########### BC for the nodes of frontleft/frontright edge            
+##            for i in xrange(len(m.nodes.sets['frontleft'])):
+##              lateralbc += "2\n{0}, 3, 1., {1}, 3, -1.\n".format(m.nodes.sets['frontleft'][i], m.nodes.sets['frontright'][i])# same displacement along Z for the rearright and rearleft nodes
+#            for i in xrange(len(m.nodes.sets['frontleft'])):
+#              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(m.nodes.sets['frontleft'][i], m.nodes.sets['frontright'][i])# same displacement along Y for the rearright and rearleft nodes
+#            for i in xrange(len(m.nodes.sets['frontleft'])):
+#              lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(m.nodes.sets['frontright'][i], m.nodes.sets['frontleft'][i], m.nodes.sets['pilot'][0])# the difference of displacement between two opposite nodes for frontleft/frontright nodes along the X axis is equal to the displacement of the associate pilot node along X
+#              
+############ BC for the nodes of frontleft/frontright and rearright/rearleft edge            
+##            for i in xrange(len(m.nodes.sets['frontright'])):
+##              lateralbc += "4\n{0}, 3, 1., {1}, 3, -1.,{2}, 3, 1., {3}, 3, -1.\n".format(m.nodes.sets['frontleft'][i], m.nodes.sets['frontright'][i], m.nodes.sets['rearright'][i], m.nodes.sets['rearleft'][i])# same difference of displacement along Z for the rearright and rearleft nodes and front right and frontleft nodes
+#
+#              
+########### BC for the nodes of frontright/rearright edge            
+##            for i in xrange(len(m.nodes.sets['frontright'])):
+##              lateralbc += "3\n{0}, 3, 1.0, {1}, 3, -1.0, {2}, 3, -1.0\n".format(m.nodes.sets['frontright'][i], m.nodes.sets['rearright'][i], m.nodes.sets['pilot'][0])# the difference of displacement between two opposite nodes for frontright/rearright nodes along the Z axis is equal to the displacement of the associate pilot node along Z            
+#              
+########### BC for the nodes of frontleft/rearleft edge
+##            for i in xrange(len(m.nodes.sets['frontleft'])):
+##              lateralbc += "3\n{0}, 3, 1.0, {1}, 3, -1.0, {2}, 3, -1.0\n".format(m.nodes.sets['frontleft'][i], m.nodes.sets['rearleft'][i], m.nodes.sets['pilot'][0])# the difference of displacement between two opposite nodes for frontleft/rearleft nodes along the Z axis is equal to the displacement of the associate pilot node along Z              
+#
+########### For summit nodes           
+########## BC for the summit node (toprearright  and toprearleft) and (topfrontright  and topfrontleft)         
+#            lateralbc += "3\n{0}, 3, 1., {1}, 3, -1., {2}, 3, -1.\n".format(m.nodes.sets['topfrontleft'][0], m.nodes.sets['toprearleft'][0],m.nodes.sets['pilot'][0] )# the difference of displacement between topfrontleft/toprearleft nodes along the Z axis is equal to the displacement of the pilot node along Z 
+#
+#            lateralbc += "4\n{0}, 3, 1., {1}, 3, -1.,{2}, 3, 1., {3}, 3, -1.\n".format(m.nodes.sets['topfrontleft'][0], m.nodes.sets['toprearleft'][0], m.nodes.sets['toprearright'][0], m.nodes.sets['pilot'][0])# same difference of displacement along Z for the rearright and rearleft nodes and front right and frontleft nodes
+#            lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(m.nodes.sets['toprearright'][0], m.nodes.sets['toprearleft'][0], m.nodes.sets['pilot'][0])# the difference of displacement between toprearright/toprearleft nodes along the X axis is equal to the displacement of the associate pilot node along X  
+#
+########### BC for the summit node bottomrearright and origin           
+#            lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(m.nodes.sets['bottomrearright'][0], m.nodes.sets['origin'][0], m.nodes.sets['pilot'][0])# the difference of displacement between bottomrearright/origin nodes along the X axis is equal to the displacement of the associate pilot node along X
+            
             
         if self.lateralbc[lbck] == 'periodic' and lbck == "left":
-          associate_nset = m.nodes.sets['right']
-          for i in xrange(len(nset)):
-            lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(nset[i], associate_nset[i])# same displacement along Y for the right and left nodes
-          for i in xrange(len(nset)):
-            lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(nset[i], associate_nset[i], pilot_node[0]) # the difference of displacement between two opposite nodes along the X axis is equal to the displacement of the pilot node along X
+          if self.is_3D:#for 3D models
+########## For Sides
+########## BC for the nodes of right/left sides            
+            for i in xrange(n):
+              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(m.nodes.sets['left'][i], m.nodes.sets['right'][i])# same displacement along Y for the right and left nodes
+              lateralbc += "4\n{0}, 3, 1., {1}, 3, -1.,{2}, 3, -1., {3}, 3, 1.\n".format(m.nodes.sets['left'][i],m.nodes.sets['topfrontleft'][0], m.nodes.sets['right'][i],m.nodes.sets['pilot'][0])# same displacement along Z for the right and left nodes
+              lateralbc += "4\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0, {3}, 1, 1.0\n".format(m.nodes.sets['right'][i], m.nodes.sets['left'][i], m.nodes.sets['pilot'][0],m.nodes.sets['topfrontleft'][0])# same displacement along X for the right and left nodes
+              
+########## For edges            
+########## BC for the nodes of topright/topleft edge            
+            for i in xrange(len(m.nodes.sets['topright'])):            
+#              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(m.nodes.sets['topleft'][i], m.nodes.sets['topright'][i])# same displacement along Y for the right and left nodes
+              lateralbc += "4\n{0}, 3, 1., {1}, 3, -1.,{2}, 3, -1., {3}, 3, 1.\n".format(m.nodes.sets['topleft'][i],m.nodes.sets['topfrontleft'][0], m.nodes.sets['topright'][i],m.nodes.sets['pilot'][0])# same displacement along Z for the right and left nodes
+              lateralbc += "4\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0, {3}, 1, 1.0\n".format(m.nodes.sets['topright'][i], m.nodes.sets['topleft'][i], m.nodes.sets['pilot'][0],m.nodes.sets['topfrontleft'][0])
+             
+              
+########## BC for the nodes of bottomright/bottomleft edge               
+            for i in xrange(len(m.nodes.sets['bottomright'])):
+#              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(m.nodes.sets['bottomleft'][i], m.nodes.sets['bottomright'][i])# same displacement along Y for the right and left nodes
+              lateralbc += "4\n{0}, 3, 1., {1}, 3, -1.,{2}, 3, -1., {3}, 3, 1.\n".format(m.nodes.sets['bottomleft'][i],m.nodes.sets['topfrontleft'][0], m.nodes.sets['bottomright'][i],m.nodes.sets['pilot'][0])# same displacement along Z for the right and left nodes
+              lateralbc += "4\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0, {3}, 1, 1.0\n".format(m.nodes.sets['bottomright'][i], m.nodes.sets['bottomleft'][i], m.nodes.sets['pilot'][0],m.nodes.sets['topfrontleft'][0])
+              
+########## BC for the nodes of rearright/rearleft edge
+            for i in xrange(len(m.nodes.sets['rearright'])):
+              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(m.nodes.sets['rearright'][i], m.nodes.sets['rearleft'][i])# same displacement along Y for the rearright and rearleft nodes
+            for i in xrange(len(m.nodes.sets['rearright'])):
+              lateralbc += "4\n{0}, 3, 1., {1}, 3, -1.,{2}, 3, -1., {3}, 3, 1.\n".format(m.nodes.sets['rearleft'][i],m.nodes.sets['topfrontleft'][0], m.nodes.sets['rearright'][i],m.nodes.sets['pilot'][0])# same displacement along Z for the right and left nodes
+              lateralbc += "4\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0, {3}, 1, 1.0\n".format(m.nodes.sets['rearright'][i], m.nodes.sets['rearleft'][i], m.nodes.sets['pilot'][0],m.nodes.sets['topfrontleft'][0])
+              
+########## BC for the nodes of frontleft/frontright edge            
+            for i in xrange(len(m.nodes.sets['frontleft'])):
+              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(m.nodes.sets['frontleft'][i], m.nodes.sets['frontright'][i])# same displacement along Y for the rearright and rearleft nodes
+            for i in xrange(len(m.nodes.sets['frontleft'])):
+              lateralbc += "4\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0, {3}, 1, 1.0\n".format(m.nodes.sets['frontright'][i], m.nodes.sets['frontleft'][i], m.nodes.sets['pilot'][0],m.nodes.sets['topfrontleft'][0])# the difference of displacement between two opposite nodes for frontleft/frontright nodes along the X axis is equal to the displacement of the associate pilot node along X
+              lateralbc += "4\n{0}, 3, 1.0, {1}, 3, -1.0, {2}, 3, -1.0, {3}, 3, 1.0\n".format(m.nodes.sets['frontleft'][i], m.nodes.sets['topfrontleft'][0], m.nodes.sets['frontright'][i],m.nodes.sets['pilot'][0])
+                          
+
+########## For summit nodes           
+######### BC for the summit node (toprearright  and toprearleft) and (topfrontright  and topfrontleft)         
+            lateralbc += "4\n{0}, 3, 1., {1}, 3, -1., {2}, 3, -1., {3}, 3, 1.\n".format(m.nodes.sets['topfrontleft'][0], m.nodes.sets['toprearleft'][0], m.nodes.sets['pilot'][0], m.nodes.sets['toprearright'][0])# the difference of displacement between topfrontleft/toprearleft nodes along the Z axis is equal to the displacement of the pilot node along Z 
+            lateralbc += "4\n{0}, 1, 1., {1}, 1, -1.,{2}, 1, -1., {3}, 1, 1.\n".format(m.nodes.sets['toprearright'][0], m.nodes.sets['toprearleft'][0], m.nodes.sets['pilot'][0], m.nodes.sets['topfrontleft'][0])# same difference of displacement along Z for the rearright and rearleft nodes and front right and frontleft nodes
+ 
+
+########### BC for the summit node (bottomrearright  and origin) and (bottomfrontright  and bottomfrontleft)           
+            lateralbc += "4\n{0}, 3, 1., {1}, 3, -1., {2}, 3, -1., {3}, 3, 1.\n".format(m.nodes.sets['bottomrearright'][0], m.nodes.sets['origin'][0], m.nodes.sets['pilot'][0], m.nodes.sets['topfrontleft'][0])
+            lateralbc += "4\n{0}, 1, 1., {1}, 1, -1.,{2}, 1, -1., {3}, 1, 1.\n".format(m.nodes.sets['bottomrearright'][0], m.nodes.sets['origin'][0], m.nodes.sets['pilot'][0], m.nodes.sets['topfrontleft'][0])
+            lateralbc += "4\n{0}, 3, 1., {1}, 3, -1., {2}, 3, -1., {3}, 3, 1.\n".format(m.nodes.sets['bottomfrontright'][0], m.nodes.sets['bottomfrontleft'][0], m.nodes.sets['pilot'][0], m.nodes.sets['topfrontleft'][0])
+            lateralbc += "4\n{0}, 1, 1., {1}, 1, -1.,{2}, 1, -1., {3}, 1, 1.\n".format(m.nodes.sets['bottomfrontright'][0], m.nodes.sets['bottomfrontleft'][0], m.nodes.sets['pilot'][0], m.nodes.sets['topfrontleft'][0])
             
-        if self.lateralbc[lbck] == 'periodic' and lbck == "left" and lbck == "right":
-          associate_nset = m.nodes.sets['left']
-          nset = m.nodes.sets['right']
-          for i in xrange(len(nset)):
-            lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(nset[i], associate_nset[i])# same displacement along Y for the right and left nodes
-          for i in xrange(len(nset)):
-            lateralbc += "3\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0\n".format(nset[i], associate_nset[i], pilot_node[0]) # the difference of displacement between two opposite nodes along the X axis is equal to the displacement of the pilot node along X
+            
+          else:#for 2D models
+            for i in xrange(n):
+              lateralbc += "2\n{0}, 2, 1., {1}, 2, -1.\n".format(nset[i], m.nodes.sets['right'][i])# same displacement along Y for the right and left nodes
+            for i in xrange(n):
+              lateralbc += "4\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0,{3}, 1, 1.0\n".format(m.nodes.sets['right'][i], nset[i], m.nodes.sets['pilot'][0],m.nodes.sets['topleft'][0]) # the difference of displacement between two opposite nodes along the X axis is equal to the difference of displacement between pilot ant topleft nodes along X
+            lateralbc += "4\n{0}, 1, 1.0, {1}, 1, -1.0, {2}, 1, -1.0,{3}, 1, 1.0\n".format(m.nodes.sets['bottomright'][0], m.nodes.sets['origin'][0], m.nodes.sets['pilot'][0],m.nodes.sets['topleft'][0]) # the difference of displacement between bottomright ant origin nodes along the X axis is equal to the displacement between pilot ant topleft nodes along X
+            
+
+
+              
+            
+        
 
             
           '''
@@ -1138,7 +1257,7 @@ EVOL
           
           for nl in left_nodes:
             nlx = 
-         '''    
+        '''    
     loading = self.loading
     pattern = pattern.replace("#LATERALBC", lateralbc[:-1])  
     pattern = pattern.replace("#MESH", m.dump2inp())
@@ -1167,9 +1286,9 @@ EVOL
     
     if self.is_3D:
       pattern = pattern.replace("#2DBOUNDARY", "")
-      pattern = pattern.replace("#3DBOUNDARY", "\niSample.bottom, 2, 2\niSample.bottomright, 2, 2\niSample.bottomrear, 2,2\niSample.bottomleft, 2,2\niSample.bottomfront, 2,2\niSample.bottomfrontright, 2,2\niSample.bottomrearright, 2,2\niSample.bottomfrontleft, 2,2\niSample.origin, 2,2\niSample.origin, 1,1\niSample.origin, 3,3\niSample.bottomrearright, 3,3\niSample.bottomfrontleft, 1,1")
+      pattern = pattern.replace("#3DBOUNDARY", "\niSample.bottom, 2, 2\niSample.bottomright, 2, 2\niSample.bottomrear, 2,2\niSample.bottomleft, 2,2\niSample.bottomfront, 2,2\niSample.bottomfrontright, 2,2\niSample.bottomrearright, 2,2\niSample.bottomfrontleft, 2,2\niSample.origin, 2,2\niSample.origin, 1,1\niSample.origin, 3,3,\niSample.bottomfrontleft, 1, 1")
     if self.is_3D == False:
-      pattern = pattern.replace("#2DBOUNDARY", "iSample.Bottom, 2, 2\niSample.BottomLeft, 1, 1")
+      pattern = pattern.replace("#2DBOUNDARY", "iSample.Bottom, 2, 2\niSample.Origin, 2, 2\niSample.Origin, 1, 1\niSample.BottomRight, 2, 2")
       pattern = pattern.replace("#3DBOUNDARY", "")
 
     

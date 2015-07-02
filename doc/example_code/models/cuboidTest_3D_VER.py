@@ -28,7 +28,7 @@ strain_exp, stress_exp = read_file(settings['file_name'])
 
 #PARAMETERS
 lx, ly, lz = 1., 1., 1.
-Nx, Ny, Nz = 2, 2, 2
+Nx, Ny, Nz = 5, 5, 5
 Ne = Nx * Ny * Nz
 is_3D = True
 loading = {"displacement"} #"loading" : force or displacement
@@ -39,8 +39,8 @@ nFrames = 30
 export_fields = False
 compart = True
 unloading_reloading = False #for one cycle of loading (F), unloding (F=0) and reloading (F+20N) 
-lateralbc = {}
-#lateralbc = { "right":"periodic"}
+#lateralbc = {}
+lateralbc = {"left":"periodic","top":"pseudohomo"}
 workdir = "workdir/"
 label = "cuboidTest_3D_VER"
 if is_3D:
