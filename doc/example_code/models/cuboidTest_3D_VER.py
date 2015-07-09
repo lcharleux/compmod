@@ -1,46 +1,48 @@
+'''
+This routine make a tensile test along Y axis on a cuboid with specific boundary conditions.
+It is possible to pilot this test in force or displacement (loading = {force} or {displacement})
+
+In case of force displacement, it is possible to have unloading and reloading conditions. In this case (unloading_reloading = True), "force" is the force of the beginning of the unloading step (end of step when F=0). Then "force_fin" is the force of reloading step (end of the step when F = force_fin)
+
+At least, cuboid must have "pseudohomo" conditions on "top"  side. it involves that bottom nodes have "pseudhomo" conditions (i.e same displacement along Y axis)
+It is possible for the other sides to have 3 types of boundary conditions:
+* none boundary conditions, then lateralbc = {}
+* "pseudohomo" conditions : same displacement along the normal vector of the side
+* "periodic" conditions : the nodes of two opposide side have the same displacement (i.e right and left sides are linked and/or front and rear sides are linked)
+
+In case of single periodic conditions, (only two sides linked): lateralbc = {"right":"periodic","top":"pseudohomo"}
+In case of double periodic conditions, (right/left sides and front/rear sides): lateralbc = {"right":"periodic", "front":"periodic", "top":"pseudohomo"}
+
+It is possible to mix boundary conditions : for example to have periodic conditions on right/left sides and pseudohomo conditions on front side. For this example, indicate : lateralbc = {"right":"periodic", "front":"pseudohomo", "top":"pseudohomo"}
+
+'''
+
 from compmod.models import CuboidTest_VER
-from compmod.distributions import Triangular 
 from abapy import materials
-from abapy.misc import load
 import matplotlib.pyplot as plt
 import numpy as np
-import pickle, copy
 import platform
 
-def read_file(file_name):
-  '''
-  Read a two rows data file and converts it to numbers
-  '''
-  f = open(file_name, 'r') # Opening the file
-  lignes = f.readlines() # Reads all lines one by one and stores them in a list
-  f.close() # Closing the file
-#    lignes.pop(0) # Delete le saut de ligne for each lines
-  strain_exp, stress_exp = [],[]
 
-  for ligne in lignes:
-      data = ligne.split() # Lines are splitted
-      strain_exp.append(float(data[0]))
-      stress_exp.append(float(data[1]))
-  return np.array(strain_exp), np.array(stress_exp)
-settings = {}
-settings['file_name'] = 'cuivre_cufe2p_ANR.txt' # experimental data
-strain_exp, stress_exp = read_file(settings['file_name'])
 
 #PARAMETERS
-lx, ly, lz = 1., 1., 1.
+lx, ly, lz = 1 , 1, 1
 Nx, Ny, Nz = 5, 5, 5
 Ne = Nx * Ny * Nz
 is_3D = True
 loading = {"displacement"} #"loading" : force or displacement
 #disp = strain_exp[-1] * ly
-disp = 0.2
+disp = 0.1
 force = 190.
+force_fin = force + 20.
 nFrames = 30
 export_fields = False
 compart = True
-unloading_reloading = False #for one cycle of loading (F), unloding (F=0) and reloading (F+20N) 
+unloading_reloading = False #for one cycle of loading (F = force), unloding (F=0) and reloading (F = force_fin) 
+
 #lateralbc = {}
-lateralbc = {"left":"periodic","top":"pseudohomo"}
+lateralbc = {"right":"periodic","top":"pseudohomo"}
+#lateralbc = {"top":"pseudohomo"}
 workdir = "workdir/"
 label = "cuboidTest_3D_VER"
 if is_3D:
@@ -80,11 +82,32 @@ else:
   labels = 'SAMPLE_MAT'
   material = materials.Hollomon(labels = labels, E = E, nu = nu, sy = sy, n=n)
       
-m =CuboidTest_VER(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, force = force, disp = disp, loading = loading, elType = elType, is_3D = is_3D, cpus = cpus, export_fields = export_fields, unloading_reloading = unloading_reloading, lateralbc = lateralbc)
+m =CuboidTest_VER(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, force = force, force_fin = force_fin, disp = disp, loading = loading, elType = elType, is_3D = is_3D, cpus = cpus, export_fields = export_fields, unloading_reloading = unloading_reloading, lateralbc = lateralbc)
 m.MakeInp()
 m.Run()
 m.MakePostProc()
 m.RunPostProc()
+
+
+def read_file(file_name):
+  '''
+  Read a two rows data file and converts it to numbers
+  '''
+  f = open(file_name, 'r') # Opening the file
+  lignes = f.readlines() # Reads all lines one by one and stores them in a list
+  f.close() # Closing the file
+#    lignes.pop(0) # Delete le saut de ligne for each lines
+  strain_exp, stress_exp = [],[]
+
+  for ligne in lignes:
+      data = ligne.split() # Lines are splitted
+      strain_exp.append(float(data[0]))
+      stress_exp.append(float(data[1]))
+  return np.array(strain_exp), np.array(stress_exp)
+settings = {}
+settings['file_name'] = 'cuivre_cufe2p_ANR.txt' # experimental data
+strain_exp, stress_exp = read_file(settings['file_name'])
+
 
 # Plotting results
 if m.outputs['completed']:
