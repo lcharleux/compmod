@@ -9,11 +9,11 @@ import platform
 #PAREMETERS
 is_3D = True
 inner_radius, outer_radius = 45.2 , 48.26
-Nt, Nr, Na = 20, 3, 5
+Nt, Nr, Na = 20, 3, 6
 displacement = 45.
 nFrames = 100
-sy = 126.8125
-E = 71413.
+sy = 150.
+E = 64000.
 nu = .3
 n = 0.1015820312
 thickness =14.92
@@ -21,7 +21,7 @@ workdir = "workdir/"
 label = "ringCompression_3D"
 elType = "C3D8"
 filename = 'test_expD2.txt'
-cpus = 6
+cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -136,7 +136,7 @@ if outputs['completed']:
   # Load vs disp
   force = -2. * outputs['history']['force']
   disp = -2. * outputs['history']['disp']
-  fig = plt.figure('Load vs. disp')
+  fig = plt.figure('Load vs. disp2')
   plt.clf()
   plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
   plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)

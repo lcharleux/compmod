@@ -477,6 +477,7 @@ class RingCompression(Simulation):
     mesh = RegularQuadMesh(Nt, Nr, .25, Ro - Ri, name = self.elType)
     mesh.nodes.add_set_by_func('left_nodes', lambda x, y, z, labels: x == 0.)
     mesh.nodes.add_set_by_func('right_nodes', lambda x, y, z, labels: x == .25)
+    
        
     def function(x, y, z, labels):
       theta = 2 * np.pi * (.25 - x)
@@ -496,7 +497,8 @@ class RingCompression(Simulation):
     mesh.add_set('surface_elements',range( Nt * (Nr-1)+1, Nt*Nr+1  ))
     mesh.add_surface('surface_faces',[ ('surface_elements',3) ])
     if self.is_3D:
-       mesh = mesh.extrude(N = Na, l = thickness, mapping = {self.elType: self.elType})  
+       mesh = mesh.extrude(N = Na, l = thickness, mapping = {self.elType: self.elType}) 
+       mesh.nodes.add_set_by_func('lateral_nodes', lambda x, y, z, labels: z == 0)
     self.mesh = mesh
   
   def MakeInp(self):
@@ -632,10 +634,10 @@ RF2, U2
     pattern = pattern.replace('#SECTIONS', sections)
     pattern = pattern.replace('#MATERIALS', matinp)
     if self.is_3D:
-      labels = self.mesh.nodes.sets['topleft']
-      nl = len(labels)
-      label = labels[(nl-1)/2]
-      pattern = pattern.replace("#3DBOUNDARY", "\nI_SAMPLE.{0}, 3, 3".format(label))
+#      labels = self.mesh.nodes.sets['topleft']
+#      nl = len(labels)
+#      label = labels[(nl-1)/2]
+      pattern = pattern.replace("#3DBOUNDARY", "\nI_SAMPLE.lateral_nodes, 3, 3\n")
       pattern = pattern.replace('#SURFTYPE', "CYLINDER")
     else:  
       pattern = pattern.replace("#3DBOUNDARY", "")
