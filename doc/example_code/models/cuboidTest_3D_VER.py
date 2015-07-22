@@ -46,7 +46,7 @@ settings['file_name'] = 'Courbe_ref_alu1.txt' # experimental data
 strain_exp, stress_exp = read_file(settings['file_name'])
 
 #PARAMETERS
-iteration = 3 #number of simulations
+iteration = 1 #number of simulations
 lx, ly, lz = 1., 2., 1.
 Nx, Ny, Nz = 15, 30, 15
 Ne = Nx * Ny * Nz

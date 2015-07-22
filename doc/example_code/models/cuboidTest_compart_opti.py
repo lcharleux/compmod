@@ -1,7 +1,7 @@
 # SOME OPTIMIZATION WITH RING COMPRESSION
 
 from abapy import materials
-from compmod.models import CuboidTest
+from compmod.models import CuboidTest_VER
 from scipy import interpolate
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
@@ -52,7 +52,7 @@ else :
     settings['Ne'] =  settings['Nx']*settings['Ny']
 settings['displacement'] = strain_exp[-1]*settings['ly']
 settings['nFrames'] = 100
-settings['E'] = 72000. * np.ones(settings['Ne'])
+settings['E'] = 64000. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
 settings['iteration'] = 40
 #settings['thickness'] = 20.02
@@ -116,7 +116,7 @@ class Simulation(object):
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
     material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
     
-    m = CuboidTest(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = True, lateralbc = lateralbc, export_fields = export_fields, cpus = cpus)
+    m = CuboidTest_VER(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = is_3D, lateralbc = lateralbc, export_fields = export_fields, cpus = cpus)
     
     # SIMULATION
     m.MakeMesh()
