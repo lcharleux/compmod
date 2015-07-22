@@ -54,7 +54,7 @@ settings['displacement'] = strain_exp[-1]*settings['ly']
 settings['nFrames'] = 100
 settings['E'] = 64000. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
-settings['iteration'] = 40
+settings['iteration'] = 20
 #settings['thickness'] = 20.02
 
 
@@ -213,7 +213,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(1000., 330., 185., settings)
+O = Opti(800., 200., 100., settings)
 #O = Opti(200., 240. , settings)
 O.Optimize()
 

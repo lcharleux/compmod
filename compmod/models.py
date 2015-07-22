@@ -826,7 +826,7 @@ class CuboidTest_VER(Simulation):
   def __init__(self, **kwargs):
     
     
-    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "force":100., "export_fields": True, "lateralbc":{}, "loading":{}, "unloading_reloading": False}
+    defaultArgs = {"Nx":10, "Ny":10, "Nz":10, "lx":1., "ly":1., "lz":1., "disp":.25, "force":100., "force_fin":110., "export_fields": True, "lateralbc":{}, "loading":{}, "unloading_reloading": False}
     for key, value in defaultArgs.iteritems(): setattr(self, key, value)
     for key, value in kwargs.iteritems(): setattr(self, key, value)
     super(CuboidTest_VER, self).__init__(**kwargs)
