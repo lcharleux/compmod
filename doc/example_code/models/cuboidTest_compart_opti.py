@@ -31,7 +31,7 @@ lateralbc = {"top":"pseudohomo"} # lateral boundary conditions : "pseudohomo"-->
 is_3D = True
 export_fields = False
 label = "CuboidTestOptiCompart"
-cpus = 6
+cpus = 1
 compart = True
 if is_3D == False :
   elType = "CPS4"
@@ -45,7 +45,7 @@ strain_exp, stress_exp = read_file(settings['file_name'])
 
 
 settings['lx'], settings['ly'], settings['lz']  = 1., 2., 1. #ly = tension test direction
-settings['Nx'], settings['Ny'], settings['Nz'] = 15, 30, 15
+settings['Nx'], settings['Ny'], settings['Nz'] = 2, 4, 2
 if is_3D == True :
     settings['Ne'] =  settings['Nx']*settings['Ny']*settings['Nz']
 else :
@@ -64,7 +64,7 @@ if node ==  'lcharleux':
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
-  workdir = "D:/Simulations/Dossier_travail_Abaqus/"
+  workdir = "workdir/"
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
   workdir = "workdir/"
@@ -186,9 +186,10 @@ class Opti(object):
     s = Simulation(Ssat, n , sy_mean, self.settings)
     s.Run()
     f = s.Interp()
-    d = self.settings['displacement']
+    d = self.settings['displacement']*0.999
     ly = self.settings['ly']
     strain_grid = np.linspace(0., d, 100)/ly
+    print strain_grid
     stress_sim = f(strain_grid)
     
     g = self.g
