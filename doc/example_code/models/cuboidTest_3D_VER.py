@@ -25,12 +25,30 @@ import matplotlib.pyplot as plt
 import numpy as np
 import platform
 
+def read_file(file_name):
+  '''
+  Read a two rows data file and converts it to numbers
+  '''
+  f = open(file_name, 'r') # Opening the file
+  lignes = f.readlines() # Reads all lines one by one and stores them in a list
+  f.close() # Closing the file
+#    lignes.pop(0) # Delete le saut de ligne for each lines
+  strain_exp, stress_exp = [],[]
 
+  for ligne in lignes:
+      data = ligne.split() # Lines are splitted
+      strain_exp.append(float(data[0]))
+      stress_exp.append(float(data[1]))
+  return np.array(strain_exp), np.array(stress_exp)
+
+settings = {}
+settings['file_name'] = 'Courbe_ref_alu1.txt' # experimental data
+strain_exp, stress_exp = read_file(settings['file_name'])
 
 #PARAMETERS
 iteration = 3 #number of simulations
-lx, ly, lz = 1 , 1, 1
-Nx, Ny, Nz = 15, 15, 15
+lx, ly, lz = 1., 2., 1.
+Nx, Ny, Nz = 15, 30, 15
 Ne = Nx * Ny * Nz
 is_3D = True
 loading = {"displacement"} #"loading" : force or displacement
@@ -96,24 +114,6 @@ for i in xrange(iteration):
   m.RunPostProc()
   
   
-  def read_file(file_name):
-    '''
-    Read a two rows data file and converts it to numbers
-    '''
-    f = open(file_name, 'r') # Opening the file
-    lignes = f.readlines() # Reads all lines one by one and stores them in a list
-    f.close() # Closing the file
-  #    lignes.pop(0) # Delete le saut de ligne for each lines
-    strain_exp, stress_exp = [],[]
-  
-    for ligne in lignes:
-        data = ligne.split() # Lines are splitted
-        strain_exp.append(float(data[0]))
-        stress_exp.append(float(data[1]))
-    return np.array(strain_exp), np.array(stress_exp)
-  settings = {}
-  settings['file_name'] = 'cuivre_cufe2p_ANR.txt' # experimental data
-  strain_exp, stress_exp = read_file(settings['file_name'])
   
   
   # Plotting results

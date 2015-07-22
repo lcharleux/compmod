@@ -27,7 +27,7 @@ def read_file(file_name):
   return np.array(strain_exp), np.array(stress_exp)
 
 
-lateralbc = { "right":"pseudohomo", "left":"pseudohomo" } # lateral boundary conditions : "pseudohomo"--> lateral nodes have the same displacement
+lateralbc = {"top":"pseudohomo"} # lateral boundary conditions : "pseudohomo"--> lateral nodes have the same displacement
 is_3D = True
 export_fields = False
 label = "CuboidTestOptiCompart"
@@ -40,12 +40,12 @@ else:
 #FIXED PAREMETERS
 settings = {}
 
-settings['file_name'] = 'Courbe_ref_alu.txt'
+settings['file_name'] = 'Courbe_ref_alu1.txt'
 strain_exp, stress_exp = read_file(settings['file_name'])
 
 
-settings['lx'], settings['ly'], settings['lz']  = 1., 1., 1. #ly = tension test direction
-settings['Nx'], settings['Ny'], settings['Nz'] = 15, 15, 15
+settings['lx'], settings['ly'], settings['lz']  = 1., 2., 1. #ly = tension test direction
+settings['Nx'], settings['Ny'], settings['Nz'] = 15, 30, 15
 if is_3D == True :
     settings['Ne'] =  settings['Nx']*settings['Ny']*settings['Nz']
 else :
@@ -146,7 +146,7 @@ class Simulation(object):
   
   def Interp(self):
     """
-    Interpolate the curve Force-displacement on a known grid
+    Interpolate the curve stress_vs_strain on a known grid
     """
     strain, stress = self.strain, self.stress
     f = interpolate.interp1d(strain, stress)
