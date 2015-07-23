@@ -31,7 +31,7 @@ lateralbc = {"top":"pseudohomo"} # lateral boundary conditions : "pseudohomo"-->
 is_3D = True
 export_fields = False
 label = "CuboidTestOptiCompart"
-cpus = 1
+cpus = 6
 compart = True
 if is_3D == False :
   elType = "CPS4"
@@ -44,8 +44,8 @@ settings['file_name'] = 'Courbe_ref_alu1.txt'
 strain_exp, stress_exp = read_file(settings['file_name'])
 
 
-settings['lx'], settings['ly'], settings['lz']  = 1., 2., 1. #ly = tension test direction
-settings['Nx'], settings['Ny'], settings['Nz'] = 2, 4, 2
+settings['lx'], settings['ly'], settings['lz']  = 1., 2., 1. #ly = tensile test direction
+settings['Nx'], settings['Ny'], settings['Nz'] = 15,30, 15
 if is_3D == True :
     settings['Ne'] =  settings['Nx']*settings['Ny']*settings['Nz']
 else :
@@ -74,9 +74,10 @@ if node ==  'epua-pd45':
 
 class Simulation(object):
   
-  def __init__(self, Ssat, n, sy_mean, settings):
+  def __init__(self, Ssat, n, sy_mean, sy, settings):
     self.sy_mean = sy_mean
     self.n = n
+    self.sy = sy
     self.Ssat = Ssat
     self.settings = settings
     
@@ -89,7 +90,8 @@ class Simulation(object):
     sy_mean = self.sy_mean * np.ones(settings['Ne'])
     n = self.n * np.ones(settings['Ne'])
     Ssat = self.Ssat * np.ones(settings['Ne'])
-  
+    sy = self.sy
+    
     E = self.settings['E']
     nu = self.settings['nu']
     lx = self.settings['lx']
@@ -106,16 +108,20 @@ class Simulation(object):
     #TASKS
     run_sim = True
     plot = True
-    
-    print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
+    if compart == True:
+        print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
+    else:
+        print E[0], nu[0], Sy, n[0]
     #print E[0], nu[0], n[0], sy_mean[0]
 
   
-    ray_param = sy_mean/1.253314 #mean = sigma*sqrt(Pi/2)
-    sy = np.random.rayleigh(ray_param, Ne)
-    labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
-    material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
-    
+    if compart == True:
+        ray_param = sy_mean/1.253314 #mean = sigma*sqrt(Pi/2)
+        Sy = np.random.rayleigh(ray_param, Ne)
+        labels = ['mat_{0}'.format(i+1) for i in xrange(len(Sy))]
+        material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = Sy[i]) for i in xrange(Ne)]
+    else:
+        material = materials.Hollomon(labels = labels, E = E[0], nu = nu[0], sy = sy, n=n)
     m = CuboidTest_VER(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = is_3D, lateralbc = lateralbc, export_fields = export_fields, cpus = cpus)
     
     # SIMULATION
@@ -189,7 +195,6 @@ class Opti(object):
     d = self.settings['displacement']*0.999
     ly = self.settings['ly']
     strain_grid = np.linspace(0., d, 100)/ly
-    print strain_grid
     stress_sim = f(strain_grid)
     
     g = self.g
@@ -214,7 +219,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(800., 200., 100., settings)
+O = Opti(800., 350., 100., settings)
 #O = Opti(200., 240. , settings)
 O.Optimize()
 

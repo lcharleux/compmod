@@ -52,8 +52,8 @@ Nx, Ny, Nz = 15, 30, 15
 Ne = Nx * Ny * Nz
 is_3D = True
 loading = {"displacement"} #"loading" : force or displacement
-#disp = strain_exp[-1] * ly #if the simulation is comparated to experimental data, activate this line
-disp = 0.1
+disp = strain_exp[-1] * ly #if the simulation is comparated to experimental data, activate this line
+#disp = 0.1
 force = 190.
 force_fin = force + 20.
 nFrames = 30
@@ -70,7 +70,7 @@ if is_3D:
   elType = "C3D8"
 else:
   elType = "CPS4"
-cpus = 1
+cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
@@ -88,12 +88,12 @@ if node ==  'SERV3-MS-SYMME':
 strain_tot, stress_tot =[], []
 for i in xrange(iteration): 
   if compart:
-    E  = 72000. * np.ones(Ne) # Young's modulus
+    E  = 64000. * np.ones(Ne) # Young's modulus
     nu = .3 * np.ones(Ne) # Poisson's ratio
     sy_mean = 184.791 * np.ones(Ne)
     Ssat = 1031.394 * np.ones(Ne)
-    #n = 333.485 * np.ones(Ne)
-    n = 1. * np.ones(Ne)
+    n = 333.485 * np.ones(Ne)
+    #n = 1. * np.ones(Ne)
     ray_param = sy_mean/1.253314
     sy = np.random.rayleigh(ray_param, Ne)
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
@@ -166,7 +166,7 @@ for i in xrange(iteration):
     strain_tot.append(strain)
     stress_tot.append(stress)
      
-fig = plt.figure(4)
+fig = plt.figure(1)
 plt.clf()
 #  sp1 = fig.add_subplot(2, 1, 1)
 #  plt.plot(strain, stress, 'k-')
@@ -176,7 +176,7 @@ plt.clf()
 #  sp1 = fig.add_subplot(2, 1, 2)
 for i in xrange(len(strain_tot)):
   plt.plot(strain_tot[i], stress_tot[i], 'k-', label = 'simulation curve', linewidth = 2.)
-#  plt.plot(strain_exp, stress_exp, 'r-', label = 'experimental curve', linewidth = 2.)
+  plt.plot(strain_exp, stress_exp, 'r-', label = 'experimental curve', linewidth = 2.)
   plt.xlabel('Tensile Strain, $\epsilon$')
   plt.ylabel(' Tensile Stress $\sigma$')
   plt.legend(loc="lower right")
