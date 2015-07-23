@@ -30,9 +30,9 @@ def read_file(file_name):
 lateralbc = {"top":"pseudohomo"} # lateral boundary conditions : "pseudohomo"--> lateral nodes have the same displacement
 is_3D = True
 export_fields = False
-label = "CuboidTestOptiCompart"
+label = "CuboidTestOpti"
 cpus = 1
-compart = True
+compart = False
 if is_3D == False :
   elType = "CPS4"
 else:
@@ -45,15 +45,15 @@ strain_exp, stress_exp = read_file(settings['file_name'])
 
 
 settings['lx'], settings['ly'], settings['lz']  = 1., 2., 1. #ly = tensile test direction
-settings['Nx'], settings['Ny'], settings['Nz'] = 15,30, 15
+settings['Nx'], settings['Ny'], settings['Nz'] = 10, 20, 10
 if is_3D == True :
     settings['Ne'] =  settings['Nx']*settings['Ny']*settings['Nz']
 else :
     settings['Ne'] =  settings['Nx']*settings['Ny']
 settings['displacement'] = strain_exp[-1]*settings['ly']
 settings['nFrames'] = 100
-settings['E'] = 64000. * np.ones(settings['Ne'])
-settings['nu'] = .3 * np.ones(settings['Ne'])
+settings['E'] = 64000.
+settings['nu'] = .3 
 settings['iteration'] = 20
 #settings['thickness'] = 20.02
 
@@ -74,10 +74,9 @@ if node ==  'epua-pd45':
 
 class Simulation(object):
   
-  def __init__(self, Ssat, n, sy_mean, settings):
-    self.sy_mean = sy_mean
+  def __init__(self, sy, n, settings):
+    self.sy = sy
     self.n = n
-    self.Ssat = Ssat
     self.settings = settings
     
     
@@ -86,9 +85,9 @@ class Simulation(object):
     Runs a simulation for a given couple (sy, n) and returns the (disp, force) couple.
     """
     #MODEL DEFINITION
-    sy_mean = self.sy_mean * np.ones(settings['Ne'])
-    n = self.n * np.ones(settings['Ne'])
-    Ssat = self.Ssat * np.ones(settings['Ne'])
+    sy = self.sy
+    n = self.n
+
     
     E = self.settings['E']
     nu = self.settings['nu']
@@ -107,14 +106,10 @@ class Simulation(object):
     run_sim = True
     plot = True
 
-    print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
-    #print E[0], nu[0], n[0], sy_mean[0]
+    print E, nu, sy, n
 
-
-    ray_param = sy_mean/1.253314 #mean = sigma*sqrt(Pi/2)
-    sy = np.random.rayleigh(ray_param, Ne)
-    labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
-    material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
+    labels = 'SAMPLE_MAT'
+    material = materials.Hollomon(labels = labels, E = E, nu = nu, sy = sy, n=n)
 
     m = CuboidTest_VER(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, disp = disp, elType = elType, is_3D = is_3D, lateralbc = lateralbc, export_fields = export_fields, cpus = cpus)
     
@@ -154,16 +149,13 @@ class Simulation(object):
 
 class Opti(object):
   
-  def __init__(self, Ssat0, n0, sy_mean0, settings):
-  #def __init__(self, n0, sy_mean0, settings):
+  def __init__(self, sy0, n0, settings):
     
-    self.sy_mean0 = sy_mean0
+    self.sy0 = sy0
     self.n0 = n0
-    self.Ssat0 = Ssat0
     self.settings = settings
-    self.sy_mean = []
+    self.sy = []
     self.n = []
-    self.Ssat = []
     self.err = []
     self.stress_sim = []
     strain_exp, stress_exp = read_file(self.settings['file_name'])
@@ -177,12 +169,9 @@ class Opti(object):
     Compute the residual error between experimental and simulated curve
     """    
     n =param[1]
-    Ssat = param[0]
-    sy_mean = param[2]
-#    n =param[0]
-#    sy_mean = param[1]
-#    Ssat = 1178.
-    s = Simulation(Ssat, n , sy_mean, self.settings)
+    sy = param[0]
+
+    s = Simulation(sy, n , self.settings)
 
     s.Run()
     f = s.Interp()
@@ -195,9 +184,8 @@ class Opti(object):
     stress_exp = g(strain_grid)
     
     err = np.sqrt(((stress_exp - stress_sim)**2).sum())
-    self.sy_mean.append(sy_mean)
+    self.sy.append(sy)
     self.n.append(n)
-    self.Ssat.append(Ssat)
     self.err.append(err)
     self.stress_sim.append(stress_sim)
     self.stress_exp = stress_exp
@@ -206,18 +194,17 @@ class Opti(object):
     return err
     
   def Optimize(self):
-    p0 = [self.Ssat0, self.n0, self.sy_mean0]   
+    p0 = [self.sy0, self.n0]   
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
 
    
-O = Opti(800., 350., 100., settings)
-#O = Opti(200., 240. , settings)
+O = Opti(100., 0.1,  settings)
 
 O.Optimize()
 
 
-fig = plt.figure('Load vs. disp')
+fig = plt.figure('Stress vs. strain')
 plt.clf()
 
 plt.plot(O.strain_grid, O.stress_exp, 'k-', label = 'experimental curve', linewidth = 2.)
@@ -229,7 +216,7 @@ for i in range(1, settings['iteration']):
   plt.plot(O.strain_grid, O.stress_sim[i], 'b-', linewidth = .2)
 plt.legend(loc="lower right")
 plt.grid()
-plt.xlabel('Strain, $\epsilon$ (\%)')
+plt.xlabel('Strain, $\epsilon$ (%)')
 plt.ylabel('Stress, $\sigma$ (Mpa)')
 plt.savefig(workdir + label + '_stress-vs-strain.pdf')
 
