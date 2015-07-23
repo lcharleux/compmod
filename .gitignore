@@ -10,6 +10,7 @@
 *.sta
 *.rpy*
 *.log
+*.pckl
 
 tests/*
 doc/example_code/models/workdir/*
