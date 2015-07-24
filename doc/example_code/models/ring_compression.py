@@ -30,7 +30,7 @@ E = 64000.
 nu = .3
 
 if compart == False: 
-  sy = 148.
+  sy = 200.
   n = 0.0875
   material = Hollomon(labels = "SAMPLE_MAT", E = E, nu = nu, sy = sy, n = n)
 else:

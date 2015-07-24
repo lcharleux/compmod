@@ -15,13 +15,13 @@ import platform
 settings = {}
 settings['file_name'] = 'force_vs_disp_ring1.txt'
 settings['inner_radius'], settings['outer_radius'] = 45.96 , 50.
-settings['Nt'], settings['Nr'], settings['Na'] = 70, 7, 13
+settings['Nt'], settings['Nr'], settings['Na'] = 80, 8, 10
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
 settings['E'] = 64000.
 settings['nu'] = .3
-settings['iteration'] = 20
+settings['iteration'] = 2
 settings['thickness'] = 15.
 
 
@@ -177,7 +177,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(133., 0.1, settings)
+O = Opti(148., 0.087, settings)
 O.Optimize()
 
 
