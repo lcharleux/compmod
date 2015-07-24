@@ -31,7 +31,7 @@ lateralbc = {"top":"pseudohomo"} # lateral boundary conditions : "pseudohomo"-->
 is_3D = True
 export_fields = False
 label = "CuboidTestOptiCompart"
-cpus = 1
+cpus = 6
 compart = True
 if is_3D == False :
   elType = "CPS4"
@@ -211,7 +211,7 @@ class Opti(object):
     self.result = result
 
    
-O = Opti(800., 350., 100., settings)
+O = Opti(880., 200., 160., settings)
 #O = Opti(200., 240. , settings)
 
 O.Optimize()

@@ -9,14 +9,14 @@ import platform
 
 
 #PAREMETERS
-cpus = 1
+cpus = 6
 compart = False #True for a compartimentalized model
 is_3D = True #True for a 3D simulation
 unloading = False #True il the unloading part of the simulation is needed
-export_fields = True #True if stress and strain fields are needed
-inner_radius, outer_radius = 45.2 , 48.26
-thickness = 14.92
-Nt, Nr, Na = 20, 3, 6
+export_fields = False #True if stress and strain fields are needed
+inner_radius, outer_radius = 45.96 , 50
+thickness = 15
+Nt, Nr, Na = 80, 8, 15
 if is_3D == False :
   Ne = Nt * Nr
   elType = "CPS4" #CPS4 for plane strain element, CPS4 for plane stress elements
@@ -30,8 +30,8 @@ E = 64000.
 nu = .3
 
 if compart == False: 
-  sy = 150.
-  n = 0.1015820312
+  sy = 148.
+  n = 0.0875
   material = Hollomon(labels = "SAMPLE_MAT", E = E, nu = nu, sy = sy, n = n)
 else:
   E_array = E * np.ones(Ne) # Young's modulus
@@ -48,7 +48,7 @@ else:
 workdir = "workdir/"
 label = "ringCompression"
 
-filename = 'test_expD2.txt'
+filename = 'force_vs_disp_ring1.txt'
 
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
@@ -166,20 +166,20 @@ if outputs['completed']:
         plt.savefig(workdir + label + '_fields.pdf')
         
 
-    # Load vs disp
-    force = -4. * outputs['history']['force']
-    disp = -2. * outputs['history']['disp']
+  # Load vs disp
+  force = -4. * outputs['history']['force']
+  disp = -2. * outputs['history']['disp']
     
-    fig = plt.figure('Load vs. disp')
-    plt.clf()
-    plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
-    if unloading == True : plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
-    plt.plot(disp_exp, force_exp, 'k-', label = 'Exp', linewidth = 2.)
-    plt.legend(loc="upper left")
-    plt.grid()
-    plt.xlabel('Displacement, $U$')
-    plt.ylabel('Force, $F$')
-    plt.savefig(workdir + label + '_load-vs-disp.pdf')
+  fig = plt.figure('Load vs. disp')
+  plt.clf()
+  plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
+  if unloading == True : plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
+  plt.plot(disp_exp, force_exp, 'k-', label = 'Exp', linewidth = 2.)
+  plt.legend(loc="upper left")
+  plt.grid()
+  plt.xlabel('Displacement, $U$')
+  plt.ylabel('Force, $F$')
+  plt.savefig(workdir + label + '_load-vs-disp.pdf')
   
 else: 
   print 'Simulation not completed'

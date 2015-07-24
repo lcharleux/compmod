@@ -13,23 +13,23 @@ import platform
 
 #FIXED PAREMETERS
 settings = {}
-settings['file_name'] = 'test_expA1.txt'
-settings['inner_radius'], settings['outer_radius'] = 45.18 , 100.72/2
-settings['Nt'], settings['Nr'], settings['Na'] = 20, 2, 3
+settings['file_name'] = 'force_vs_disp_ring1.txt'
+settings['inner_radius'], settings['outer_radius'] = 45.96 , 50.
+settings['Nt'], settings['Nr'], settings['Na'] = 70, 7, 13
 settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 settings['displacement'] = 45.
 settings['nFrames'] = 100
-settings['E'] = 72469.
+settings['E'] = 64000.
 settings['nu'] = .3
-settings['iteration'] = 50
-settings['thickness'] = 20.02
+settings['iteration'] = 20
+settings['thickness'] = 15.
 
 
-is_3D = False
+is_3D = True
 workdir = "workdir/"
 label = "ringCompression_opti"
-elType = "CPS4"
-cpus = 1
+elType = "C3D8"
+cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
@@ -86,7 +86,7 @@ class Simulation(object):
     Nt = self.settings['Nt']
     Na = self.settings['Na']
     Ne = self.settings['Ne']
-    thickness = self.settings['thickness']
+    thickness = self.settings['thickness']/2.
     print E, nu, sy, n
     
     material = Hollomon(
@@ -115,7 +115,7 @@ class Simulation(object):
     m.Run()
     m.PostProc()
     outputs = m.outputs
-    force = -2. * outputs['history']['force']
+    force = -4. * outputs['history']['force']
     disp = -2. * outputs['history']['disp']
     
     self.disp = disp
@@ -147,8 +147,8 @@ class Opti(object):
     g = interpolate.interp1d(disp_exp, force_exp)
     self.disp_exp = disp_exp
     self.force_exp = force_exp
-    d = self.settings['displacement']
-    self.disp_grid = np.linspace(0., d, 1000)
+    d = self.settings['displacement']-0.1
+    self.disp_grid = np.linspace(0., d, 100)
     self.force_exp_grid= g(self.disp_grid)
 
   def Err(self, param):
@@ -177,7 +177,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(180., 0.15, settings)
+O = Opti(133., 0.1, settings)
 O.Optimize()
 
 
