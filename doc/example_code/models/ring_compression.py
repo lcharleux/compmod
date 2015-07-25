@@ -9,14 +9,13 @@ import platform
 
 
 #PAREMETERS
-cpus = 6
 compart = False #True for a compartimentalized model
 is_3D = True #True for a 3D simulation
 unloading = False #True il the unloading part of the simulation is needed
 export_fields = False #True if stress and strain fields are needed
 inner_radius, outer_radius = 45.96 , 50
-thickness = 15
-Nt, Nr, Na = 80, 8, 15
+thickness = 15.
+Nt, Nr, Na = 80, 8, 12
 if is_3D == False :
   Ne = Nt * Nr
   elType = "CPS4" #CPS4 for plane strain element, CPS4 for plane stress elements
@@ -51,6 +50,10 @@ label = "ringCompression"
 filename = 'force_vs_disp_ring1.txt'
 
 node = platform.node()
+if node == 'serv2-ms-symme':
+  cpus = 6
+else:
+  cpus = 1
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 

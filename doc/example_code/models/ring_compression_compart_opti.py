@@ -9,33 +9,36 @@ import numpy as np
 import pickle, copy
 import platform
 node = platform.node()
+if node == 'serv2-ms-symme':
+  cpus = 6
+else:
+  cpus = 1
 
-
-
+compart = True
 is_3D = True
 unloading = False
 export_fields = False
 label = "ringCompressionOptiCompart"
-cpus = 6
+
 if is_3D == False :
   elType = "CPS4"
 else:
   elType = "C3D8"
 #FIXED PAREMETERS
 settings = {}
-settings['file_name'] = 'test_expA1.txt'
-settings['inner_radius'], settings['outer_radius'] = 100.72/2-5.18 , 100.72/2
-settings['Nt'], settings['Nr'], settings['Na'] = 80, 8, 15
+settings['file_name'] = 'force_vs_disp_ring1.txt'
+settings['inner_radius'], settings['outer_radius'] =  45.96 , 50
+settings['Nt'], settings['Nr'], settings['Na'] = 80, 8, 10
 if is_3D == True :
     settings['Ne'] =  settings['Nt']*settings['Nr']*settings['Na']
 else :
     settings['Ne'] =  settings['Nt']*settings['Nr']
-settings['displacement'] = 35.
+settings['displacement'] = 45.
 settings['nFrames'] = 100
-settings['E'] =72469. * np.ones(settings['Ne'])
+settings['E'] = 64000. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
-settings['iteration'] = 50
-settings['thickness'] = 20.02
+settings['iteration'] = 10
+settings['thickness'] = 15.
 
 
 if node ==  'lcharleux':      
@@ -97,7 +100,7 @@ class Simulation(object):
     Nt = self.settings['Nt']
     Na = self.settings['Na']
     Ne = self.settings['Ne']
-    thickness = self.settings['thickness']
+    thickness = self.settings['thickness']/2
     
     #TASKS
     run_sim = True
@@ -115,7 +118,7 @@ class Simulation(object):
     m = RingCompression( material = material , 
         inner_radius = inner_radius, 
         outer_radius = outer_radius, 
-        disp = disp/2,
+        disp = disp,
         thickness = thickness,
         nFrames = nFrames, 
         Nr = Nr, 
@@ -129,7 +132,7 @@ class Simulation(object):
         abqlauncher = abqlauncher,
         cpus = cpus,
         is_3D = is_3D,
-        compart = True)
+        compart = compart)
     
     # SIMULATION
     m.MakeMesh()
@@ -138,7 +141,7 @@ class Simulation(object):
       m.Run()
       m.PostProc()
       outputs = m.outputs
-      force = -2. * outputs['history']['force']
+      force = -4. * outputs['history']['force']
       disp = -2 * outputs['history']['disp']
     
       self.disp = disp
@@ -156,12 +159,12 @@ class Simulation(object):
 
 class Opti(object):
   
-  def __init__(self, Ssat0, n0, sy_mean0, settings):
-  #def __init__(self, n0, sy_mean0, settings):
+  #def __init__(self, Ssat0, n0, sy_mean0, settings):
+  def __init__(self, n0, sy_mean0, settings):
     
     self.sy_mean0 = sy_mean0
     self.n0 = n0
-    self.Ssat0 = Ssat0
+    #self.Ssat0 = Ssat0
     self.settings = settings
     self.sy_mean = []
     self.n = []
@@ -178,19 +181,19 @@ class Opti(object):
     """
     Compute the residual error between experimental and simulated curve
     """
-    n =param[1]
-    Ssat = param[0]
-    sy_mean = param[2]
-#    n =param[0]
-#    sy_mean = param[1]
-#    Ssat = 1178.
+#    n =param[1]
+#    Ssat = param[0]
+#    sy_mean = param[2]
+    n =param[0]
+    sy_mean = param[1]
+    Ssat = 500.
    
     s = Simulation(Ssat, n , sy_mean, self.settings)
     s.Run()
     f = s.Interp()
-    d = self.settings['displacement']
+    d = self.settings['displacement']/2.
     disp = np.linspace(0., d, 100)
-    force_sim = f(disp/2)
+    force_sim = f(disp)
     
     g = self.g
     force_exp = g(disp)
@@ -208,14 +211,14 @@ class Opti(object):
     return err
     
   def Optimize(self):
-    p0 = [self.Ssat0, self.n0, self.sy_mean0]
-    #p0 = [self.n0, self.sy_mean0]
+    #p0 = [self.Ssat0, self.n0, self.sy_mean0]
+    p0 = [self.n0, self.sy_mean0]
     
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(1000., 300., 300., settings)
-#O = Opti(200., 240. , settings)
+#O = Opti(900., 200., 160., settings)
+O = Opti(189., 180. , settings)
 O.Optimize()
 
 
@@ -231,8 +234,8 @@ for i in range(1, settings['iteration']):
   plt.plot(O.disp, O.force_sim[i], 'b-', linewidth = .2)
 plt.legend(loc="upper left")
 plt.grid()
-plt.xlabel('Displacement, $U$')
-plt.ylabel('Force, $F$')
+plt.xlabel('Displacement, $U$ (mm)')
+plt.ylabel('Force, $F$ (N)')
 plt.savefig(workdir + label + '_load-vs-disp.pdf')
 
 

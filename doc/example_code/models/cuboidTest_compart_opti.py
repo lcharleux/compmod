@@ -9,6 +9,10 @@ import numpy as np
 import pickle, copy
 import platform
 node = platform.node()
+if node == 'serv2-ms-symme':
+  cpus = 6
+else:
+  cpus = 1
 
 def read_file(file_name):
   '''
@@ -31,7 +35,6 @@ lateralbc = {"top":"pseudohomo"} # lateral boundary conditions : "pseudohomo"-->
 is_3D = True
 export_fields = False
 label = "CuboidTestOptiCompart"
-cpus = 6
 compart = True
 if is_3D == False :
   elType = "CPS4"

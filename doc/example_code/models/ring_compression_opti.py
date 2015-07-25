@@ -21,16 +21,21 @@ settings['displacement'] = 45.
 settings['nFrames'] = 100
 settings['E'] = 64000.
 settings['nu'] = .3
-settings['iteration'] = 2
+settings['iteration'] = 1
 settings['thickness'] = 15.
+settings['unloading'] = False
+settings['export_fields'] = False
 
 
 is_3D = True
 workdir = "workdir/"
 label = "ringCompression_opti"
 elType = "C3D8"
-cpus = 6
 node = platform.node()
+if node == 'serv2-ms-symme':
+  cpus = 6
+else:
+  cpus = 1
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
@@ -87,6 +92,10 @@ class Simulation(object):
     Na = self.settings['Na']
     Ne = self.settings['Ne']
     thickness = self.settings['thickness']/2.
+    unloading = settings['unloading']
+    export_fields = settings['export_fields']
+    
+    export_fields = False
     print E, nu, sy, n
     
     material = Hollomon(
@@ -107,7 +116,9 @@ class Simulation(object):
       elType = elType,
       abqlauncher = abqlauncher,
       cpus = cpus,
-      is_3D = is_3D)
+      is_3D = is_3D,
+      unloading = unloading,
+      export_fields = export_fields)
   
     # SIMULATION
     m.MakeMesh()
