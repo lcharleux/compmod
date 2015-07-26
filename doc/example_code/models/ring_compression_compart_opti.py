@@ -225,14 +225,18 @@ O.Optimize()
 fig = plt.figure('Load vs. disp')
 plt.clf()
 
-plt.plot(O.disp, O.force_exp, 'k-', label = 'experimental curve', linewidth = 2.)
-plt.plot(O.disp, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
+
+
 a = O.err
 index = np.argmin(a)
-plt.plot(O.disp, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
+
 for i in range(1, settings['iteration']):
   plt.plot(O.disp, O.force_sim[i], 'b-', linewidth = .2)
-plt.legend(loc="upper left")
+  
+plt.plot(O.disp, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
+plt.plot(O.disp, O.force_exp, 'k-', label = 'experimental curve', linewidth = 2.)
+plt.plot(O.disp, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
+plt.legend(loc="upper right")
 plt.grid()
 plt.xlabel('Displacement, $U$ (mm)')
 plt.ylabel('Force, $F$ (N)')
