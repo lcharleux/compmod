@@ -48,7 +48,7 @@ strain_exp, stress_exp = read_file(settings['file_name'])
 
 
 settings['lx'], settings['ly'], settings['lz']  = 1., 2., 1. #ly = tensile test direction
-settings['Nx'], settings['Ny'], settings['Nz'] = 15,30, 15
+settings['Nx'], settings['Ny'], settings['Nz'] = 10,20, 10
 if is_3D == True :
     settings['Ne'] =  settings['Nx']*settings['Ny']*settings['Nz']
 else :
@@ -58,7 +58,7 @@ settings['nFrames'] = 100
 settings['E'] = 64000. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
 settings['iteration'] = 20
-#settings['thickness'] = 20.02
+
 
 
 if node ==  'lcharleux':      
@@ -110,8 +110,9 @@ class Simulation(object):
     run_sim = True
     plot = True
 
-    print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
+    #print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
     #print E[0], nu[0], n[0], sy_mean[0]
+    print E[0], nu[0], sy_mean[0]
 
 
     ray_param = sy_mean/1.253314 #mean = sigma*sqrt(Pi/2)
@@ -157,12 +158,13 @@ class Simulation(object):
 
 class Opti(object):
   
-  def __init__(self, Ssat0, n0, sy_mean0, settings):
+  #def __init__(self, Ssat0, n0, sy_mean0, settings):
   #def __init__(self, n0, sy_mean0, settings):
+  def __init__(self, sy_mean0, settings):
     
     self.sy_mean0 = sy_mean0
-    self.n0 = n0
-    self.Ssat0 = Ssat0
+    #self.n0 = n0
+    #self.Ssat0 = Ssat0
     self.settings = settings
     self.sy_mean = []
     self.n = []
@@ -179,12 +181,17 @@ class Opti(object):
     """
     Compute the residual error between experimental and simulated curve
     """    
-    n =param[1]
-    Ssat = param[0]
-    sy_mean = param[2]
+#    n =param[1]
+#    Ssat = param[0]
+#    sy_mean = param[2]
+    
 #    n =param[0]
 #    sy_mean = param[1]
 #    Ssat = 1178.
+    
+    n =500.
+    sy_mean = param[0]
+    Ssat = 500.
     s = Simulation(Ssat, n , sy_mean, self.settings)
 
     s.Run()
@@ -209,13 +216,17 @@ class Opti(object):
     return err
     
   def Optimize(self):
-    p0 = [self.Ssat0, self.n0, self.sy_mean0]   
+#    p0 = [self.Ssat0, self.n0, self.sy_mean0]
+#    p0 = [ self.n0, self.sy_mean0]
+    p0 = [self.sy_mean0]
+    
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
 
    
-O = Opti(880., 200., 160., settings)
+#O = Opti(880., 200., 160., settings)
 #O = Opti(200., 240. , settings)
+O = Opti(100. , settings)
 
 O.Optimize()
 
@@ -227,12 +238,13 @@ plt.plot(O.strain_grid, O.stress_exp, 'k-', label = 'experimental curve', linewi
 plt.plot(O.strain_grid, O.stress_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
 a = O.err
 index = np.argmin(a)
-plt.plot(O.strain_grid, O.stress_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
+
 for i in range(1, settings['iteration']):
   plt.plot(O.strain_grid, O.stress_sim[i], 'b-', linewidth = .2)
+plt.plot(O.strain_grid, O.stress_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
 plt.legend(loc="lower right")
 plt.grid()
-plt.xlabel('Strain, $\epsilon$ (\%)')
+plt.xlabel('Strain, $\epsilon$ (%)')
 plt.ylabel('Stress, $\sigma$ (Mpa)')
 plt.savefig(workdir + label + '_stress-vs-strain.pdf')
 
