@@ -9,10 +9,10 @@ import platform
 
 
 #PAREMETERS
-compart = False #True for a compartimentalized model
+compart = True #True for a compartimentalized model
 is_3D = True #True for a 3D simulation
-unloading = False #True il the unloading part of the simulation is needed
-export_fields = False #True if stress and strain fields are needed
+unloading = True #True il the unloading part of the simulation is needed
+export_fields = True #True if stress and strain fields are needed
 inner_radius, outer_radius = 45.96 , 50
 thickness = 15.
 Nt, Nr, Na = 80, 8, 12
@@ -35,9 +35,9 @@ if compart == False:
 else:
   E_array = E * np.ones(Ne) # Young's modulus
   nu_array = nu * np.ones(Ne) # Poisson's ratio
-  Ssat =1000 * np.ones(Ne)
-  n = 200 * np.ones(Ne)
-  sy_mean = 200.
+  Ssat = 500. * np.ones(Ne)
+  n = 189.88 * np.ones(Ne)
+  sy_mean = 180.15
   ray_param = sy_mean/1.253314
   sy = np.random.rayleigh(ray_param, Ne)
   labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
@@ -76,13 +76,13 @@ def read_file(file_name):
   lignes = f.readlines() # Reads all lines one by one and stores them in a list
   f.close() # Closing the file
 #    lignes.pop(0) # Delete le saut de ligne for each lines
-  force_exp, disp_exp = [],[]
+  data1, data2 = [],[]
 
   for ligne in lignes:
       data = ligne.split() # Lines are splitted
-      disp_exp.append(float(data[0]))
-      force_exp.append(float(data[1]))
-  return -np.array(disp_exp), -np.array(force_exp)
+      data1.append(float(data[0]))
+      data2.append(float(data[1]))
+  return -np.array(data1), -np.array(data2)
 
 
 disp_exp, force_exp = read_file(filename)
@@ -129,6 +129,7 @@ if outputs['completed']:
           A function that defines the scalar field you want to plot
           """
           return outputs['field']['S'][step].vonmises()
+    
     if is_3D == False:
         def plot_mesh(ax, mesh, outputs, step, field_func =None, zone = 'upper right', cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
           """
@@ -155,7 +156,7 @@ if outputs['completed']:
               bar.set_label(cbar_label)
         
         # Exp data
-        disp_exp, force_exp = read_file("test_expD2.txt")    
+        X_exp, Y_exp = read_file("test_expD2.txt")    
         
         fig = plt.figure("Fields")
         plt.clf()
@@ -167,8 +168,55 @@ if outputs['completed']:
         plt.xlabel('$x$')
         plt.ylabel('$y$')
         plt.savefig(workdir + label + '_fields.pdf')
+  
+    else:#for ploting
+      
+      mesh2 = copy.deepcopy(mesh)
+      top_external_nodes = [val for val in m.mesh.nodes.sets['top'] if val in m.mesh.nodes.sets['external_nodes']]
+      top_lateral_nodes = [val for val in m.mesh.nodes.sets['top'] if val in m.mesh.nodes.sets['lateral_nodes']]
+      top_edge_nodes = []
+      if unloading == True:
+        step = 1
+      else:
+        step = 0
+      U = outputs['field']['U'][step]
+      mesh2.nodes.apply_displacement(U)
+      x_coord = mesh2.nodes.x
+      y_coord = mesh2.nodes.y
+      X_lateral, Y_lateral, X_external, Y_external = [], [], [], []
+      X,Y = [],[]
+      for i in top_external_nodes:
+        X_external.append(x_coord[i-1])
+        Y_external.append(y_coord[i-1])
+      for i in top_lateral_nodes:
+        X_lateral.append(x_coord[i-1])
+        Y_lateral.append(y_coord[i-1])
         
-
+      for i in xrange(len(X_external)):
+        if Y_lateral[i] <= Y_external[i]:
+          X.append(X_external[i])
+          Y.append(Y_external[i])
+        else:
+          X.append(X_lateral[i])
+          Y.append(Y_lateral[i])
+      
+      filename1 = 'geometrie_anneau1.xyz'
+      X_exp, Y_exp = read_file("geometrie_anneau1.xyz")    
+      X_exp_fin = X_exp + 123.0985
+      Y_exp_fin = Y_exp + 96.12343
+      fig = plt.figure("Deformed shape")
+      plt.clf()
+      ax = fig.add_subplot(1, 1, 1)
+      ax.set_aspect('equal')
+      plt.grid()
+      plt.plot(X, Y, 'b-', label = 'Simulated shape', linewidth = 2.)
+      plt.plot(-X_exp_fin, Y_exp_fin, 'k-', label = 'Experimental shape', linewidth = 2.)
+      plt.xlabel('$x$')
+      plt.ylabel('$y$')
+      plt.savefig(workdir + label + '_deformed_shape.pdf')
+            
+      
+      
   # Load vs disp
   force = -4. * outputs['history']['force']
   disp = -2. * outputs['history']['disp']

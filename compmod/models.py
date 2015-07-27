@@ -499,6 +499,8 @@ class RingCompression(Simulation):
     if self.is_3D:
        mesh = mesh.extrude(N = Na, l = thickness, mapping = {self.elType: self.elType}) 
        mesh.nodes.add_set_by_func('lateral_nodes', lambda x, y, z, labels: z == 0)
+       mesh.nodes.add_set_by_func('external_nodes', lambda x, y, z, labels: z == z.max())
+       
     self.mesh = mesh
   
   def MakeInp(self):
