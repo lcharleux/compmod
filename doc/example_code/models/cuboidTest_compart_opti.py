@@ -244,7 +244,7 @@ for i in range(1, settings['iteration']):
 plt.plot(O.strain_grid, O.stress_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
 plt.legend(loc="lower right")
 plt.grid()
-plt.xlabel('Strain, $\epsilon\ (%)$',fontsize=16)
+plt.xlabel('Strain, $\epsilon\ (\%)$',fontsize=16)
 plt.ylabel('Stress, $\sigma\ (MPa)$',fontsize=16)
 plt.savefig(workdir + label + '_stress-vs-strain.pdf')
 

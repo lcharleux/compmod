@@ -48,7 +48,7 @@ strain_exp, stress_exp = read_file(settings['file_name'])
 #PARAMETERS
 iteration = 1 #number of simulations
 lx, ly, lz = 1., 2., 1.
-Nx, Ny, Nz = 10, 20, 10
+Nx, Ny, Nz = 15, 30, 15
 Ne = Nx * Ny * Nz
 is_3D = True
 loading = {"displacement"} #"loading" : force or displacement
@@ -92,9 +92,9 @@ for i in xrange(iteration):
   if compart:
     E  = 64000. * np.ones(Ne) # Young's modulus
     nu = .3 * np.ones(Ne) # Poisson's ratio
-    sy_mean = 180.15 * np.ones(Ne)
-    Ssat = 500. * np.ones(Ne)
-    n = 189.88 * np.ones(Ne)
+    sy_mean = 158.6 * np.ones(Ne)
+    Ssat = 506. * np.ones(Ne)
+    n = 5158 * np.ones(Ne)
     #n = 1. * np.ones(Ne)
     ray_param = sy_mean/1.253314
     sy = np.random.rayleigh(ray_param, Ne)
@@ -177,9 +177,9 @@ plt.clf()
 #  plt.grid()
 #  sp1 = fig.add_subplot(2, 1, 2)
 for i in xrange(len(strain_tot)):
-  plt.plot(strain_tot[i], stress_tot[i], 'k-', label = 'simulation curve', linewidth = 2.)
-  plt.plot(strain_exp, stress_exp, 'r-', label = 'experimental curve', linewidth = 2.)
-  plt.xlabel('Tensile Strain, $\epsilon \ (%)$',fontsize=16)
+  plt.plot(strain_tot[i], stress_tot[i], 'r-', label = 'simulation curve', linewidth = 2.)
+  plt.plot(strain_exp, stress_exp, 'ko', label = 'experimental curve', markersize = 5., markevery=10)
+  plt.xlabel('Tensile Strain, $\epsilon \ (\%)$',fontsize=16)
   plt.ylabel(' Tensile Stress $\sigma \ (MPa)$',fontsize=16)
   plt.legend(loc="lower right")
   plt.grid()
