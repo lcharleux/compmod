@@ -12,7 +12,7 @@ import platform
 compart = True #True for a compartimentalized model
 is_3D = True #True for a 3D simulation
 unloading = True #True il the unloading part of the simulation is needed
-export_fields = True #True if stress and strain fields are needed
+export_fields = False #True if stress and strain fields are needed
 inner_radius, outer_radius = 45.96 , 50
 thickness = 15.
 Nt, Nr, Na = 80, 8, 12
@@ -29,7 +29,7 @@ E = 64000.
 nu = .3
 
 if compart == False: 
-  sy = 200.
+  sy = 148.
   n = 0.0875
   material = Hollomon(labels = "SAMPLE_MAT", E = E, nu = nu, sy = sy, n = n)
 else:
@@ -202,35 +202,38 @@ if outputs['completed']:
       
       filename1 = 'geometrie_anneau1.xyz'
       X_exp, Y_exp = read_file("geometrie_anneau1.xyz")    
-      X_exp_fin = X_exp + 123.0985
+      X_exp_fin = X_exp + 124.
       Y_exp_fin = Y_exp + 96.12343
       fig = plt.figure("Deformed shape")
       plt.clf()
       ax = fig.add_subplot(1, 1, 1)
       ax.set_aspect('equal')
       plt.grid()
+      ax.set_ylim([-10,40])
+      ax.set_xlim([-10,70])
       plt.plot(X, Y, 'b-', label = 'Simulated shape', linewidth = 2.)
-      plt.plot(-X_exp_fin, Y_exp_fin, 'k-', label = 'Experimental shape', linewidth = 2.)
-      plt.xlabel('$x$')
-      plt.ylabel('$y$')
-      plt.savefig(workdir + label + '_deformed_shape.pdf')
-            
-      
-      
+      plt.plot(-X_exp_fin, Y_exp_fin, 'ro', label = 'Experimental shape', markersize = 5., markevery=2)
+      plt.legend(loc="lower left")
+      plt.xlabel('$x\ (mm)$',fontsize=18)
+      plt.ylabel('$y\ (mm)$',fontsize=18)
+      plt.savefig(workdir + label + '_deformed_shape.pdf') 
+          
+         
   # Load vs disp
   force = -4. * outputs['history']['force']
   disp = -2. * outputs['history']['disp']
     
   fig = plt.figure('Load vs. disp')
   plt.clf()
-  plt.plot(disp.data[0], force.data[0], 'ro-', label = 'Loading', linewidth = 2.)
-  if unloading == True : plt.plot(disp.data[1], force.data[1], 'bv-', label = 'Unloading', linewidth = 2.)
-  plt.plot(disp_exp, force_exp, 'k-', label = 'Exp', linewidth = 2.)
+  plt.plot(disp.data[0], force.data[0], 'r-', label = 'Loading',  linewidth = 2.)
+  if unloading == True : plt.plot(disp.data[1], force.data[1], 'b-', label = 'Unloading',  linewidth = 2.)
+  plt.plot(disp_exp, force_exp, 'ko', label = 'Exp', markersize = 5., markevery=10)
   plt.legend(loc="upper left")
   plt.grid()
-  plt.xlabel('Displacement, $U$')
-  plt.ylabel('Force, $F$')
+  plt.xlabel('Displacement, $U\ (mm)$',fontsize=16)
+  plt.ylabel('Force, $F\ (N)$',fontsize=16)
   plt.savefig(workdir + label + '_load-vs-disp.pdf')
+  
   
 else: 
   print 'Simulation not completed'

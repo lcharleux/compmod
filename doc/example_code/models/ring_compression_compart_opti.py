@@ -159,12 +159,12 @@ class Simulation(object):
 
 class Opti(object):
   
-  #def __init__(self, Ssat0, n0, sy_mean0, settings):
-  def __init__(self, n0, sy_mean0, settings):
+  def __init__(self, Ssat0, n0, sy_mean0, settings):
+  #def __init__(self, n0, sy_mean0, settings):
     
     self.sy_mean0 = sy_mean0
     self.n0 = n0
-    #self.Ssat0 = Ssat0
+    self.Ssat0 = Ssat0
     self.settings = settings
     self.sy_mean = []
     self.n = []
@@ -181,12 +181,12 @@ class Opti(object):
     """
     Compute the residual error between experimental and simulated curve
     """
-#    n =param[1]
-#    Ssat = param[0]
-#    sy_mean = param[2]
-    n =param[0]
-    sy_mean = param[1]
-    Ssat = 500.
+    n =param[1]
+    Ssat = param[0]
+    sy_mean = param[2]
+#    n =param[0]
+#    sy_mean = param[1]
+#    Ssat = 500.
    
     s = Simulation(Ssat, n , sy_mean, self.settings)
     s.Run()
@@ -211,14 +211,14 @@ class Opti(object):
     return err
     
   def Optimize(self):
-    #p0 = [self.Ssat0, self.n0, self.sy_mean0]
-    p0 = [self.n0, self.sy_mean0]
+    p0 = [self.Ssat0, self.n0, self.sy_mean0]
+#    p0 = [self.n0, self.sy_mean0]
     
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-#O = Opti(900., 200., 160., settings)
-O = Opti(189., 180. , settings)
+O = Opti(500., 190., 180., settings)
+#O = Opti(189., 180. , settings)
 O.Optimize()
 
 
@@ -236,7 +236,7 @@ for i in range(1, settings['iteration']):
 plt.plot(O.disp, O.force_sim[0], 'g-', label = 'initial curve', linewidth = 2.)
 plt.plot(O.disp, O.force_exp, 'k-', label = 'experimental curve', linewidth = 2.)
 plt.plot(O.disp, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
-plt.legend(loc="upper right")
+plt.legend(loc="lower right")
 plt.grid()
 plt.xlabel('Displacement, $U$ (mm)')
 plt.ylabel('Force, $F$ (N)')
