@@ -48,7 +48,7 @@ strain_exp, stress_exp = read_file(settings['file_name'])
 #PARAMETERS
 iteration = 1 #number of simulations
 lx, ly, lz = 1., 2., 1.
-Nx, Ny, Nz = 15, 30, 15
+Nx, Ny, Nz = 10, 20, 10
 Ne = Nx * Ny * Nz
 is_3D = True
 loading = {"displacement"} #"loading" : force or displacement
@@ -70,7 +70,6 @@ if is_3D:
   elType = "C3D8"
 else:
   elType = "CPS4"
-cpus = 6
 node = platform.node()
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
@@ -82,7 +81,10 @@ if node ==  'epua-pd45':
   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
-
+if node == 'serv2-ms-symme':
+  cpus = 6
+else:
+  cpus = 1
 
 
 strain_tot, stress_tot =[], []
@@ -90,9 +92,9 @@ for i in xrange(iteration):
   if compart:
     E  = 64000. * np.ones(Ne) # Young's modulus
     nu = .3 * np.ones(Ne) # Poisson's ratio
-    sy_mean = 184.791 * np.ones(Ne)
-    Ssat = 1031.394 * np.ones(Ne)
-    n = 333.485 * np.ones(Ne)
+    sy_mean = 180.15 * np.ones(Ne)
+    Ssat = 500. * np.ones(Ne)
+    n = 189.88 * np.ones(Ne)
     #n = 1. * np.ones(Ne)
     ray_param = sy_mean/1.253314
     sy = np.random.rayleigh(ray_param, Ne)
@@ -101,8 +103,8 @@ for i in xrange(iteration):
   else:
     E = 70000.
     nu =.3
-    sy = 150
-    n = .1
+    sy = 133.1
+    n = .081
     labels = 'SAMPLE_MAT'
     material = materials.Hollomon(labels = labels, E = E, nu = nu, sy = sy, n=n)
   
@@ -177,8 +179,8 @@ plt.clf()
 for i in xrange(len(strain_tot)):
   plt.plot(strain_tot[i], stress_tot[i], 'k-', label = 'simulation curve', linewidth = 2.)
   plt.plot(strain_exp, stress_exp, 'r-', label = 'experimental curve', linewidth = 2.)
-  plt.xlabel('Tensile Strain, $\epsilon$')
-  plt.ylabel(' Tensile Stress $\sigma$')
+  plt.xlabel('Tensile Strain, $\epsilon \ (%)$',fontsize=16)
+  plt.ylabel(' Tensile Stress $\sigma \ (MPa)$',fontsize=16)
   plt.legend(loc="lower right")
   plt.grid()
 plt.savefig(workdir + label + 'history.pdf')

@@ -238,8 +238,8 @@ plt.plot(O.disp, O.force_exp, 'k-', label = 'experimental curve', linewidth = 2.
 plt.plot(O.disp, O.force_sim[index], 'r-', label = 'optimized curve', linewidth = 2.)
 plt.legend(loc="lower right")
 plt.grid()
-plt.xlabel('Displacement, $U$ (mm)')
-plt.ylabel('Force, $F$ (N)')
+plt.xlabel('Displacement, $U \ (mm)$',fontsize=16)
+plt.ylabel('Force, $F \ (N)$',fontsize=16)
 plt.savefig(workdir + label + '_load-vs-disp.pdf')
 
 
