@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from scipy import interpolate
-from compmod.models import CuboidTest
+from compmod.models import CuboidTest_VER
 from abapy import materials
 from abapy.misc import load
 from abapy.postproc import FieldOutput
@@ -14,38 +14,76 @@ import platform
 
 
 # PLATFORM SETTINGS
-workdir = "workdir/"
-label = "cuboidTest"
-cpus = 1
 abqlauncher = None
+workdir = "workdir/"
+label = "cuboidTest_3D_VER"
+if is_3D:
+  elType = "C3D8"
+else:
+  elType = "CPS4"
 node = platform.node()
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
 if node ==  'serv2-ms-symme': 
   abqlauncher   = '/opt/abaqus/Commands/abaqus' # Local machine configuration
 if node ==  'epua-pd47': 
-  abqlauncher   = 'C:\SIMULIA\Abaqus\6.13-1'
+  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
 if node ==  'epua-pd45': 
-  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
-
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+if node == 'serv2-ms-symme':
+  cpus = 6
+else:
+  cpus = 1
+  
 # SIMULATION SETTINGS
-run_simulation = True
-elType = "C3D8"
-lx, ly, lz = 1., 1., .2
-Nx, Ny, Nz = 20, 20, 5
+lx, ly, lz = 1., 2., 1.
+Nx, Ny, Nz = 15, 30, 15
 Ne = Nx * Ny * Nz
-disp = .3
-nFrames = 50
-Nseed = 20 # Number of grain seeds
-sigma_0_hp = .001
-k_hp = .001
-nu = 0.3
-n = 0.001
-E = 1.
+is_3D = True
+loading = {"displacement"} #"loading" : force or displacement
+#disp = strain_exp[-1] * ly #if the simulation is comparated to experimental data, activate this line
+disp = 0.1
+force = 190.
+force_fin = force + 20.
+nFrames = 30
+export_fields = True
 compart = True
-Run_simu = True
+unloading_reloading = False #for one cycle of loading (F = force), unloding (F=0) and reloading (F = force_fin)
+Nseed = 50
+sigma_0_hp = 0.001
+k_hp = .001
 
-model = CuboidTest(lx = lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus = cpus, compart = compart, disp = disp, elType = elType, is_3D = True)
+Run_simu = True
+#lateralbc = {}
+#lateralbc = {"right":"periodic","front":"periodic","top":"pseudohomo"}
+lateralbc = {"top":"pseudohomo"}
+
+
+if compart:
+  E  = 64000. * np.ones(Ne) # Young's modulus
+  nu = .3 * np.ones(Ne) # Poisson's ratio
+  sy_mean = 158.6 * np.ones(Ne)
+  Ssat = 506. * np.ones(Ne)
+  n = 515 * np.ones(Ne)
+  #n = 1. * np.ones(Ne)
+  ray_param = sy_mean/1.253314
+  sy = np.random.rayleigh(ray_param, Ne)
+  labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
+  material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
+else:
+  E = 70000.
+  nu =.3
+  sy = 133.1
+  n = .081
+  labels = 'SAMPLE_MAT'
+  material = materials.Hollomon(labels = labels, E = E, nu = nu, sy = sy, n=n)
+  
+     
+model = CuboidTest_VER(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, force = force, force_fin = force_fin, disp = disp, loading = loading, elType = elType, is_3D = is_3D, cpus = cpus, export_fields = export_fields, unloading_reloading = unloading_reloading, lateralbc = lateralbc)
+
+#model = CuboidTest(lx = lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus = cpus, compart = compart, disp = disp, elType = elType, is_3D = True)
 model.MakeMesh()
 mesh = model.mesh
 centroids = mesh.centroids()

@@ -94,7 +94,7 @@ for i in xrange(iteration):
     nu = .3 * np.ones(Ne) # Poisson's ratio
     sy_mean = 158.6 * np.ones(Ne)
     Ssat = 506. * np.ones(Ne)
-    n = 5158 * np.ones(Ne)
+    n = 515 * np.ones(Ne)
     #n = 1. * np.ones(Ne)
     ray_param = sy_mean/1.253314
     sy = np.random.rayleigh(ray_param, Ne)
