@@ -32,18 +32,19 @@ workdir = "workdir/"
 label = "ringCompression_opti"
 elType = "C3D8"
 node = platform.node()
-if node == 'serv2-ms-symme':
+if node ==  'lcharleux':      
+  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
+if node ==  'serv2-ms-symme': 
+  abqlauncher   = '/opt/abaqus/Commands/abaqus'# Local machine configuration
   cpus = 6
-else:
-  cpus = 1
-if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
-if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+  cpus = 1
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
-if node ==  'epua-pd45': 
-  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus' 
+  cpus = 6
   
 
 def read_file(file_name):
@@ -205,8 +206,8 @@ for i in range(1, settings['iteration']):
 #plt.plot(disp.data[1], force.data[1], 'b-', label = 'Unloading', linewidth = 2.)  
 plt.legend(loc="lower right")
 plt.grid()
-plt.xlabel('Displacement, $U$')
-plt.ylabel('Force, $F$')
+plt.xlabel('Displacement, $U \ (mm)$',fontsize=16)
+plt.ylabel('Force, $F \ (N)$',fontsize=16)
 plt.savefig(workdir + label + '_load-vs-disp.pdf')
 
 

@@ -9,10 +9,19 @@ import numpy as np
 import pickle, copy
 import platform
 node = platform.node()
-if node == 'serv2-ms-symme':
+if node ==  'lcharleux':      
+  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
+if node ==  'serv2-ms-symme': 
+  abqlauncher   = '/opt/abaqus/Commands/abaqus'# Local machine configuration
   cpus = 6
-else:
+if node ==  'epua-pd47': 
+  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
   cpus = 1
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+  cpus = 6
 
 compart = True
 is_3D = True
@@ -217,7 +226,7 @@ class Opti(object):
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
     
-O = Opti(500., 190., 180., settings)
+O = Opti(570., 500., 190., settings)
 #O = Opti(189., 180. , settings)
 O.Optimize()
 

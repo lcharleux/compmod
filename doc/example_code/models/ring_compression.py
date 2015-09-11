@@ -6,16 +6,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle, copy
 import platform
-
+node = platform.node()
 
 #PAREMETERS
 compart = True #True for a compartimentalized model
 is_3D = True #True for a 3D simulation
-unloading = True #True il the unloading part of the simulation is needed
+unloading = False #True il the unloading part of the simulation is needed
 export_fields = False #True if stress and strain fields are needed
 inner_radius, outer_radius = 45.96 , 50
 thickness = 15.
-Nt, Nr, Na = 80, 8, 12
+Nt, Nr, Na = 80, 10, 12
 if is_3D == False :
   Ne = Nt * Nr
   elType = "CPS4" #CPS4 for plane strain element, CPS4 for plane stress elements
@@ -29,15 +29,15 @@ E = 64000.
 nu = .3
 
 if compart == False: 
-  sy = 148.
-  n = 0.0875
+  sy = 145.8
+  n = 0.081
   material = Hollomon(labels = "SAMPLE_MAT", E = E, nu = nu, sy = sy, n = n)
 else:
   E_array = E * np.ones(Ne) # Young's modulus
   nu_array = nu * np.ones(Ne) # Poisson's ratio
-  Ssat = 500. * np.ones(Ne)
-  n = 189.88 * np.ones(Ne)
-  sy_mean = 180.15
+  Ssat = 673.88 * np.ones(Ne)
+  n = 511.18 * np.ones(Ne)
+  sy_mean = 174.46
   ray_param = sy_mean/1.253314
   sy = np.random.rayleigh(ray_param, Ne)
   labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
@@ -49,20 +49,20 @@ label = "ringCompression"
 
 filename = 'force_vs_disp_ring1.txt'
 
-node = platform.node()
-if node == 'serv2-ms-symme':
+if node ==  'lcharleux':      
+  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
+if node ==  'serv2-ms-symme': 
+  abqlauncher   = '/opt/abaqus/Commands/abaqus'# Local machine configuration
   cpus = 6
-else:
-  cpus = 1
-if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
-if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+  cpus = 1
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
-if node ==  'epua-pd45': 
-  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus' 
-  
+  cpus = 6
+
 
 #TASKS
 run_sim = True

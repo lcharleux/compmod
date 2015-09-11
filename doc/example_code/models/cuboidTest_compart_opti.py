@@ -9,10 +9,19 @@ import numpy as np
 import pickle, copy
 import platform
 node = platform.node()
-if node == 'serv2-ms-symme':
+if node ==  'lcharleux':      
+  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
+if node ==  'serv2-ms-symme': 
+  abqlauncher   = '/opt/abaqus/Commands/abaqus'# Local machine configuration
   cpus = 6
-else:
+if node ==  'epua-pd47': 
+  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
   cpus = 1
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
+if node ==  'SERV3-MS-SYMME': 
+  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
+  cpus = 6
 
 def read_file(file_name):
   '''
@@ -43,12 +52,12 @@ else:
 #FIXED PAREMETERS
 settings = {}
 
-settings['file_name'] = 'Courbe_ref_alu1.txt'
+settings['file_name'] = 'Courbe_ref_alu_transv.txt'
 strain_exp, stress_exp = read_file(settings['file_name'])
 
 
 settings['lx'], settings['ly'], settings['lz']  = 1., 2., 1. #ly = tensile test direction
-settings['Nx'], settings['Ny'], settings['Nz'] = 10,20, 10
+settings['Nx'], settings['Ny'], settings['Nz'] = 10, 20, 10
 if is_3D == True :
     settings['Ne'] =  settings['Nx']*settings['Ny']*settings['Nz']
 else :
@@ -57,23 +66,7 @@ settings['displacement'] = strain_exp[-1]*settings['ly']
 settings['nFrames'] = 100
 settings['E'] = 64000. * np.ones(settings['Ne'])
 settings['nu'] = .3 * np.ones(settings['Ne'])
-settings['iteration'] = 20
-
-
-
-if node ==  'lcharleux':      
-  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
-  workdir = "workdir/"
-if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
-if node ==  'epua-pd47': 
-  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
-  workdir = "workdir/"
-if node ==  'SERV3-MS-SYMME': 
-  abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
-  workdir = "workdir/"
-if node ==  'epua-pd45': 
-  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
-
+settings['iteration'] = 10
 
 class Simulation(object):
   
@@ -110,9 +103,9 @@ class Simulation(object):
     run_sim = True
     plot = True
 
-    #print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
+    print E[0], nu[0], Ssat[0], n[0], sy_mean[0]
     #print E[0], nu[0], n[0], sy_mean[0]
-    print E[0], nu[0], sy_mean[0]
+    #print E[0], nu[0], sy_mean[0]
 
 
     ray_param = sy_mean/1.253314 #mean = sigma*sqrt(Pi/2)
@@ -158,13 +151,13 @@ class Simulation(object):
 
 class Opti(object):
   
-  #def __init__(self, Ssat0, n0, sy_mean0, settings):
+  def __init__(self, Ssat0, n0, sy_mean0, settings):
   #def __init__(self, n0, sy_mean0, settings):
-  def __init__(self, sy_mean0, settings):
+  #def __init__(self, sy_mean0, settings):
     
     self.sy_mean0 = sy_mean0
-    #self.n0 = n0
-    #self.Ssat0 = Ssat0
+    self.n0 = n0
+    self.Ssat0 = Ssat0
     self.settings = settings
     self.sy_mean = []
     self.n = []
@@ -181,17 +174,17 @@ class Opti(object):
     """
     Compute the residual error between experimental and simulated curve
     """    
-#    n =param[1]
-#    Ssat = param[0]
-#    sy_mean = param[2]
+    n =param[1]
+    Ssat = param[0]
+    sy_mean = param[2]
     
 #    n =param[0]
 #    sy_mean = param[1]
 #    Ssat = 1178.
     
-    n =500.
-    sy_mean = param[0]
-    Ssat = 500.
+#    n =500.
+#    sy_mean = param[0]
+#    Ssat = 500.
     s = Simulation(Ssat, n , sy_mean, self.settings)
 
     s.Run()
@@ -216,17 +209,17 @@ class Opti(object):
     return err
     
   def Optimize(self):
-#    p0 = [self.Ssat0, self.n0, self.sy_mean0]
+    p0 = [self.Ssat0, self.n0, self.sy_mean0]
 #    p0 = [ self.n0, self.sy_mean0]
-    p0 = [self.sy_mean0]
+#    p0 = [self.sy_mean0]
     
     result = minimize(self.Err, p0, method='nelder-mead', options={'disp':True, 'maxiter':settings['iteration']})
     self.result = result
 
    
-#O = Opti(880., 200., 160., settings)
+O = Opti(645.88, 486.31, 174.75, settings)
 #O = Opti(200., 240. , settings)
-O = Opti(100. , settings)
+#O = Opti(100. , settings)
 
 O.Optimize()
 

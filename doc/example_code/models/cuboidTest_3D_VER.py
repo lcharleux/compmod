@@ -42,7 +42,7 @@ def read_file(file_name):
   return np.array(strain_exp), np.array(stress_exp)
 
 settings = {}
-settings['file_name'] = 'Courbe_ref_alu1.txt' # experimental data
+settings['file_name'] = 'Courbe_ref_alu_transv.txt' # experimental data
 strain_exp, stress_exp = read_file(settings['file_name'])
 
 #PARAMETERS
@@ -74,17 +74,16 @@ node = platform.node()
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
 if node ==  'serv2-ms-symme': 
-  abqlauncher   = '/opt/abaqus/Commands/abaqus' # Local machine configuration
+  abqlauncher   = '/opt/abaqus/Commands/abaqus'# Local machine configuration
+  cpus = 6
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
+  cpus = 1
 if node ==  'epua-pd45': 
   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
-if node == 'serv2-ms-symme':
   cpus = 6
-else:
-  cpus = 1
 
 
 strain_tot, stress_tot =[], []
@@ -92,19 +91,19 @@ for i in xrange(iteration):
   if compart:
     E  = 64000. * np.ones(Ne) # Young's modulus
     nu = .3 * np.ones(Ne) # Poisson's ratio
-    sy_mean = 158.6 * np.ones(Ne)
-    Ssat = 506. * np.ones(Ne)
-    n = 515 * np.ones(Ne)
+    sy_mean = 174.45 * np.ones(Ne)
+    Ssat = 673.79 * np.ones(Ne)
+    n = 511.18 * np.ones(Ne)
     #n = 1. * np.ones(Ne)
     ray_param = sy_mean/1.253314
     sy = np.random.rayleigh(ray_param, Ne)
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
     material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = Ssat[i], n=n[i], sy = sy[i]) for i in xrange(Ne)]
   else:
-    E = 70000.
+    E = 64000.
     nu =.3
-    sy = 133.1
-    n = .081
+    sy = 148.
+    n = .088
     labels = 'SAMPLE_MAT'
     material = materials.Hollomon(labels = labels, E = E, nu = nu, sy = sy, n=n)
   

@@ -31,7 +31,6 @@ lateralbc = {"top":"pseudohomo"} # lateral boundary conditions : "pseudohomo"-->
 is_3D = True
 export_fields = False
 label = "CuboidTestOpti"
-cpus = 1
 compart = False
 if is_3D == False :
   elType = "CPS4"
@@ -39,8 +38,8 @@ else:
   elType = "C3D8"
 #FIXED PAREMETERS
 settings = {}
-
-settings['file_name'] = 'Courbe_ref_alu1.txt'
+workdir = "workdir/"
+settings['file_name'] = 'Courbe_ref_alu_transv.txt'
 strain_exp, stress_exp = read_file(settings['file_name'])
 
 
@@ -54,23 +53,23 @@ settings['displacement'] = strain_exp[-1]*settings['ly']
 settings['nFrames'] = 100
 settings['E'] = 64000.
 settings['nu'] = .3 
-settings['iteration'] = 20
+settings['iteration'] = 7
 #settings['thickness'] = 20.02
 
 
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
-  workdir = "workdir/"
-if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
+if node ==  'serv2-ms-symme': 
+  abqlauncher   = '/opt/abaqus/Commands/abaqus'# Local machine configuration
+  cpus = 6
 if node ==  'epua-pd47': 
   abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
-  workdir = "workdir/"
+  cpus = 1
+if node ==  'epua-pd45': 
+  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
 if node ==  'SERV3-MS-SYMME': 
   abqlauncher   = '"C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"' # Local machine configuration
-  workdir = "workdir/"
-if node ==  'epua-pd45': 
-  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
-
+  cpus = 6
 
 class Simulation(object):
   
@@ -199,7 +198,7 @@ class Opti(object):
     self.result = result
 
    
-O = Opti(100., 0.1,  settings)
+O = Opti(144., 0.086,  settings)
 
 O.Optimize()
 
