@@ -9,7 +9,7 @@ import platform
 node = platform.node()
 
 #PAREMETERS
-compart = True #True for a compartimentalized model
+compart = False#True for a compartimentalized model
 is_3D = True #True for a 3D simulation
 unloading = False #True il the unloading part of the simulation is needed
 export_fields = False #True if stress and strain fields are needed
@@ -233,6 +233,12 @@ if outputs['completed']:
   plt.xlabel('Displacement, $U\ (mm)$',fontsize=16)
   plt.ylabel('Force, $F\ (N)$',fontsize=16)
   plt.savefig(workdir + label + '_load-vs-disp.pdf')
+  
+  file = open("force_deplacement_hollo_80_10_12.txt", "w")
+  for i in xrange(len(disp.data[0])):
+      file.write(str(disp.data[0][i])+"\t"+str(force.data[0][i])+"\n")
+  file.close()
+  
   
   
 else: 
