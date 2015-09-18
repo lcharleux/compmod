@@ -24,6 +24,7 @@ from abapy import materials
 import matplotlib.pyplot as plt
 import numpy as np
 import platform
+from scipy import interpolate
 
 def read_file(file_name):
   '''
@@ -48,7 +49,7 @@ strain_exp, stress_exp = read_file(settings['file_name'])
 #PARAMETERS
 iteration = 1 #number of simulations
 lx, ly, lz = 1., 2., 1.
-Nx, Ny, Nz = 15, 30, 15
+Nx, Ny, Nz = 15,30, 15
 Ne = Nx * Ny * Nz
 is_3D = True
 loading = {"displacement"} #"loading" : force or displacement
@@ -58,7 +59,7 @@ force = 190.
 force_fin = force + 20.
 nFrames = 30
 export_fields = False
-compart = True
+compart = False
 unloading_reloading = False #for one cycle of loading (F = force), unloding (F=0) and reloading (F = force_fin) 
 
 #lateralbc = {}
@@ -102,8 +103,8 @@ for i in xrange(iteration):
   else:
     E = 64000.
     nu =.3
-    sy = 148.
-    n = .088
+    sy = 145.8
+    n = .081
     labels = 'SAMPLE_MAT'
     material = materials.Hollomon(labels = labels, E = E, nu = nu, sy = sy, n=n)
   
@@ -166,6 +167,19 @@ for i in xrange(iteration):
     
     strain_tot.append(strain)
     stress_tot.append(stress)
+
+
+strain_min = min(strain_tot[0][-1], strain_exp[-1])
+strain_grid = np.linspace(0., strain_min, 100)
+g = interpolate.interp1d(strain_exp, stress_exp)
+interp_stress_exp = g(strain_grid)
+interp_stress_tot, err = [], []
+for i in xrange(len(strain_tot)):      
+    f = interpolate.interp1d(strain_tot[i], stress_tot[i])
+    interp_stress_tot.append(f(strain_grid))
+for i in xrange(len(strain_tot)):
+    err.append(np.sqrt(((interp_stress_tot[i] - interp_stress_exp)**2).sum()))
+
      
 fig = plt.figure(1)
 plt.clf()

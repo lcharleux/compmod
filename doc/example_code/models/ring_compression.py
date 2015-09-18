@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle, copy
 import platform
+from scipy import interpolate
 node = platform.node()
 
 #PAREMETERS
-compart = False#True for a compartimentalized model
+compart = False #True for a compartimentalized model
 is_3D = True #True for a 3D simulation
 unloading = False #True il the unloading part of the simulation is needed
 export_fields = False #True if stress and strain fields are needed
@@ -35,9 +36,9 @@ if compart == False:
 else:
   E_array = E * np.ones(Ne) # Young's modulus
   nu_array = nu * np.ones(Ne) # Poisson's ratio
-  Ssat = 673.88 * np.ones(Ne)
-  n = 511.18 * np.ones(Ne)
-  sy_mean = 174.46
+  Ssat = 673.79 * np.ones(Ne)
+  n = 511.2 * np.ones(Ne)
+  sy_mean = 174.45
   ray_param = sy_mean/1.253314
   sy = np.random.rayleigh(ray_param, Ne)
   labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
@@ -234,12 +235,18 @@ if outputs['completed']:
   plt.ylabel('Force, $F\ (N)$',fontsize=16)
   plt.savefig(workdir + label + '_load-vs-disp.pdf')
   
-  file = open("force_deplacement_hollo_80_10_12.txt", "w")
+  file = open("force_deplacement_hollo_CPS4_200_24.txt", "w")
   for i in xrange(len(disp.data[0])):
       file.write(str(disp.data[0][i])+"\t"+str(force.data[0][i])+"\n")
   file.close()
-  
-  
+
+  disp_min = min(disp.data[0][-1], disp_exp[-1])
+  disp_grid = np.linspace(0., disp_min, 100)
+  g = interpolate.interp1d(disp_exp, force_exp)
+  interp_force_exp = g(disp_grid)    
+  f = interpolate.interp1d(disp.data[0], force.data[0])
+  interp_force = f(disp_grid)
+  err = np.sqrt(((interp_force - interp_force_exp)**2).sum())
   
 else: 
   print 'Simulation not completed'
