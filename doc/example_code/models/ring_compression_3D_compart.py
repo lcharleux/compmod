@@ -1,4 +1,4 @@
-from compmod.models import RingCompression
+from compmod.models import RingCompression_VER
 from abapy import materials
 from abapy.misc import load
 import matplotlib.pyplot as plt
@@ -59,7 +59,7 @@ plot = True
 
 #MODEL DEFINITION
 
-m = RingCompression( material = material,inner_radius = inner_radius, 
+m = RingCompression_VER( material = material,inner_radius = inner_radius, 
   outer_radius = outer_radius, 
   disp = disp/2,
   thickness = thickness,

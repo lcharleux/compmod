@@ -10,6 +10,7 @@
 *.sta
 *.rpy*
 *.log
+*.pckl
 
 tests/*
 doc/example_code/models/workdir/*
@@ -18,3 +19,5 @@ doc/_build/*
 doc/sandbox/awa/workdir/*
 
 !/doc/example_code/models/workdir/*.pckl
+
+*.pckl

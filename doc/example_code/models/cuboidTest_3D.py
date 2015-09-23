@@ -23,28 +23,29 @@ def read_file(file_name):
       stress_exp.append(float(data[1]))
   return np.array(strain_exp), np.array(stress_exp)
 settings = {}
-settings['file_name'] = 'Courbe_ref_alu.txt' # experimental data
+settings['file_name'] = 'cuivre_cufe2p_ANR.txt' # experimental data
 strain_exp, stress_exp = read_file(settings['file_name'])
 
 #PARAMETERS
 lx, ly, lz = 2., 10., 10.
-Nx, Ny, Nz = 10, 50, 50
+Nx, Ny, Nz = 1, 5, 5
 Ne = Nx * Ny * Nz
 disp = strain_exp[-1] * ly
 nFrames = 20
 export_fields = False
 compart = True
+#lateralbc = { "right":"periodic", "left":"periodic" }
 workdir = "workdir/"
 label = "cuboidTest_3D"
 elType = "C3D8"
-cpus = 6
+cpus = 1
 node = platform.node()
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
 if node ==  'serv2-ms-symme': 
   abqlauncher   = '/opt/abaqus/Commands/abaqus' # Local machine configuration
 if node ==  'epua-pd47': 
-  abqlauncher   = 'C:\SIMULIA\Abaqus\6.13-1'
+  abqlauncher   = 'C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe' # Local machine configuration
 if node ==  'epua-pd45': 
   abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'
 if node ==  'SERV3-MS-SYMME': 

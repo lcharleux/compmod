@@ -1,4 +1,4 @@
-from compmod.models import CuboidTest
+from compmod.models import CuboidTest_BC
 from abapy import materials
 from abapy.misc import load
 import matplotlib.pyplot as plt
@@ -50,7 +50,7 @@ label0 = "cuboidTest_homo0"
 label1 = "cuboidTest_homo1"
 
 elType = "CPE4"
-lateralbc = { "right":"pseudohomo", "left":"pseudohomo" }
+lateralbc = { "right":"periodic", "left":"periodic" }
 cpus = 1
 abqlauncher = None
 node = platform.node()
@@ -81,8 +81,8 @@ else:
   labels = 'SAMPLE_MAT'
   material = materials.Bilinear(labels = labels, E = E, nu = nu, sy = sy, n = n)
 
-m0 = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label0, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType, lateralbc = lateralbc)
-m1 = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label1, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType)
+m0 = CuboidTest_BC(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label0, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType, lateralbc = lateralbc)
+m1 = CuboidTest_BC(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label1, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType)
 
 if run_simulation:
   m0.MakeInp()
