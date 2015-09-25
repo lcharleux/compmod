@@ -123,12 +123,13 @@ class CuboidTest(Simulation):
   
   This model can be used for a wide range of problems. A few examples are given here:
   
-  1. Simple 2D homogenous model:
+  1. Simple 2D compartmentalized model:
   
+  .. plot:: example_code/models/cuboidTest.py
+     :include-source:
   
-  
-    
-  CuboidTest with microstructure generated using Voronoi cells : 
+     
+  2. CuboidTest with microstructure generated using Voronoi cells : 
    
   * Source: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.py>`.
   * VTK output: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.vtk>`.
