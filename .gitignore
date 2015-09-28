@@ -20,4 +20,4 @@ doc/sandbox/awa/workdir/*
 
 !/doc/example_code/models/workdir/*.pckl
 
-*.pckl
+
