@@ -128,6 +128,7 @@ class CuboidTest(Simulation):
   .. plot:: example_code/models/cuboidTest.py
      :include-source:
   
+  
      
   2. CuboidTest with microstructure generated using Voronoi cells : 
    

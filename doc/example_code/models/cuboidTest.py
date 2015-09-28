@@ -12,13 +12,13 @@ settings['export_fields'] = True
 settings['compart'] = True
 settings['is_3D']   = False
 settings['lx']      = 10.
-settings['ly']      = 20. # test direction 
+settings['ly']      = 10. # test direction 
 settings['lz']      = 10.
-settings['Nx']      = 20
-settings['Ny']      = 40
+settings['Nx']      = 40
+settings['Ny']      = 20
 settings['Nz']      = 2
-settings['disp']    = .5
-settings['nFrames'] = 100
+settings['disp']    = 1.2
+settings['nFrames'] = 50
 settings['workdir'] = "workdir/"
 settings['label']   = "cuboidTest"
 settings['elType']  = "CPS4"
@@ -29,8 +29,8 @@ run_simulation = False # True to run it, False to just use existing results
 E           = 1.
 sy_mean     = .001
 nu          = 0.3
-sigma_sat   = .003
-n           = 0.1
+sigma_sat   = .005
+n           = 0.05
 
 
 # ABAQUS PATH SETTINGS
@@ -122,14 +122,21 @@ if m.outputs['completed']:
   ax.tick_params(right="off")
   
   plt.grid()
-  bb = mesh.nodes.boundingBox()
-
-  plt.xlim(bb[0])
-  plt.ylim(bb[1])
+  
+  lx, ly = settings['lx'], settings['ly'] + settings['disp']
+  
+  plt.xlim(-lx/10., 1.1 * lx)
+  plt.ylim(-ly/10., 1.1 * ly)
   mesh.draw(ax,
     disp_func  = lambda fields : outputs['field']['U'][-1],
     field_func = lambda fields : outputs['field']['LE'][-1].get_component(22),
     cmap = cm.jet,
+    cmap_levels = 10,
+    alpha = .75,
+    contour = True,
+    contour_colors = "black",
+    edge_color = "black",
+    edge_width = .5,
     cbar_orientation = "vertical",
     cbar_label = "$LE_{22}$")
   plt.xlabel('$x$')
