@@ -11,12 +11,12 @@ settings = {}
 settings['export_fields'] = True
 settings['compart'] = True
 settings['is_3D']   = True
-settings['lx']      = 10.
-settings['ly']      = 10. # test direction 
-settings['lz']      = 10.
-settings['Nx']      = 4
-settings['Ny']      = 4
-settings['Nz']      = 4
+settings['lx']      = 5.
+settings['ly']      = 5. # test direction 
+settings['lz']      = 5.
+settings['Nx']      = 10
+settings['Ny']      = 10
+settings['Nz']      = 10
 settings['disp']    = 1.2
 settings['nFrames'] = 50
 settings['workdir'] = "workdir/"
@@ -106,40 +106,6 @@ if m.outputs['completed']:
   
   
   # Field Outputs
-  
-  outputs = m.outputs
-  mesh = outputs['mesh']
-  max_strain = strain.max()
-  fig = plt.figure("Fields")
-  plt.clf()
-  ax = fig.add_subplot(1, 1, 1)
-  ax.set_aspect('equal')
-  ax.spines['top'].set_visible(False)
-  ax.spines['right'].set_visible(False)
-  ax.spines['bottom'].set_visible(False)
-  ax.spines['left'].set_visible(False)
-  ax.tick_params(top="off")
-  ax.tick_params(right="off")
-  
-  plt.grid()
-  
-  lx, ly = settings['lx'], settings['ly'] + settings['disp']
-  
-  plt.xlim(-lx/10., 1.1 * lx)
-  plt.ylim(-ly/10., 1.1 * ly)
-  mesh.draw(ax,
-    disp_func  = lambda fields : outputs['field']['U'][-1],
-    field_func = lambda fields : outputs['field']['LE'][-1].get_component(22),
-    cmap = cm.jet,
-    cmap_levels = 10,
-    alpha = .75,
-    contour = True,
-    contour_colors = "black",
-    edge_color = "black",
-    edge_width = .5,
-    cbar_orientation = "vertical",
-    cbar_label = "$LE_{22}$")
-  plt.xlabel('$x$')
-  plt.ylabel('$y$')
-  plt.savefig(settings['workdir'] + settings['label'] + '_fields.pdf')
+  if settings["export_fields"]:
+    m.mesh.dump2vtk(settings['workdir'] + settings['label'] + '.vtk')
   

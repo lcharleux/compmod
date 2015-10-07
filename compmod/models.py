@@ -9,6 +9,10 @@ from abapy.misc import load
 import numpy as np
 import os, time, subprocess, pickle, copy
 
+#-------------------------------------------------------------------------------
+# SIMULATION (META CLASS)
+#-------------------------------------------------------------------------------
+
 
 class Simulation(object):
   """
@@ -95,6 +99,11 @@ class Simulation(object):
     """
     self.outputs = load(self.workdir + self.label + ".pckl")
     
+
+
+#-------------------------------------------------------------------------------
+# CUBOID TEST  
+#-------------------------------------------------------------------------------    
     
 class CuboidTest(Simulation):
   """
@@ -128,12 +137,28 @@ class CuboidTest(Simulation):
   .. plot:: example_code/models/cuboidTest.py
      :include-source:
   
+  * VTK output: :download:`cuboidTest.vtk <example_code/models/workdir/cuboidTest.vtk>`.
+  * VTK file displayed with Paraview:
+  
+  .. image:: example_code/models/cuboidTest.png
+     :width: 30%
+  
+  2. Simple 3D compartmentalized model:
+  
+  .. plot:: example_code/models/cuboidTest_3D.py
+     :include-source:
+     
+  * VTK output: :download:`cuboidTest.vtk <example_code/models/workdir/cuboidTest_3D.vtk>`.
+  * VTK file displayed with Paraview:
+  
+  .. image:: example_code/models/cuboidTest_3D.png
+     :width: 30%
   
      
-  2. CuboidTest with microstructure generated using Voronoi cells : 
+  3. CuboidTest with microstructure generated using Voronoi cells : 
    
   * Source: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.py>`.
-  * VTK output: :download:`cuboidTest_voronoi <example_code/models/cuboidTest_voronoi.vtk>`.
+  * VTK output: :download:`cuboidTest_voronoi <example_code/models/workdir/cuboidTest_voronoi.vtk>`.
  
   """
   __doc__ = __doc__.format(Simulation.__doc__)
@@ -422,8 +447,20 @@ dump(data, file_name+'.pckl')"""
     f = open(self.workdir + self.label + '_abqpostproc.py', 'w')
     f.write(pattern)
     f.close()
-  
-  
+
+  def LoadResults(self):
+    super(CuboidTest, self).LoadResults()
+    if self.outputs['completed']:
+      fields =  self.outputs['field']
+      if hasattr(self, "mesh") == False: self.MakeMesh()
+      for key in fields.keys():
+        for i in xrange(len(fields[key])):
+          self.mesh.add_field(fields[key][i], key+"_{0}".format(i))
+
+
+#-------------------------------------------------------------------------------
+# RING COMPRESSION  
+#-------------------------------------------------------------------------------  
 class RingCompression(Simulation):
   """
  let see 2 kind of RingCompression , one homogenous and the second compartmentalized
@@ -781,8 +818,13 @@ dump(data, file_name+'.pckl')"""
     f = open(self.workdir + self.label + '_abqpostproc.py', 'w')
     f.write(pattern)
     f.close()
+  
+  
+    
 
-
+#-------------------------------------------------------------------------------
+# CUBOID TEST VER (WORK IN PROGRESS)
+#-------------------------------------------------------------------------------
    
 class CuboidTest_VER(Simulation):
   """
