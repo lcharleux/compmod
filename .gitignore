@@ -16,5 +16,6 @@ doc/example_code/models/workdir/*
 doc/example_code/models/tutu*.txt
 doc/_build/*
 doc/sandbox/awa/workdir/*
+*nohup.out
 
 !/doc/example_code/models/workdir/*.pckl
