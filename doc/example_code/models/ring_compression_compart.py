@@ -7,11 +7,12 @@ import pickle, copy
 import platform
 
 #PAREMETERS
+compart = True
 is_3D = True
 unloading = False
 export_fields = False
-inner_radius, outer_radius = 100.72/2-5.18 , 100.72/2
-Nt, Nr, Na = 20, 5, 2
+inner_radius, outer_radius =  45.96 , 50
+Nt, Nr, Na = 80, 8, 10
 #Ne = Nt * Nr
 if is_3D == False :
   Ne = Nt * Nr
@@ -21,12 +22,12 @@ else:
   elType = "C3D8"
 disp = 45.
 nFrames = 100
-thickness = 20.02
-E  = 72469. * np.ones(Ne) # Young's modulus
+thickness = 15.
+E  = 64000. * np.ones(Ne) # Young's modulus
 nu = .3 * np.ones(Ne) # Poisson's ratio
-Ssat = 1031.394 * np.ones(Ne)
-n = 333.485 * np.ones(Ne)
-sy_mean = 184.79
+Ssat = 910. * np.ones(Ne)
+n = 207. * np.ones(Ne)
+sy_mean = 165.
 
 ray_param = sy_mean/1.253314
 sy = np.random.rayleigh(ray_param, Ne)
@@ -36,10 +37,14 @@ material = [materials.Bilinear(labels = labels[i], E = E[i], nu = nu[i], Ssat = 
 
 workdir = "workdir/"
 label = "ringCompression_compart"
-cpus = 6
-filename = 'test_expA1.txt'
+
+filename = 'force_vs_disp_ring1.txt'
 
 node = platform.node()
+if node == 'serv2-ms-symme':
+  cpus = 6
+else:
+  cpus = 1
 if node ==  'lcharleux':      abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Ludovic
 if node ==  'serv2-ms-symme': abqlauncher   = '/opt/abaqus/Commands/abaqus' # Linux
 if node ==  'epua-pd47': 
@@ -79,7 +84,7 @@ m = RingCompression( material = material ,
   inner_radius = inner_radius, 
   outer_radius = outer_radius, 
   disp = disp/2,
-  thickness = thickness,
+  thickness = thickness/2,
   nFrames = nFrames, 
   Nr = Nr, 
   Nt = Nt, 
@@ -92,7 +97,7 @@ m = RingCompression( material = material ,
   abqlauncher = abqlauncher,
   cpus = cpus,
   is_3D = is_3D,
-  compart = True)
+  compart = compart)
 
 # SIMULATION
 m.MakeMesh()
@@ -153,7 +158,7 @@ if outputs['completed']:
       plt.savefig(workdir + label + '_fields.pdf')
   
   # Load vs disp
-  force = -2. * outputs['history']['force']
+  force = -4. * outputs['history']['force']
   disp = -2. * outputs['history']['disp']
   
   fig = plt.figure('Load vs. disp')
