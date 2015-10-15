@@ -52,7 +52,7 @@ nFrames = 30
 export_fields = True
 compart = True
 unloading_reloading = False #for one cycle of loading (F = force), unloding (F=0) and reloading (F = force_fin)
-Nseed = 20
+Nseed = 2
 sigma_0_hp = 0.001
 k_hp = .001
 
@@ -84,7 +84,7 @@ else:
      
 model = CuboidTest_VER(lx =lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, material = material, compart = compart, force = force, force_fin = force_fin, disp = disp, loading = loading, elType = elType, is_3D = is_3D, cpus = cpus, export_fields = export_fields, unloading_reloading = unloading_reloading, lateralbc = lateralbc)
 
-#model = CuboidTest(lx = lx, ly = ly, lz = lz, Nx = Nx, Ny = Ny, Nz = Nz, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus = cpus, compart = compart, disp = disp, elType = elType, is_3D = True)
+
 model.MakeMesh()
 mesh = model.mesh
 centroids = mesh.centroids()
@@ -105,22 +105,16 @@ seeds = np.random.rand(Nseed,3) * np.array([[xmax - xmin, ymax -ymin, zmax - zmi
 seed_flags = np.arange(Nseed)
 elem_flags = interpolate.griddata(seeds, seed_flags, centroids, method = "nearest")
 
-# Volumes and dimensions
-elem_volume = mesh.volume()
-grain_volume = np.zeros(len(seed_flags))
+# Building sets
+elabels = np.array(mesh.labels)
+grain_sets = []
 for i in xrange(len(seed_flags)):
   flag = seed_flags[i]
-  grain_volume[i] = ((elem_flags == flag) * elem_volume).sum()
-grain_diameter = (grain_volume * 6./np.pi)**(1. / 3.)   
-elem_grain_diameter = grain_diameter[elem_flags]
+  grain_sets.append(elabels[np.where(elem_flags == flag)[0]])
+  mesh.add_set(label = "Kikinou{0}".format(i), elements = elabels[np.where(elem_flags == flag)[0]])
   
 
-# Hall-Petch
-sy = sigma_0_hp + k_hp / elem_grain_diameter**.5
 
-E  = E * np.ones(Ne) # Young's modulus
-nu = nu * np.ones(Ne) # Poisson's ratio
-n = n * np.ones(Ne)
 
 
 labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
@@ -128,46 +122,7 @@ material = [materials.Bilinear(labels = labels[i],E = E[i], nu = nu[i], n = n[i]
 model.material = material
 sy_field = FieldOutput(labels = mesh.labels, data = sy, position = "element")
 
-if Run_simu:
-  model.MakeInp()
-  model.Run()
-  model.MakePostProc()
-  model.RunPostProc()
-else:
-  model.LoadResults()
-# Plotting results
-if model.outputs['completed']:
-  U = model.outputs['field']['U'][0]
-  mesh.nodes.apply_displacement(U)
-  f = open("cuboidTest_voronoi.vtk", "w")
-  f.write(mesh.dump2vtk())
-  f.write(sy_field.dump2vtk(name = "Yield_Stress"))
-  f.write( model.outputs['field']['S'][0].vonmises().dump2vtk(name = "Von_Mises_Stress"))
-  f.close()
-  
-  # History Outputs
-  disp =  np.array(model.outputs['history']['disp'].values()[0].data[0])
-  force =  np.array(np.array(model.outputs['history']['force'].values()).sum().data[0])
-  volume = np.array(np.array(model.outputs['history']['volume'].values()).sum().data[0])
-  length = ly + disp
-  surface = volume / length
-  logstrain = np.log10(1. + disp / ly)
-  linstrain = disp/ly
-  strain = linstrain
-  stress = force / surface 
-   
-  fig = plt.figure(0)
-  plt.clf()
-  sp1 = fig.add_subplot(2, 1, 1)
-  plt.plot(disp, force, 'ok-')
-  plt.xlabel('Displacement, $U$')
-  plt.ylabel('Force, $F$')
-  plt.grid()
-  sp1 = fig.add_subplot(2, 1, 2)
-  plt.plot(strain, stress, 'ok-')
-  plt.xlabel('Tensile Strain, $\epsilon$')
-  plt.ylabel(' Tensile Stress $\sigma$')
-  plt.grid()
-  plt.savefig(workdir + label + 'history.pdf')
+
+model.MakeInp()
 
 
