@@ -1,0 +1,278 @@
+**----------------------------------
+**DISTRIBUTED MECHANICAL PROPERTIES
+**----------------------------------
+**HEADER
+*Preprint, echo=NO, model=NO, history=NO, contact=NO
+**----------------------------------
+** PART "pSAMPLE" DEFINITION
+*Part, name = pSample
+**----------------------------------
+** NODES
+**----------------------------------
+*NODE, NSET=ALLNODES
+  1, 0.0, 0.0, 0.0
+  2, 0.5, 0.0, 0.0
+  3, 1.0, 0.0, 0.0
+  4, 0.0, 0.5, 0.0
+  5, 0.5, 0.5, 0.0
+  6, 1.0, 0.5, 0.0
+  7, 0.0, 1.0, 0.0
+  8, 0.5, 1.0, 0.0
+  9, 1.0, 1.0, 0.0
+  10, 0.0, 0.0, 0.5
+  11, 0.5, 0.0, 0.5
+  12, 1.0, 0.0, 0.5
+  13, 0.0, 0.5, 0.5
+  14, 0.5, 0.5, 0.5
+  15, 1.0, 0.5, 0.5
+  16, 0.0, 1.0, 0.5
+  17, 0.5, 1.0, 0.5
+  18, 1.0, 1.0, 0.5
+  19, 0.0, 0.0, 1.0
+  20, 0.5, 0.0, 1.0
+  21, 1.0, 0.0, 1.0
+  22, 0.0, 0.5, 1.0
+  23, 0.5, 0.5, 1.0
+  24, 1.0, 0.5, 1.0
+  25, 0.0, 1.0, 1.0
+  26, 0.5, 1.0, 1.0
+  27, 1.0, 1.0, 1.0
+**----------------------------------
+** NODE SETS
+**----------------------------------
+*NSET, NSET=REFY
+21,
+*NSET, NSET=REFX
+9,
+*NSET, NSET=RIGHT
+15,
+*NSET, NSET=BOTTOMRIGHT
+12,
+*NSET, NSET=BOTTOMFRONTLEFT
+19,
+*NSET, NSET=TOPRIGHT
+18,
+*NSET, NSET=BOTTOMREAR
+2,
+*NSET, NSET=REFZ
+25,
+*NSET, NSET=FRONTRIGHT
+24,
+*NSET, NSET=BOTTOM
+11,
+*NSET, NSET=TOP
+17,18,16,8,26,9,7,25,
+*NSET, NSET=TOPREARLEFT
+7,
+*NSET, NSET=BOTTOMLEFT
+10,
+*NSET, NSET=ORIGIN
+1,
+*NSET, NSET=BOTTOMFRONT
+20,
+*NSET, NSET=REARRIGHT
+6,
+*NSET, NSET=FRONT
+23,
+*NSET, NSET=REAR
+5,
+*NSET, NSET=PILOT
+27,
+*NSET, NSET=TOPLEFT
+16,
+*NSET, NSET=TOPREAR
+8,
+*NSET, NSET=BOTTOMREARRIGHT
+3,
+*NSET, NSET=REARLEFT
+4,
+*NSET, NSET=FRONTLEFT
+22,
+*NSET, NSET=TOPFRONT
+26,
+*NSET, NSET=LEFT
+13,
+**----------------------------------
+** ELEMENTS
+**----------------------------------
+*ELEMENT, TYPE=C3D8, ELSET=C3D8_ELEMENTS
+  1, 1, 2, 5, 4, 10, 11, 14, 13, 
+  2, 2, 3, 6, 5, 11, 12, 15, 14, 
+  3, 4, 5, 8, 7, 13, 14, 17, 16, 
+  4, 5, 6, 9, 8, 14, 15, 18, 17, 
+  5, 10, 11, 14, 13, 19, 20, 23, 22, 
+  6, 11, 12, 15, 14, 20, 21, 24, 23, 
+  7, 13, 14, 17, 16, 22, 23, 26, 25, 
+  8, 14, 15, 18, 17, 23, 24, 27, 26, 
+**----------------------------------
+** ELEMENT SETS
+**----------------------------------
+*ELSET, ELSET=BIATCH0
+  1, 2, 5, 6, 7,
+*ELSET, ELSET=ALLELEMENTS
+  1, 2, 3, 4, 5, 6, 7, 8,
+*ELSET, ELSET=BIATCH1
+  8, 3, 4,
+**----------------------------------
+** ELEMENT SURFACES
+**----------------------------------
+*Solid Section, elset=Elset1, material=mat_1
+*Elset, Elset=Elset1
+1,
+*Solid Section, elset=Elset2, material=mat_2
+*Elset, Elset=Elset2
+2,
+*Solid Section, elset=Elset3, material=mat_3
+*Elset, Elset=Elset3
+3,
+*Solid Section, elset=Elset4, material=mat_4
+*Elset, Elset=Elset4
+4,
+*Solid Section, elset=Elset5, material=mat_5
+*Elset, Elset=Elset5
+5,
+*Solid Section, elset=Elset6, material=mat_6
+*Elset, Elset=Elset6
+6,
+*Solid Section, elset=Elset7, material=mat_7
+*Elset, Elset=Elset7
+7,
+*Solid Section, elset=Elset8, material=mat_8
+*Elset, Elset=Elset8
+8,
+*EQUATION
+2
+17, 2, 1.0,27, 2, -1.0
+2
+18, 2, 1.0,27, 2, -1.0
+2
+16, 2, 1.0,27, 2, -1.0
+2
+8, 2, 1.0,27, 2, -1.0
+2
+26, 2, 1.0,27, 2, -1.0
+2
+9, 2, 1.0,27, 2, -1.0
+2
+7, 2, 1.0,27, 2, -1.0
+2
+25, 2, 1.0,27, 2, -1.0
+*End part
+**----------------------------------
+** ASSEMBLY
+*Assembly, name = Assembly
+*Instance, name=iSample, part=pSample
+*End Instance
+*End Assembly
+**----------------------------------
+** MATERIALS
+** <Bilinear instance: 1 samples>
+*MATERIAL, NAME=mat_1
+*ELASTIC
+  64000.0, 0.3
+*PLASTIC
+  47.6843246757, 0.
+ 1000.0, 1.84915665112 
+** <Bilinear instance: 1 samples>
+*MATERIAL, NAME=mat_2
+*ELASTIC
+  64000.0, 0.3
+*PLASTIC
+  108.109553609, 0.
+ 1000.0, 1.7318261095 
+** <Bilinear instance: 1 samples>
+*MATERIAL, NAME=mat_3
+*ELASTIC
+  64000.0, 0.3
+*PLASTIC
+  277.859483926, 0.
+ 1000.0, 1.40221459432 
+** <Bilinear instance: 1 samples>
+*MATERIAL, NAME=mat_4
+*ELASTIC
+  64000.0, 0.3
+*PLASTIC
+  174.42343243, 0.
+ 1000.0, 1.60306129625 
+** <Bilinear instance: 1 samples>
+*MATERIAL, NAME=mat_5
+*ELASTIC
+  64000.0, 0.3
+*PLASTIC
+  161.437994581, 0.
+ 1000.0, 1.62827573868 
+** <Bilinear instance: 1 samples>
+*MATERIAL, NAME=mat_6
+*ELASTIC
+  64000.0, 0.3
+*PLASTIC
+  94.668901423, 0.
+ 1000.0, 1.75792446326 
+** <Bilinear instance: 1 samples>
+*MATERIAL, NAME=mat_7
+*ELASTIC
+  64000.0, 0.3
+*PLASTIC
+  111.000520592, 0.
+ 1000.0, 1.72621258137 
+** <Bilinear instance: 1 samples>
+*MATERIAL, NAME=mat_8
+*ELASTIC
+  64000.0, 0.3
+*PLASTIC
+  142.937013643, 0.
+ 1000.0, 1.66419997351 
+**----------------------------------
+** STEPS
+*Step, Name=Loading0, Nlgeom=YES, Inc=1000000
+*Static
+0.01, 1, 1e-08, 0.01
+** BOUNDARY CONDITIONS
+*Boundary
+
+iSample.origin, 2,2
+iSample.origin, 1,1
+iSample.origin, 3,3,
+iSample.bottomfrontleft, 1, 1
+
+iSample.bottom, 2, 2
+iSample.bottomright, 2, 2
+iSample.bottomrear, 2,2
+iSample.bottomleft, 2,2
+iSample.bottomfront, 2,2
+iSample.refy,2,2
+iSample.bottomrearright, 2,2
+iSample.bottomfrontleft, 2,2
+iSample.PILOT,    2, 2,0.1
+** LOADS
+
+** RESTART OPTIONS 
+*Restart, write, frequency=0
+** FIELD OUTPUTS
+*Output, field, frequency=1
+*Node Output
+U
+*Element Output, directions=YES
+E, PE, EE, PEEQ, S
+** HYSTORY OUTPUTS
+*Output, history
+*Energy Output
+ALLPD, ALLSE, ALLWK
+*Node Output, nset=iSample.Top
+RF2
+*Node Output, nset=iSample.pilot
+RF2
+*Node Output, nset=iSample.Top
+CF2
+*Node Output, nset=iSample.pilot
+CF2
+*Node Output, nset=iSample.TopLeft
+U2
+*Node Output, nset=iSample.Left
+COOR1
+*Node Output, nset=iSample.Right
+COOR1
+*Element Output, elset=iSample.allElements, directions=NO
+EVOL
+*End Step
+  
