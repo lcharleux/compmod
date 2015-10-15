@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle, copy
 import platform
+from scipy import interpolate
 node = platform.node()
 
 #PAREMETERS
@@ -18,7 +19,7 @@ thickness = 15.
 Nt, Nr, Na = 80, 10, 12
 if is_3D == False :
   Ne = Nt * Nr
-  elType = "CPS4" #CPS4 for plane strain element, CPS4 for plane stress elements
+  elType = "CPE4" #CPS4 for plane strain element, CPS4 for plane stress elements
 else:
   Ne = Nt * Nr * Na
   elType = "C3D8"
@@ -29,8 +30,8 @@ E = 64000.
 nu = .3
 
 if compart == False: 
-  sy = 145.8
-  n = 0.081
+  sy = 148.0
+  n = 0.088
   material = Hollomon(labels = "SAMPLE_MAT", E = E, nu = nu, sy = sy, n = n)
 else:
   E_array = E * np.ones(Ne) # Young's modulus
@@ -234,12 +235,18 @@ if outputs['completed']:
   plt.ylabel('Force, $F\ (N)$',fontsize=16)
   plt.savefig(workdir + label + '_load-vs-disp.pdf')
   
-  file = open("force_deplacement_hollo_80_10_12.txt", "w")
+  file = open("force_deplacement_compart_CPE4_100_12.txt", "w")
   for i in xrange(len(disp.data[0])):
       file.write(str(disp.data[0][i])+"\t"+str(force.data[0][i])+"\n")
   file.close()
   
-  
+  disp_min = min(disp.data[0][-1], disp_exp[-1])
+  disp_grid = np.linspace(0., disp_min, 100)
+  g = interpolate.interp1d(disp_exp, force_exp)
+  interp_force_exp = g(disp_grid)    
+  f = interpolate.interp1d(disp.data[0], force.data[0])
+  interp_force = f(disp_grid)
+  err = np.sqrt(((interp_force - interp_force_exp)**2).sum())  
   
 else: 
   print 'Simulation not completed'
