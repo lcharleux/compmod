@@ -1,121 +1,111 @@
-from compmod.models import CuboidTest
+from abapy import materials
+from abapy.misc import load
 import matplotlib.pyplot as plt
+from matplotlib import cm
 import numpy as np
-import pickle, copy, abapy, platform
-  
-def field_func(outputs, step):
-    """
-    A function that defines the scalar field you want to plot
-    """
-    epsilon = np.array(outputs['field']['LE'][step].get_component(22).data)
-    return (epsilon - max_strain) / max_strain
-  
-def plot_mesh(ax, mesh, outputs, step, field_func =None, cbar = True, cbar_label = 'Z', cbar_orientation = 'horizontal', disp = True):
-    """
-    A function that plots the deformed mesh with a given field on it.
-    """
-    mesh2 = copy.deepcopy(mesh)
-    if disp:
-      U = outputs['field']['U'][step]
-      mesh2.nodes.apply_displacement(U)
-    X,Y,Z,tri = mesh2.dump2triplot()
-    xb,yb,zb = mesh2.get_border() 
-    xe, ye, ze = mesh2.get_edges()
-    ax.plot(xb, yb,'k-', linewidth = 2.)
-    ax.plot(xe, ye,'k-', linewidth = .5)
-    if field_func != None:
-      field = field_func(outputs, step)
-      grad = ax.tricontourf( X, Y, tri, field)
-      if cbar :
-        bar = plt.colorbar(grad, orientation = cbar_orientation)
-        bar.set_label(cbar_label)
+import pickle, copy, platform, compmod
 
 
-#PARAMETERS
-lx, ly = 1., 1.
-Nx, Ny = 10, 10 
-Ne = Nx * Ny
-disp = .1
-nFrames = 20
-workdir = "workdir/"
-label = "cuboidTest"
-elType = "CPE4" # Plane strain elements
-cpus = 1
+# GENERAL SETTINGS
+settings = {}
+settings['export_fields'] = True
+settings['compart'] = True
+settings['is_3D']   = False
+settings['lx']      = 10.
+settings['ly']      = 10. # test direction 
+settings['lz']      = 10.
+settings['Nx']      = 40
+settings['Ny']      = 20
+settings['Nz']      = 2
+settings['disp']    = 1.2
+settings['nFrames'] = 50
+settings['workdir'] = "workdir/"
+settings['label']   = "cuboidTest"
+settings['elType']  = "CPS4"
+settings['cpus']    = 1
+
+run_simulation = False # True to run it, False to just use existing results
+
+E           = 1.
+sy_mean     = .001
+nu          = 0.3
+sigma_sat   = .005
+n           = 0.05
+
+
+# ABAQUS PATH SETTINGS
 node = platform.node()
 if node ==  'lcharleux':      
-  abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
+  settings['abqlauncher']   = "/opt/Abaqus/6.9/Commands/abaqus" 
 if node ==  'serv2-ms-symme': 
-  abqlauncher   = '/opt/abaqus/Commands/abaqus' # Local machine configuration
+  settings['abqlauncher']   = "/opt/abaqus/Commands/abaqus"
 if node ==  'epua-pd47': 
-  abqlauncher   = 'C:\SIMULIA\Abaqus\6.13-1'
+  settings['abqlauncher']   = "C:/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe" 
 if node ==  'epua-pd45': 
-  abqlauncher   = 'C:\SIMULIA/Abaqus/Commands/abaqus'  
-compart = True
-run_simulation = False
+  settings['abqlauncher']   = "C:\SIMULIA/Abaqus/Commands/abaqus"
+if node ==  'SERV3-MS-SYMME': 
+  settings['abqlauncher']   = "C:/Program Files (x86)/SIMULIA/Abaqus/6.11-2/exec/abq6112.exe"
 
-if compart:
-  E  = 1. * np.ones(Ne) # Young's modulus
-  nu = .3 * np.ones(Ne) # Poisson's ratio
-  sy_mean = .01
-  sy = np.random.rayleigh(sy_mean, Ne)
-  labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy))]
-  material = [materials.VonMises(labels = labels[i], E = E[i], nu = nu[i], sy = sy[i]) for i in xrange(Ne)]
+
+# MATERIALS CREATION
+Ne = settings['Nx'] * settings['Ny'] 
+if settings['is_3D']: Ne *= settings['Nz']
+if settings['compart']:
+  E         = E         * np.ones(Ne) # Young's modulus
+  nu        = nu        * np.ones(Ne) # Poisson's ratio
+  sy_mean   = sy_mean   * np.ones(Ne)
+  sigma_sat = sigma_sat * np.ones(Ne)
+  n         = n         * np.ones(Ne)
+  sy = compmod.distributions.Rayleigh(sy_mean).rvs(Ne)
+  labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy_mean))]
+  settings['material'] = [materials.Bilinear(labels = labels[i], 
+                                 E = E[i], nu = nu[i], Ssat = sigma_sat[i], 
+                                 n=n[i], sy = sy[i]) for i in xrange(Ne)]
 else:
-  E = 1.
-  nu =.3
-  sy = .01
   labels = 'SAMPLE_MAT'
-  material = materials.VonMises(labels = labels, E = E, nu = nu, sy = sy)
+  settings['material'] = materials.Bilinear(labels = labels, 
+                                E = E, nu = nu, sy = sy_mean, Ssat = sigma_sat,
+                                n = n)
 
-m = CuboidTest(lx =lx, ly = ly, Nx = Nx, Ny = Ny, abqlauncher = abqlauncher, label = label, workdir = workdir, cpus = cpus, material = material, compart = compart, disp = disp, elType = elType)
+       
+m = compmod.models.CuboidTest(**settings)
 if run_simulation:
   m.MakeInp()
   m.Run()
-  m.PostProc()
-else:
-  m.LoadResults()
-
+  m.MakePostProc()
+  m.RunPostProc()
+m.LoadResults()
 # Plotting results
 if m.outputs['completed']:
-    disp =  np.array(m.outputs['history']['disp'].values()[0].data[0])
-    force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
-    volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
-    length = ly + disp
-    surface = volume / length
-    logstrain = np.log10(1. + disp / ly)
-    linstrain = disp/ly
-    strain = linstrain
-    stress = force / surface 
-    
-    fig = plt.figure(0)
-    plt.clf()
-    sp1 = fig.add_subplot(2, 1, 1)
-    plt.plot(disp, force, 'ok-')
-    plt.xlabel('Displacement, $U$')
-    plt.ylabel('Force, $F$')
-    plt.grid()
-    sp1 = fig.add_subplot(2, 1, 2)
-    plt.plot(strain, stress, 'ok-')
-    plt.xlabel('Tensile Strain, $\epsilon$')
-    plt.ylabel(' Tensile Stress $\sigma$')
-    plt.grid()
-    plt.savefig(workdir + label + 'history.pdf')
-    
-  # Field Outputs
-     
-          
-      
+  
 
-    mesh = m.outputs['mesh']
-    max_strain = strain.max()
-    fig = plt.figure("Fields")
-    plt.clf()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.set_aspect('equal')
-    plt.grid()
-    plot_mesh(ax, mesh, m.outputs, 0, field_func, cbar_label = r'Relative Tensile Strain, $\frac{\epsilon - \epsilon_{av}}{\epsilon_{av}}$')
-      #plot_mesh(ax, mesh, outputs, 0, field_func = None, cbar = False, disp = False)
-    plt.xlabel('$x$')
-    plt.ylabel('$y$')
-    #plt.savefig(workdir + label + '_fields.pdf')
-    plt.show()
+  # History Outputs
+  disp =  np.array(m.outputs['history']['disp'].values()[0].data[0])
+  force =  np.array(np.array(m.outputs['history']['force'].values()).sum().data[0])
+  volume = np.array(np.array(m.outputs['history']['volume'].values()).sum().data[0])
+  length = settings['ly'] + disp
+  surface = volume / length
+  logstrain = np.log10(1. + disp / settings['ly'])
+  linstrain = disp/ settings['ly']
+  strain = linstrain
+  stress = force / surface 
+   
+  fig = plt.figure(0)
+  plt.clf()
+  sp1 = fig.add_subplot(2, 1, 1)
+  plt.plot(disp, force, 'ro-')
+  plt.xlabel('Displacement, $U$')
+  plt.ylabel('Force, $F$')
+  plt.grid()
+  sp1 = fig.add_subplot(2, 1, 2)
+  plt.plot(strain, stress, 'ro-', label = 'simulation curve', linewidth = 2.)
+  plt.xlabel('Tensile Strain, $\epsilon$')
+  plt.ylabel(' Tensile Stress $\sigma$')
+  plt.grid()
+  plt.savefig(settings['workdir'] + settings['label'] + 'history.pdf')
+  
+  
+  # Field Outputs
+  if settings["export_fields"]:
+    m.mesh.dump2vtk(settings['workdir'] + settings['label'] + '.vtk')
+  
