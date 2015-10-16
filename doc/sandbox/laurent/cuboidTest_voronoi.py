@@ -40,7 +40,7 @@ else:
   
 # SIMULATION SETTINGS
 lx, ly, lz = 1., 1., 1.
-Nx, Ny, Nz = 2, 2, 2
+Nx, Ny, Nz = 5, 5, 5
 Ne = Nx * Ny * Nz
 
 loading = {"displacement"} #"loading" : force or displacement
@@ -52,7 +52,7 @@ nFrames = 30
 export_fields = True
 compart = True
 unloading_reloading = False #for one cycle of loading (F = force), unloding (F=0) and reloading (F = force_fin)
-Nseed = 2
+Nseed = 20
 sigma_0_hp = 0.001
 k_hp = .001
 
