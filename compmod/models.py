@@ -843,8 +843,8 @@ class CuboidTest_VER(Simulation):
   :type Ny: int
   :param Nz: number of elements along the z direction.
   :type Nz: int
-  :param disp: imposed displacement along the y direction (default = .25)
-  :type disp: float 
+  :param steps: steps !
+  :type steps: dict 
   :param export_fields: indicates if the field outputs are exported (default = True). Can be set to False to speed up post processing.
   :type export: boolean
   :param lateral_bc: indicates the type of lateral boundary conditions to be used.
@@ -971,15 +971,16 @@ class CuboidTest_VER(Simulation):
 #MATERIALS
 **----------------------------------
 ** STEPS
-*Step, Name=Loading0, Nlgeom=YES, Inc=1000000
+"""
+    step_pattern = """*Step, Name=#NAME, Nlgeom=YES, Inc=1000000
 *Static
 #FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
 ** BOUNDARY CONDITIONS
-*Boundary
+*Boundary, op = NEW
 #2D_INIT#2DBOUNDARY#3D_INIT#3DBOUNDARY
-#DISP_INIT#DISP
-** LOADS
-#LOAD_INIT#LOAD
+#DISP** LOADS
+*Cload
+ISAMPLE.PILOT, 2, #LOAD
 ** RESTART OPTIONS 
 *Restart, write, frequency=0
 ** FIELD OUTPUTS
@@ -992,111 +993,20 @@ E, PE, EE, PEEQ, S
 *Output, history
 *Energy Output
 ALLPD, ALLSE, ALLWK
-*Node Output, nset=iSample.Top
-RF2
 *Node Output, nset=iSample.pilot
 RF2
-*Node Output, nset=iSample.Top
-CF2
 *Node Output, nset=iSample.pilot
 CF2
-*Node Output, nset=iSample.TopLeft
+*Node Output, nset=iSample.pilot
 U2
-*Node Output, nset=iSample.Left
-COOR1
-*Node Output, nset=iSample.Right
-COOR1
 *Element Output, elset=iSample.allElements, directions=NO
 EVOL
 *End Step
-  """
-    if self.unloading_reloading and "force" in self.loading:
-      pattern += '''** STEPS
-*Step, Name=unloading, Nlgeom=YES, Inc=1000000
-*Static
-#FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
-** BOUNDARY CONDITIONS
-*Boundary
-#2D_INIT#2DBOUNDARY#3D_INIT#3DBOUNDARY
-** LOADS
-#LOAD_INIT#LOAD0
-** RESTART OPTIONS 
-*Restart, write, frequency=0
-** FIELD OUTPUTS
-*Output, field, frequency=1
-*Node Output
-U
-*Element Output, directions=YES
-E, PE, EE, PEEQ, S
-** HYSTORY OUTPUTS
-*Output, history
-*Energy Output
-ALLPD, ALLSE, ALLWK
-*Node Output, nset=iSample.Top
-RF2
-*Node Output, nset=iSample.pilot
-RF2
-*Node Output, nset=iSample.Top
-CF2
-*Node Output, nset=iSample.pilot
-CF2
-*Node Output, nset=iSample.TopLeft
-U2
-*Node Output, nset=iSample.Left
-COOR1
-*Node Output, nset=iSample.Right
-COOR1
-*Element Output, elset=iSample.allElements, directions=NO
-EVOL
-*End Step
-
-** STEPS
-*Step, Name=reloading, Nlgeom=YES, Inc=1000000
-*Static
-#FRAME_DURATION, 1, 1e-08, #FRAME_DURATION
-** BOUNDARY CONDITIONS
-*Boundary
-#2D_INIT#2DBOUNDARY#3D_INIT#3DBOUNDARY
-** LOADS
-#LOAD_INIT#LOAD1
-** RESTART OPTIONS 
-*Restart, write, frequency=0
-** FIELD OUTPUTS
-*Output, field, frequency=1
-*Node Output
-U
-*Element Output, directions=YES
-E, PE, EE, PEEQ, S
-** HYSTORY OUTPUTS
-*Output, history
-*Energy Output
-ALLPD, ALLSE, ALLWK
-*Node Output, nset=iSample.Top
-RF2
-*Node Output, nset=iSample.pilot
-RF2
-*Node Output, nset=iSample.Top
-CF2
-*Node Output, nset=iSample.pilot
-CF2
-*Node Output, nset=iSample.TopLeft
-U2
-*Node Output, nset=iSample.Left
-COOR1
-*Node Output, nset=iSample.Right
-COOR1
-*Element Output, elset=iSample.allElements, directions=NO
-EVOL
-*End Step
-  '''
+"""
     Nx , Ny, Nz = self.Nx, self.Ny, self.Nz
     lx, ly, lz = self.lx, self.ly, self.lz
     elType = self.elType
     material = self.material
-    disp = self.disp
-    force = self.force
-    force_fin = self.force_fin #for a cyclic test, force_fin is the force that ended the test
-    nFrames = self.nFrames
     if self.is_3D:
       Ne = Nx * Ny * Nz
     else:
@@ -1290,62 +1200,56 @@ EVOL
             lateralbc += Equation(1, [m.nodes.sets['bottomfrontleft'][0], m.nodes.sets['origin'][0], m.nodes.sets['pilot'][0], m.nodes.sets['refx'][0]],[1.,-1., -1., 1.])
               
             
-   
-    loading = self.loading
-    pattern = pattern.replace("#LATERALBC", lateralbc[:-1])  
+    # STEPS:
+    steps_inp = ""
+    for step in self.steps:
+      steps_inp += step_pattern
+      steps_inp = steps_inp.replace("#NAME", step["name"])
+      pattern = pattern.replace("#LATERALBC", lateralbc[:-1]) 
+      if step["control"] == "displacement":  #the pilot node is piloted with a displacement condition  
+        steps_inp = steps_inp.replace("#DISP", "iSample.PILOT, 2, 2, {0}\n".format(step["value"]) )
+        steps_inp = steps_inp.replace("#LOAD", "0.")
+      if step["control"] == "force": #the pilot node is piloted with a force condition and the test is not a cyclic test
+        steps_inp = steps_inp.replace("#LOAD", "{0}".format(step["value"]))
+        steps_inp = steps_inp.replace("#DISP", "")
+      steps_inp = steps_inp.replace("#FRAME_DURATION", "{0}".format(1. / step["frames"]))
+      
+      if self.is_3D:
+        steps_inp = steps_inp.replace("#2D_INIT", "")
+        steps_inp = steps_inp.replace("#2DBOUNDARY", "")
+        steps_inp = steps_inp.replace("#3D_INIT", "iSample.origin, 2,2\niSample.origin, 1,1\niSample.origin, 3,3,\niSample.bottomfrontleft, 1, 1")
+        if len(self.lateralbc.keys()) != 0: 
+          lateralbc_keys = self.lateralbc.keys()
+          for lbck in lateralbc_keys:
+            if self.lateralbc[lbck] == 'pseudohomo':
+              if lbck == "top":          
+                steps_inp = steps_inp.replace("#3DBOUNDARY", "\niSample.bottom, 2, 2\niSample.bottomright, 2, 2\niSample.bottomrear, 2,2\niSample.bottomleft, 2,2\niSample.bottomfront, 2,2\niSample.refy,2,2\niSample.bottomrearright, 2,2\niSample.bottomfrontleft, 2,2")
+              if lbck == "right":
+                steps_inp = steps_inp.replace("#3DBOUNDARY", "\niSample.left, 1, 1\niSample.bottomleft, 1, 1\niSample.topleft, 1,1\niSample.frontleft, 1,1\niSample.rearleft, 1,1\niSample.refz, 1,1\niSample.toprearleft, 1,1")
+              if lbck == "front":
+                steps_inp = steps_inp.replace("#3DBOUNDARY", "\niSample.rear, 3, 3\niSample.rearleft, 3, 3\niSample.rearright, 3,3\niSample.toprear, 3,3\niSample.bottomrear, 3,3\niSample.bottomrearright, 3,3\niSample.refx, 3,3\niSample.toprearleft, 3,3")
+            if self.lateralbc[lbck] == 'periodic':
+              if lbck == 'top':
+                steps_inp = steps_inp.replace("#3DBOUNDARY", "")
+                
+         
+      if self.is_3D == False:
+        steps_inp = steps_inp.replace("#3D_INIT", "")
+        steps_inp = steps_inp.replace("#3DBOUNDARY", "")
+        steps_inp = steps_inp.replace("#2D_INIT", "\niSample.origin, 2,2\niSample.origin, 1,1")
+        for lbck in lateralbc_keys:
+          if self.lateralbc[lbck] == 'pseudohomo':
+            if lbck == "bottom":
+              steps_inp = steps_inp.replace("#2DBOUNDARY", "iSample.Bottom, 2, 2\niSample.BottomRight, 2, 2")     
+            if lbck == "left":
+              steps_inp = steps_inp.replace("#2DBOUNDARY", "iSample.left, 1, 1\niSample.topleft, 1, 1") 
+    # MAIN FILE:
+    pattern += steps_inp
     pattern = pattern.replace("#MESH", m.dump2inp())
     pattern = pattern.replace("#SECTIONS", sections[:-1])
     pattern = pattern.replace("#MATERIALS", matinp[:-1])
     
-    if "displacement" in loading:  #the pilot node is piloted with a displacement condition  
-      pattern = pattern.replace("#DISP_INIT", "iSample.PILOT,    2, 2," )
-      pattern = pattern.replace("#DISP", str(disp))
-      pattern = pattern.replace("#LOAD_INIT", "")
-      pattern = pattern.replace("#LOAD", "")
-    if "force" in loading and self.unloading_reloading == False: #the pilot node is piloted with a force condition and the test is not a cyclic test
-      pattern = pattern.replace("#LOAD_INIT", "*Cload\nISAMPLE.PILOT, 2,")
-      pattern = pattern.replace("#LOAD", str(force))
-      pattern = pattern.replace("#DISP_INIT", "")
-      pattern = pattern.replace("#DISP", "")
-    if "force" in loading and self.unloading_reloading:#the pilot node is piloted with a force condition and the test is a cyclic test
-      pattern = pattern.replace("#LOAD_INIT", "** Name: CFORCE-1   Type: Concentrated force\n*Cload\nISAMPLE.PILOT, 2,")    
-      pattern = pattern.replace("#LOAD0", str(0.))
-      pattern = pattern.replace("#LOAD1", str(force_fin))
-      pattern = pattern.replace("#LOAD", str(force))
-      pattern = pattern.replace("#DISP_INIT", "")
-      pattern = pattern.replace("#DISP", "")
-      
-    pattern = pattern.replace("#FRAME_DURATION", str(1./nFrames))
     
-    if self.is_3D:
-      pattern = pattern.replace("#2D_INIT", "")
-      pattern = pattern.replace("#2DBOUNDARY", "")
-      pattern = pattern.replace("#3D_INIT", "\niSample.origin, 2,2\niSample.origin, 1,1\niSample.origin, 3,3,\niSample.bottomfrontleft, 1, 1\n")
-      if len(self.lateralbc.keys()) != 0: 
-        lateralbc_keys = self.lateralbc.keys()
-        for lbck in lateralbc_keys:
-          if self.lateralbc[lbck] == 'pseudohomo':
-            if lbck == "top":          
-              pattern = pattern.replace("#3DBOUNDARY", "\niSample.bottom, 2, 2\niSample.bottomright, 2, 2\niSample.bottomrear, 2,2\niSample.bottomleft, 2,2\niSample.bottomfront, 2,2\niSample.refy,2,2\niSample.bottomrearright, 2,2\niSample.bottomfrontleft, 2,2")
-            if lbck == "right":
-              pattern = pattern.replace("#3DBOUNDARY", "\niSample.left, 1, 1\niSample.bottomleft, 1, 1\niSample.topleft, 1,1\niSample.frontleft, 1,1\niSample.rearleft, 1,1\niSample.refz, 1,1\niSample.toprearleft, 1,1")
-            if lbck == "front":
-              pattern = pattern.replace("#3DBOUNDARY", "\niSample.rear, 3, 3\niSample.rearleft, 3, 3\niSample.rearright, 3,3\niSample.toprear, 3,3\niSample.bottomrear, 3,3\niSample.bottomrearright, 3,3\niSample.refx, 3,3\niSample.toprearleft, 3,3")
-          if self.lateralbc[lbck] == 'periodic':
-            if lbck == 'top':
-              pattern = pattern.replace("#3DBOUNDARY", "")
-              
-       
-    if self.is_3D == False:
-      pattern = pattern.replace("#3D_INIT", "")
-      pattern = pattern.replace("#3DBOUNDARY", "")
-      pattern = pattern.replace("#2D_INIT", "\niSample.origin, 2,2\niSample.origin, 1,1")
-      for lbck in lateralbc_keys:
-        if self.lateralbc[lbck] == 'pseudohomo':
-          if lbck == "bottom":
-            pattern = pattern.replace("#2DBOUNDARY", "iSample.Bottom, 2, 2\niSample.BottomRight, 2, 2")     
-          if lbck == "left":
-            pattern = pattern.replace("#2DBOUNDARY", "iSample.left, 1, 1\niSample.topleft, 1, 1")
 
     f = open(self.workdir + self.label + '.inp', 'wb')
     f.write(pattern)
@@ -1464,9 +1368,9 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
     pattern += """# History Outputs
   data['history'] = {} 
   ho = data['history']
-  ho['disp'] =   gho(odb,'U2')
-  ho['force'] =   gho(odb,'RF2')
-  ho['load'] =   gho(odb,'CF2')
+  ho['U'] =   gho(odb,'U2')
+  ho['RF'] =   gho(odb,'RF2')
+  ho['CF'] =   gho(odb,'CF2')
   ho['allse'] =   gho(odb,'ALLSE').values()[0]
   ho['allpd'] =   gho(odb,'ALLPD').values()[0]
   ho['allwk'] =   gho(odb,'ALLWK').values()[0]
