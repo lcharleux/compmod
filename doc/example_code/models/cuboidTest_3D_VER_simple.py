@@ -35,15 +35,25 @@ Ne = Nx * Ny * Nz
 is_3D = True
 steps =  []
 steps.append({
-  "name": "LOADING", 
+  "name": "LOADING0", 
   "control": "displacement",
   "frames": 100,
   "value": 0.04})
 steps.append({
-  "name": "UNLOADING", 
+  "name": "UNLOADING0", 
   "control": "force",
   "frames": 100,
   "value": 0.})
+steps.append({
+  "name": "LOADING1", 
+  "control": "displacement",
+  "frames": 100,
+  "value": 0.041})
+steps.append({
+  "name": "UNLOADING1", 
+  "control": "force",
+  "frames": 100,
+  "value": 0.})  
 
 export_fields = False
 compart = True
