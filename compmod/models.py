@@ -1464,9 +1464,9 @@ if job_status == JOB_STATUS_COMPLETED_SUCCESSFULLY:
     pattern += """# History Outputs
   data['history'] = {} 
   ho = data['history']
-  ho['disp'] =   gho(odb,'U2')
-  ho['force'] =   gho(odb,'RF2')
-  ho['load'] =   gho(odb,'CF2')
+  ho['U'] =   gho(odb,'U2')
+  ho['RF'] =   gho(odb,'RF2')
+  ho['CF'] =   gho(odb,'CF2')
   ho['allse'] =   gho(odb,'ALLSE').values()[0]
   ho['allpd'] =   gho(odb,'ALLPD').values()[0]
   ho['allwk'] =   gho(odb,'ALLWK').values()[0]
