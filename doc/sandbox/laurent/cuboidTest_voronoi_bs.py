@@ -7,13 +7,13 @@ from scipy import interpolate
 
   
 # SIMULATION SETTINGS
-lx, ly, lz = 1., 1., 1.
-Nx, Ny, Nz = 5, 5, 5
+lx, ly, lz = 0.1, 0.3, 0.2
+Nx, Ny, Nz = 10, 30, 20
 Ne = Nx * Ny * Nz
 
 
-Nseed = 200
-
+Nseed = 100
+label = 'inp_grain'
 
 
  
@@ -58,7 +58,9 @@ for i in xrange(1, len(inp)):
   inp2 += inp[i][6:]
   
 print inp2  
-  
+f = open(label + '.inp', 'wb')
+f.write(inp2)
+f.close()  
 
 
 

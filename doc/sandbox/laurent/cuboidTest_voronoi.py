@@ -39,8 +39,8 @@ else:
   cpus = 1
   
 # SIMULATION SETTINGS
-lx, ly, lz = 1., 1., 1.
-Nx, Ny, Nz = 5, 5, 5
+lx, ly, lz = 0.1, 0.3, 0.2
+Nx, Ny, Nz = 10, 30, 20
 Ne = Nx * Ny * Nz
 
 loading = {"displacement"} #"loading" : force or displacement
@@ -52,7 +52,7 @@ nFrames = 30
 export_fields = True
 compart = True
 unloading_reloading = False #for one cycle of loading (F = force), unloding (F=0) and reloading (F = force_fin)
-Nseed = 20
+Nseed = 10
 sigma_0_hp = 0.001
 k_hp = .001
 
@@ -111,7 +111,7 @@ grain_sets = []
 for i in xrange(len(seed_flags)):
   flag = seed_flags[i]
   grain_sets.append(elabels[np.where(elem_flags == flag)[0]])
-  mesh.add_set(label = "Kikinou{0}".format(i), elements = elabels[np.where(elem_flags == flag)[0]])
+  mesh.add_set(label = "G{0}".format(i), elements = elabels[np.where(elem_flags == flag)[0]])
   
 
 
