@@ -3,6 +3,7 @@ from abapy.misc import load
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy as np
+import pandas as pd
 import pickle, copy, platform, compmod, os
 
 
@@ -51,23 +52,15 @@ def Tensile_Test(settings):
     linstrain = disp/ settings['ly']
     strain = linstrain
     stress = force / surface 
-     
-    fig = plt.figure(0)
-    plt.clf()
-    sp1 = fig.add_subplot(2, 1, 1)
-    plt.plot(disp, force, 'ro-')
-    plt.xlabel('Displacement, $U$')
-    plt.ylabel('Force, $F$')
-    plt.grid()
-    sp1 = fig.add_subplot(2, 1, 2)
-    plt.plot(strain, stress, 'ro-', label = 'simulation curve', linewidth = 2.)
-    plt.xlabel('Tensile Strain, $\epsilon$')
-    plt.ylabel(' Tensile Stress $\sigma$')
-    plt.grid()
-    plt.savefig(settings['workdir'] + settings['label'] + 'history.pdf')
+    output = {}
+    output["force"] = force 
+    output["disp"]  = disp 
+    output["stress"] = stress
+    output["strain"] = strain
+    df = pd.DataFrame(output)
+    df.to_csv("{0}{1}.csv".format(settings["workdir"], settings["label"]))
+    df.to_excel("{0}{1}.xls".format(settings["workdir"], settings["label"]))
     
     
-    # Field Outputs
-    if settings["export_fields"]:
-      m.mesh.dump2vtk(settings['workdir'] + settings['label'] + '.vtk')
+   
   

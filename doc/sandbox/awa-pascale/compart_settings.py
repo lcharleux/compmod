@@ -3,7 +3,6 @@ import platform
 
 # GENERAL SETTINGS
 settings = {}
-settings['export_fields'] = True
 settings['compart'] = True
 settings['is_3D']   = True
 settings['lx']      = 5.
