@@ -10,7 +10,7 @@ import pickle, copy, platform, compmod, os
 
 
 def Tensile_Test(settings):
-
+  settings = settings.copy()
   # MATERIALS CREATION
   Ne = settings['Nx'] * settings['Ny'] 
   if settings['is_3D']: Ne *= settings['Nz']
@@ -77,7 +77,8 @@ def Tensile_Test(settings):
     df = pd.DataFrame(output)
     df.to_csv("{0}{1}.csv".format(settings["workdir"], settings["label"]), index = False)
     df.to_excel("{0}{1}.xls".format(settings["workdir"], settings["label"]), index = False)
-    
+    inputs = pd.DataFrame(settings, index = [0])
+    inputs.to_csv("{0}{1}_inputs.csv".format(settings["workdir"], settings["label"]))
     
    
   
