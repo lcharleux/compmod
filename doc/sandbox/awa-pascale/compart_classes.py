@@ -22,15 +22,29 @@ def Tensile_Test(settings):
     n         = settings["n"]         * np.ones(Ne)
     sy = compmod.distributions.Rayleigh(settings["sy_mean"]).rvs(Ne)
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy_mean))]
-    settings['material'] = [materials.Bilinear(labels = labels[i], 
-                                   E = E[i], nu = nu[i], Ssat = sigma_sat[i], 
-                                   n=n[i], sy = sy[i]) for i in xrange(Ne)]
+    if settings['material_type']  == "Bilinear":
+      settings['material'] = [materials.Bilinear(labels = labels[i], 
+                                     E = E[i], nu = nu[i], Ssat = sigma_sat[i], 
+                                     n=n[i], sy = sy[i]) for i in xrange(Ne)]
+    if settings['material_type']  == "Hollomon":
+      settings['material'] = [materials.Hollomon(labels = labels[i], 
+                                     E = E[i], nu = nu[i], n=n[i], 
+                                     sy = sy[i]) for i in xrange(Ne)]
   else:
     labels = 'SAMPLE_MAT'
-    settings['material'] = materials.Bilinear(labels = labels, 
-                                  E = E, nu = nu, sy = sy_mean, Ssat = sigma_sat,
-                                  n = n)
-
+    if settings['material_type']  == "Bilinear":
+      settings['material'] = materials.Bilinear(labels = labels, 
+                                    E = settings["E"], 
+                                    nu = settings["nu"], 
+                                    sy = settings["sy_mean"], 
+                                    Ssat = settings["sigma_sat"],
+                                    n = settings["n"])
+    if settings['material_type']  == "Hollomon":
+      settings['material'] = materials.Hollomon(labels = labels, 
+                                     E = settings["E"], 
+                                    nu = settings["nu"], 
+                                    sy = settings["sy_mean"], 
+                                    n = settings["n"])
          
   m = compmod.models.CuboidTest(**settings)
   m.MakeInp()
@@ -57,9 +71,11 @@ def Tensile_Test(settings):
     output["disp"]  = disp 
     output["stress"] = stress
     output["strain"] = strain
+    output["volume"] = volume
+    output["length"] = length
     df = pd.DataFrame(output)
-    df.to_csv("{0}{1}.csv".format(settings["workdir"], settings["label"]))
-    df.to_excel("{0}{1}.xls".format(settings["workdir"], settings["label"]))
+    df.to_csv("{0}{1}.csv".format(settings["workdir"], settings["label"]), index = False)
+    df.to_excel("{0}{1}.xls".format(settings["workdir"], settings["label"]), index = False)
     
     
    
