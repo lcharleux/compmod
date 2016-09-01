@@ -1,0 +1,393 @@
+1
+
+   Abaqus 6.13-1                                  Date 01-sept.-2016   Time 10:13:52
+   For use at  under license from Dassault Systemes or its subsidiary.
+
+
+
+                         The Abaqus Software is a product of:
+
+                           Dassault Systemes Simulia Corp.
+                                 Rising Sun Mills
+                                 166 Valley Street
+                           Providence, RI 02909-2499, USA
+ 
+
+
+                   Available for internal use at . 
+                   The Abaqus Online Support System is accessible
+                   through the "My Support" section of the SIMULIA
+                   Home Page at http://www.simulia.com.
+
+                   Support policies for academic licenses are described
+                   on the SIMULIA web site at
+                   http://www.3ds.com/products/simulia/academics/
+ 
+                          On machine lcharleux-HP 
+                          you are authorized to run
+                          Abaqus/Standard until 25-Feb-2017
+
+                          Your site id is: 200000000053092 
+
+
+ 
+                    For assistance or any other information you may
+                    obtain contact information for your local office
+                    from the world wide web at:
+
+                      http://www.3ds.com/products/simulia/locations/
+
+ 
+                * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                *                                                         * 
+                *                   *****************                     * 
+                *                   *  N O T I C E  *                     * 
+                *                   *****************                     * 
+                *                                                         * 
+                *                                                         * 
+                *                    Abaqus 6.13-1                        * 
+                *                                                         * 
+                *          BUILD ID: 2013_05_16-01.56.28 126354           * 
+                *                                                         * 
+                *                                                         * 
+                *  Please make sure you are using release 6.13 manuals    * 
+                *  plus the notes accompanying this release.              * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *   This program may not be used for commercial purposes  * 
+                *           without payment of a commercial fee.          * 
+                *                                                         * 
+                * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
+
+ 
+
+
+
+     PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   *******************************************************
+
+
+     END PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   ***********************************************************
+
+
+
+
+     OPTIONS BEING PROCESSED
+   ***************************
+
+
+  *Node
+  *Element, type=C3D8
+  *Nset, nset=ASSEMBLY_ISAMPLE_ALLNODES
+  *Nset, nset=ASSEMBLY_ISAMPLE_BOTTOM
+  *Nset, nset=ASSEMBLY_ISAMPLE_BOTTOMLEFT
+  *Nset, nset=ASSEMBLY_ISAMPLE_BOTTOMRIGHT
+  *Nset, nset=ASSEMBLY_ISAMPLE_LEFT
+  *Nset, nset=ASSEMBLY_ISAMPLE_RIGHT
+  *Nset, nset=ASSEMBLY_ISAMPLE_TOP
+  *Nset, nset=ASSEMBLY_ISAMPLE_TOPLEFT
+  *Nset, nset=ASSEMBLY_ISAMPLE_TOPRIGHT
+  *Elset, elset=ASSEMBLY_ISAMPLE_ALLELEMENTS
+  *Elset, elset=ASSEMBLY_ISAMPLE_C3D8_ELEMENTS
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET1
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET10
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET11
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET12
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET13
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET14
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET15
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET16
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET17
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET18
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET19
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET2
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET20
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET21
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET22
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET23
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET24
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET25
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET26
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET27
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET3
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET4
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET5
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET6
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET7
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET8
+  *Elset, elset=ASSEMBLY_ISAMPLE_ELSET9
+  *material, name=MAT_1
+  *elastic
+  *plastic
+  *material, name=MAT_2
+  *elastic
+  *plastic
+  *material, name=MAT_3
+  *elastic
+  *plastic
+  *material, name=MAT_4
+  *elastic
+  *plastic
+  *material, name=MAT_5
+  *elastic
+  *plastic
+  *material, name=MAT_6
+  *elastic
+  *plastic
+  *material, name=MAT_7
+  *elastic
+  *plastic
+  *material, name=MAT_8
+  *elastic
+  *plastic
+  *material, name=MAT_9
+  *elastic
+  *plastic
+  *material, name=MAT_10
+  *elastic
+  *plastic
+  *material, name=MAT_11
+  *elastic
+  *plastic
+  *material, name=MAT_12
+  *elastic
+  *plastic
+  *material, name=MAT_13
+  *elastic
+  *plastic
+  *material, name=MAT_14
+  *elastic
+  *plastic
+  *material, name=MAT_15
+  *elastic
+  *plastic
+  *material, name=MAT_16
+  *elastic
+  *plastic
+  *material, name=MAT_17
+  *elastic
+  *plastic
+  *material, name=MAT_18
+  *elastic
+  *plastic
+  *material, name=MAT_19
+  *elastic
+  *plastic
+  *material, name=MAT_20
+  *elastic
+  *plastic
+  *material, name=MAT_21
+  *elastic
+  *plastic
+  *material, name=MAT_22
+  *elastic
+  *plastic
+  *material, name=MAT_23
+  *elastic
+  *plastic
+  *material, name=MAT_24
+  *elastic
+  *plastic
+  *material, name=MAT_25
+  *elastic
+  *plastic
+  *material, name=MAT_26
+  *elastic
+  *plastic
+  *material, name=MAT_27
+  *elastic
+  *plastic
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET1, material=MAT_1
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET2, material=MAT_2
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET3, material=MAT_3
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET4, material=MAT_4
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET5, material=MAT_5
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET6, material=MAT_6
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET7, material=MAT_7
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET8, material=MAT_8
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET9, material=MAT_9
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET10, material=MAT_10
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET11, material=MAT_11
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET12, material=MAT_12
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET13, material=MAT_13
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET14, material=MAT_14
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET15, material=MAT_15
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET16, material=MAT_16
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET17, material=MAT_17
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET18, material=MAT_18
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET19, material=MAT_19
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET20, material=MAT_20
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET21, material=MAT_21
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET22, material=MAT_22
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET23, material=MAT_23
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET24, material=MAT_24
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET25, material=MAT_25
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET26, material=MAT_26
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET27, material=MAT_27
+  *boundary
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET1, material=MAT_1
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET2, material=MAT_2
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET3, material=MAT_3
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET4, material=MAT_4
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET5, material=MAT_5
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET6, material=MAT_6
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET7, material=MAT_7
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET8, material=MAT_8
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET9, material=MAT_9
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET10, material=MAT_10
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET11, material=MAT_11
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET12, material=MAT_12
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET13, material=MAT_13
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET14, material=MAT_14
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET15, material=MAT_15
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET16, material=MAT_16
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET17, material=MAT_17
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET18, material=MAT_18
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET19, material=MAT_19
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET20, material=MAT_20
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET21, material=MAT_21
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET22, material=MAT_22
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET23, material=MAT_23
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET24, material=MAT_24
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET25, material=MAT_25
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET26, material=MAT_26
+  *solidsection, elset=ASSEMBLY_ISAMPLE_ELSET27, material=MAT_27
+  *output, field, frequency=999999
+  *output, history
+  *elementoutput, directions=YES
+  *elementoutput, elset=ASSEMBLY_ISAMPLE_ALLELEMENTS, directions=NO
+  *output, field, frequency=999999
+  *output, history
+  *elementoutput, directions=YES
+  *elementoutput, elset=ASSEMBLY_ISAMPLE_ALLELEMENTS, directions=NO
+  *output, field, frequency=999999
+  *output, history
+  *elementoutput, directions=YES
+  *elementoutput, elset=ASSEMBLY_ISAMPLE_ALLELEMENTS, directions=NO
+  *Step, name=Loading0, nlgeom=YES, inc=1000000
+  *output, field, frequency=999999
+  *output, history
+  *Step, name=Loading0, nlgeom=YES, inc=1000000
+  *Step, name=Loading0, nlgeom=YES, inc=1000000
+  *static
+  *boundary
+  *output, field, frequency=999999
+  *nodeoutput
+  *elementoutput, directions=YES
+  *output, history
+  *energyoutput
+  *nodeoutput, nset=ASSEMBLY_ISAMPLE_TOP
+  *nodeoutput, nset=ASSEMBLY_ISAMPLE_TOPLEFT
+  *nodeoutput, nset=ASSEMBLY_ISAMPLE_LEFT
+  *nodeoutput, nset=ASSEMBLY_ISAMPLE_RIGHT
+  *elementoutput, elset=ASSEMBLY_ISAMPLE_ALLELEMENTS, directions=NO
+  *endstep
+  *Step, name=Loading0, nlgeom=YES, inc=1000000
+  *static
+  *boundary
+  *endstep
+
+
+
+                            P R O B L E M   S I Z E
+
+
+          NUMBER OF ELEMENTS IS                                    27
+          NUMBER OF NODES IS                                       64
+          NUMBER OF NODES DEFINED BY THE USER                      64
+          TOTAL NUMBER OF VARIABLES IN THE MODEL                  192
+          (DEGREES OF FREEDOM PLUS MAX NO. OF ANY LAGRANGE MULTIPLIER
+           VARIABLES. INCLUDE *PRINT,SOLVE=YES TO GET THE ACTUAL NUMBER.)
+
+
+
+                              END OF USER INPUT PROCESSING
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =  0.19000    
+       SYSTEM TIME (SEC)    =  5.00000E-02
+       TOTAL CPU TIME (SEC) =  0.24000    
+       WALLCLOCK TIME (SEC) =          1
+1
+
+   Abaqus 6.13-1                                  Date 01-sept.-2016   Time 10:14:05
+   For use at  under license from Dassault Systemes or its subsidiary.
+
+                                                                                               STEP    1  INCREMENT    1
+                                                                                          TIME COMPLETED IN THIS STEP   0.00    
+
+
+                        S T E P       1     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                2.000E-02
+          AND A TOTAL TIME PERIOD OF                            1.00    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-08
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                2.000E-02
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+          LARGE DISPLACEMENT THEORY WILL BE USED
+  
+                   M E M O R Y   E S T I M A T E
+  
+ PROCESS      FLOATING PT       MINIMUM MEMORY        MEMORY TO
+              OPERATIONS           REQUIRED          MINIMIZE I/O
+             PER ITERATION         (MBYTES)           (MBYTES)
+  
+     1          4.86E+05               17                 24
+  
+ NOTE:
+      (1) SINCE ABAQUS DOES NOT PRE-ALLOCATE MEMORY AND ONLY ALLOCATES MEMORY AS NEEDED DURING THE ANALYSIS,
+          THE MEMORY REQUIREMENT PRINTED HERE CAN ONLY BE VIEWED AS A GENERAL GUIDELINE BASED ON THE BEST
+          KNOWLEDGE AVAILABLE AT THE BEGINNING OF A STEP BEFORE THE SOLUTION PROCESS HAS BEGUN.
+      (2) THE ESTIMATE IS NORMALLY UPDATED AT THE BEGINNING OF EVERY STEP. IT IS THE MAXIMUM VALUE OF THE
+          ESTIMATE FROM THE CURRENT STEP TO THE LAST STEP OF THE ANALYSIS, WITH UNSYMMETRIC SOLUTION TAKEN
+          INTO ACCOUNT IF APPLICABLE. 
+      (3) SINCE THE ESTIMATE IS BASED ON THE ACTIVE DEGREES OF FREEDOM IN THE FIRST ITERATION OF THE 
+          CURRENT STEP, THE MEMORY ESTIMATE MIGHT BE SIGNIFICANTLY DIFFERENT THAN ACTUAL USAGE FOR 
+          PROBLEMS WITH SUBSTANTIAL CHANGES IN ACTIVE DEGREES OF FREEDOM BETWEEN STEPS (OR EVEN WITHIN
+          THE SAME STEP). EXAMPLES ARE: PROBLEMS WITH SIGNIFICANT CONTACT CHANGES, PROBLEMS WITH MODEL
+          CHANGE, PROBLEMS WITH BOTH STATIC STEP AND STEADY STATE DYNAMIC PROCEDURES WHERE ACOUSTIC 
+          ELEMENTS WILL ONLY BE ACTIVATED IN THE STEADY STATE DYNAMIC STEPS.
+      (4) FOR MULTI-PROCESS EXECUTION, THE ESTIMATED VALUE OF FLOATING POINT OPERATIONS FOR EACH PROCESS
+          IS BASED ON AN INITIAL SCHEDULING OF OPERATIONS AND MIGHT NOT REFLECT THE ACTUAL FLOATING 
+          POINT OPERATIONS COMPLETED ON EACH PROCESS. OPERATIONS ARE DYNAMICALLY BALANCED DURING EXECUTION, 
+          SO THE ACTUAL BALANCE OF OPERATIONS BETWEEN PROCESSES IS EXPECTED TO BE BETTER THAN THE ESTIMATE
+          PRINTED HERE.
+      (5) THE UPPER LIMIT OF MEMORY THAT CAN BE ALLOCATED BY ABAQUS WILL IN GENERAL DEPEND ON THE VALUE OF
+          THE "MEMORY" PARAMETER AND THE AMOUNT OF PHYSICAL MEMORY AVAILABLE ON THE MACHINE. PLEASE SEE
+          THE "ABAQUS ANALYSIS USER'S MANUAL" FOR MORE DETAILS. THE ACTUAL USAGE OF MEMORY AND OF DISK
+          SPACE FOR SCRATCH DATA WILL DEPEND ON THIS UPPER LIMIT AS WELL AS THE MEMORY REQUIRED TO MINIMIZE
+          I/O. IF THE MEMORY UPPER LIMIT IS GREATER THAN THE MEMORY REQUIRED TO MINIMIZE I/O, THEN THE ACTUAL
+          MEMORY USAGE WILL BE CLOSE TO THE ESTIMATED "MEMORY TO MINIMIZE I/O" VALUE, AND THE SCRATCH DISK
+          USAGE WILL BE CLOSE-TO-ZERO; OTHERWISE, THE ACTUAL MEMORY USED WILL BE CLOSE TO THE PREVIOUSLY
+          MENTIONED MEMORY LIMIT, AND THE SCRATCH DISK USAGE WILL BE ROUGHLY PROPORTIONAL TO THE DIFFERENCE
+          BETWEEN THE ESTIMATED "MEMORY TO MINIMIZE I/O" AND THE MEMORY UPPER LIMIT. HOWEVER ACCURATE
+          ESTIMATE OF THE SCRATCH DISK SPACE IS NOT POSSIBLE.
+      (6) USING "*RESTART, WRITE" CAN GENERATE A LARGE AMOUNT OF DATA WRITTEN IN THE WORK DIRECTORY.
+
+
+          THE ANALYSIS HAS BEEN COMPLETED
+
+
+
+                              ANALYSIS COMPLETE
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =   1.1300    
+       SYSTEM TIME (SEC)    =  0.12000    
+       TOTAL CPU TIME (SEC) =   1.2500    
+       WALLCLOCK TIME (SEC) =          1
