@@ -3,15 +3,17 @@ import platform
 
 # GENERAL SETTINGS
 settings = {}
-settings['compart']   = False
-settings['is_3D']     = True
+settings['compart']   = True # True: compartimented, False: homogeneous
+settings['is_3D']     = True  # leave True....
 # MATERIAL
-settings["material_type"]  = 'Hollomon'
-settings["E"]         = 210.e9 #Pa
-settings["sy_mean"]   = 400.e6 #Pa
-settings["nu"]        = 0.3    
-settings["sigma_sat"] = 600.e6 #Pa 
-settings["n"]         = 0.1
+settings["material_type"]  = "Hollomon" # "Bilinear" or "Hollomon"
+settings["E"]         = 210.e9 # [Pa]
+settings["sy_mean"]   = 400.e6 # [Pa] (only for bilinear)
+settings["nu"]        = 0.3    # Poisson's ratio
+settings["sigma_sat"] = 600.e6 # [Pa] 
+settings["n_hol"]     = 0.1     # Hollomon hardening
+settings["n_bil"]     = 1.e9    # [Pa] Bilinear hardening
+
 # SAMPLE DIMENSIONS
 settings['lx']        = 1.
 settings['ly']        = 1. # test direction 
@@ -24,7 +26,7 @@ settings['elType']    = "CPS4" # Only for 2D
 # LOADING
 settings['disp']      = .2
 # NUMBER OF FRAMES
-settings['nFrames']   = 50
+settings['nFrames']   = 100
 # NAMES & DIRECTORIES
 settings['workdir']   = "workdir/"
 settings['label']     = "tensile_test" 

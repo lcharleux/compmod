@@ -19,16 +19,17 @@ def Tensile_Test(settings):
     nu        = settings["nu"]        * np.ones(Ne) # Poisson's ratio
     sy_mean   = settings["sy_mean"]   * np.ones(Ne)
     sigma_sat = settings["sigma_sat"] * np.ones(Ne)
-    n         = settings["n"]         * np.ones(Ne)
+    n_hol     = settings["n_hol"]     * np.ones(Ne)
+    n_bil     = settings["n_bil"]     * np.ones(Ne)
     sy = compmod.distributions.Rayleigh(settings["sy_mean"]).rvs(Ne)
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy_mean))]
     if settings['material_type']  == "Bilinear":
       settings['material'] = [materials.Bilinear(labels = labels[i], 
                                      E = E[i], nu = nu[i], Ssat = sigma_sat[i], 
-                                     n=n[i], sy = sy[i]) for i in xrange(Ne)]
+                                     n=n_bil[i], sy = sy[i]) for i in xrange(Ne)]
     if settings['material_type']  == "Hollomon":
       settings['material'] = [materials.Hollomon(labels = labels[i], 
-                                     E = E[i], nu = nu[i], n=n[i], 
+                                     E = E[i], nu = nu[i], n=n_hol[i], 
                                      sy = sy[i]) for i in xrange(Ne)]
   else:
     labels = 'SAMPLE_MAT'
@@ -38,13 +39,13 @@ def Tensile_Test(settings):
                                     nu = settings["nu"], 
                                     sy = settings["sy_mean"], 
                                     Ssat = settings["sigma_sat"],
-                                    n = settings["n"])
+                                    n = settings["n_bil"])
     if settings['material_type']  == "Hollomon":
       settings['material'] = materials.Hollomon(labels = labels, 
                                      E = settings["E"], 
                                     nu = settings["nu"], 
                                     sy = settings["sy_mean"], 
-                                    n = settings["n"])
+                                    n = settings["n_hol"])
          
   m = compmod.models.CuboidTest(**settings)
   m.MakeInp()
