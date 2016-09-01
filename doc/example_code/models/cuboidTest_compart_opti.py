@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle, copy
 import platform
+
 node = platform.node()
 if node ==  'lcharleux':      
   abqlauncher   = '/opt/Abaqus/6.9/Commands/abaqus' # Local machine configuration
