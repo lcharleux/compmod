@@ -80,7 +80,30 @@ def Tensile_Test(settings):
     inputs = pd.DataFrame(settings, index = [0])
     inputs.transpose().to_csv("{0}{1}_inputs.csv".format(settings["workdir"], settings["label"]))
     
+
    
 def Optimize(settings):
-  pass
+  def Cost_Function(X):
+    settings = settings.copy()
+    settings["sy_mean"]   = X[0] # [Pa] (only for bilinear)
+    settings["n_bil"]     = X[1] # [Pa] Bilinear hardening
+    settings["sigma_sat"] = X[2] # [Pa] 
+    Tensile_Test(settings)
+    sim = pd.read_csv(settings["workdir"] + settings["label"] + ".csv")
+    
+
+  settings = settings.copy()
+  settings['compart']   = True # True: compartimented, False: homogeneous
+  settings["material_type"]  = "Bilinear" # "Bilinear" or "Hollomon"
+  # EXPERIMENTAL DATA
+  exp = pd.read_csv(settings["expdir"] + settings["experiment"], 
+                  delim_whitespace = True)
+  exp.stress *= settings['exp_stress_factor']
+  exp.strain *= settings['exp_strain_factor']
+  sim_id = 1
+  settings["label"] += "_{0}".format(sim_id)
+  strain_grid = np.linspace(settings["eps_lim"][0], settings["eps_lim"][1], 100) # Strain grid
+  sigma_exp_grid = interpolate.interp1d(exp.strain, exp.stress)(strain_grid)
+  X0 = [settings["sy_mean"], settings["n"], settings['s_sat']]
+  
   

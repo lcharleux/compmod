@@ -35,8 +35,8 @@ settings['experiment']= "CuFe2p_ANR.txt"
 # EXPERIMENTS
 settings['exp_stress_factor'] = 1.e6 # A factor to adjust units between exp and simulations
 settings['exp_strain_factor'] = 1.   # A factor to adjust units between exp and simulations
-settings["eps_lim"]      = [1.e-3, .1]  # Limits of the exp strain
-   
+settings["eps_lim_min"]           = 1.e-3  # Limits of the exp strain
+settings["eps_lim_max"]           = .1  # Limits of the exp strain   
 # NUMBER OF CORES/CPUS
 settings['cpus']      = 1          #Number of CPUs/cores
 
