@@ -6,8 +6,7 @@ from compart_settings import settings
 
 df = pd.read_csv(settings["workdir"] + settings["label"] + ".csv")
 exp = pd.read_csv(settings["expdir"] + settings["experiment"], 
-                  delim_whitespace = True,
-                  comment = "#")
+                  delim_whitespace = True)
 exp.stress *= settings['exp_stress_factor']
 exp.strain *= settings['exp_strain_factor']
 

@@ -1,6 +1,3 @@
-# CuFe2P
-# Stress unit: MPa
-# Strain unit: None
 strain    stress
 0	        38.343904
 0.00059	        38.287165

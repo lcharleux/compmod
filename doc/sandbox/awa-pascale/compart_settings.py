@@ -7,7 +7,7 @@ settings['compart']   = True # True: compartimented, False: homogeneous
 settings['is_3D']     = True  # leave True....
 # MATERIAL
 settings["material_type"]  = "Bilinear" # "Bilinear" or "Hollomon"
-settings["E"]         = 210.e9 # [Pa]
+settings["E"]         = 123.e9 # [Pa]
 settings["sy_mean"]   = 400.e6 # [Pa] (only for bilinear)
 settings["nu"]        = 0.3    # Poisson's ratio
 settings["sigma_sat"] = 600.e6 # [Pa] 
@@ -32,9 +32,11 @@ settings['workdir']   = "workdir/" # Simulation work directory
 settings['label']     = "tensile_test"
 settings['expdir']    = "experiments/" # Experiments directory 
 settings['experiment']= "CuFe2p_ANR.txt" 
+# EXPERIMENTS
 settings['exp_stress_factor'] = 1.e6 # A factor to adjust units between exp and simulations
 settings['exp_strain_factor'] = 1.   # A factor to adjust units between exp and simulations
-
+settings["eps_lim"]      = [1.e-3, .1]  # Limits of the exp strain
+   
 # NUMBER OF CORES/CPUS
 settings['cpus']      = 1          #Number of CPUs/cores
 
