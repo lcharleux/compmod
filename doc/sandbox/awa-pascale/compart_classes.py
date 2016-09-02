@@ -5,7 +5,7 @@ from matplotlib import cm
 import numpy as np
 import pandas as pd
 import pickle, copy, platform, compmod, os
-
+from scipy import optimize, interpolate
 
 
 
@@ -82,28 +82,51 @@ def Tensile_Test(settings):
     
 
    
-def Optimize(settings):
-  def Cost_Function(X):
+class Optimize(object):
+  def __init__(self, settings):
     settings = settings.copy()
+    settings['compart']   = True # True: compartimented, False: homogeneous
+    settings["material_type"]  = "Bilinear" # "Bilinear" or "Hollomon"
+    self.settings = settings
+    self.inputs = []
+    self.sim_id = 1
+    exp = pd.read_csv(settings["expdir"] + settings["experiment"], 
+                    delim_whitespace = True)
+    exp.stress *= settings['exp_stress_factor']
+    exp.strain *= settings['exp_strain_factor']
+    # STRAIN GRID FOR LEAST SQUARE OPTIMIZATION
+    self.strain_grid = np.linspace(settings["eps_lim_min"], settings["eps_lim_max"], 100) # Strain grid
+    self.sigma_exp_grid = interpolate.interp1d(exp.strain, exp.stress)(self.strain_grid)
+    
+  def Cost_Function(self, X):
+    settings = self.settings.copy()
     settings["sy_mean"]   = X[0] # [Pa] (only for bilinear)
     settings["n_bil"]     = X[1] # [Pa] Bilinear hardening
     settings["sigma_sat"] = X[2] # [Pa] 
+    # SIMULATION LABEL RENAMING
+    settings["label"] += "_{0}".format(self.sim_id)
     Tensile_Test(settings)
     sim = pd.read_csv(settings["workdir"] + settings["label"] + ".csv")
+    strain_grid = self.strain_grid
+    sigma_sim_grid = interpolate.interp1d(sim.strain, sim.stress)(strain_grid)
+    err = ((sigma_sim_grid - self.sigma_exp_grid)**2).sum()/len(strain_grid)
+    self.inputs.append([self.sim_id] + list(X))
+    self.sim_id +=1
+    return err
+  
+  def run(self):  
+    # EXPERIMENTAL DATA
+    settings = self.settings
+    # OPTIMiZATION START POINT
+    X0 = np.array([settings["sy_mean"], settings["n_bil"], settings['sigma_sat']])
+    sol_compart = optimize.minimize(self.Cost_Function, X0, 
+      method = "Nelder-Mead", 
+      options = {"maxfev": settings["max_number_of_simulations"]})
+    self.sol = sol_compart  
+    inputs = np.array(self.inputs).transpose()
+    df = pd.DataFrame({"sim_id": inputs[0],
+                       "sy_mean":inputs[1],
+                       "n_bil":  inputs[2],
+                       "sigma_sat":inputs[3],})
+    df.to_csv("{0}{1}_opti_results.csv".format(settings["workdir"], settings["label"]), index = False)                   
     
-
-  settings = settings.copy()
-  settings['compart']   = True # True: compartimented, False: homogeneous
-  settings["material_type"]  = "Bilinear" # "Bilinear" or "Hollomon"
-  # EXPERIMENTAL DATA
-  exp = pd.read_csv(settings["expdir"] + settings["experiment"], 
-                  delim_whitespace = True)
-  exp.stress *= settings['exp_stress_factor']
-  exp.strain *= settings['exp_strain_factor']
-  sim_id = 1
-  settings["label"] += "_{0}".format(sim_id)
-  strain_grid = np.linspace(settings["eps_lim"][0], settings["eps_lim"][1], 100) # Strain grid
-  sigma_exp_grid = interpolate.interp1d(exp.strain, exp.stress)(strain_grid)
-  X0 = [settings["sy_mean"], settings["n"], settings['s_sat']]
-  
-  

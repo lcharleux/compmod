@@ -39,7 +39,8 @@ settings["eps_lim_min"]           = 1.e-3  # Limits of the exp strain
 settings["eps_lim_max"]           = .1  # Limits of the exp strain   
 # NUMBER OF CORES/CPUS
 settings['cpus']      = 1          #Number of CPUs/cores
-
+# OPTIMIZATION SETTINGS
+settings["max_number_of_simulations"] = 3
 
 # ABAQUS PATH SETTINGS
 node = platform.node()
