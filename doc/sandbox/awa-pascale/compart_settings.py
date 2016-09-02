@@ -19,12 +19,12 @@ settings['lx']        = 1.
 settings['ly']        = 1. # test direction 
 settings['lz']        = 1.
 # MESH
-settings['Nx']        = 3
-settings['Ny']        = 3
+settings['Nx']        = 5
+settings['Ny']        = 5
 settings['Nz']        = 3
 settings['elType']    = "CPS4" # Only for 2D 
 # LOADING
-settings['disp']      = .1
+settings['disp']      = .11 
 # NUMBER OF FRAMES
 settings['nFrames']   = 100
 # NAMES & DIRECTORIES
@@ -40,7 +40,7 @@ settings["eps_lim_max"]           = .1  # Limits of the exp strain
 # NUMBER OF CORES/CPUS
 settings['cpus']      = 1          #Number of CPUs/cores
 # OPTIMIZATION SETTINGS
-settings["max_number_of_simulations"] = 3
+settings["max_number_of_simulations"] = 20 # 4 or more, 100 is ok
 
 # ABAQUS PATH SETTINGS
 node = platform.node()
