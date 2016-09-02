@@ -10,7 +10,7 @@ import pickle, copy, platform, compmod, os
 
 
 def Tensile_Test(settings):
-  settings = settings.copy()
+  args = settings.copy()
   # MATERIALS CREATION
   Ne = settings['Nx'] * settings['Ny'] 
   if settings['is_3D']: Ne *= settings['Nz']
@@ -23,31 +23,31 @@ def Tensile_Test(settings):
     n_bil     = settings["n_bil"]     * np.ones(Ne)
     sy = compmod.distributions.Rayleigh(settings["sy_mean"]).rvs(Ne)
     labels = ['mat_{0}'.format(i+1) for i in xrange(len(sy_mean))]
-    if settings['material_type']  == "Bilinear":
-      settings['material'] = [materials.Bilinear(labels = labels[i], 
+    if args['material_type']  == "Bilinear":
+      args['material'] = [materials.Bilinear(labels = labels[i], 
                                      E = E[i], nu = nu[i], Ssat = sigma_sat[i], 
                                      n=n_bil[i], sy = sy[i]) for i in xrange(Ne)]
-    if settings['material_type']  == "Hollomon":
-      settings['material'] = [materials.Hollomon(labels = labels[i], 
+    if args['material_type']  == "Hollomon":
+      args['material'] = [materials.Hollomon(labels = labels[i], 
                                      E = E[i], nu = nu[i], n=n_hol[i], 
                                      sy = sy[i]) for i in xrange(Ne)]
   else:
     labels = 'SAMPLE_MAT'
-    if settings['material_type']  == "Bilinear":
-      settings['material'] = materials.Bilinear(labels = labels, 
+    if args['material_type']  == "Bilinear":
+      args['material'] = materials.Bilinear(labels = labels, 
                                     E = settings["E"], 
                                     nu = settings["nu"], 
                                     sy = settings["sy_mean"], 
                                     Ssat = settings["sigma_sat"],
                                     n = settings["n_bil"])
-    if settings['material_type']  == "Hollomon":
-      settings['material'] = materials.Hollomon(labels = labels, 
+    if args['material_type']  == "Hollomon":
+      args['material'] = materials.Hollomon(labels = labels, 
                                      E = settings["E"], 
                                     nu = settings["nu"], 
                                     sy = settings["sy_mean"], 
                                     n = settings["n_hol"])
          
-  m = compmod.models.CuboidTest(**settings)
+  m = compmod.models.CuboidTest(**args)
   m.MakeInp()
   m.Run()
   m.MakePostProc()
@@ -78,7 +78,7 @@ def Tensile_Test(settings):
     df.to_csv("{0}{1}.csv".format(settings["workdir"], settings["label"]), index = False)
     df.to_excel("{0}{1}.xls".format(settings["workdir"], settings["label"]), index = False)
     inputs = pd.DataFrame(settings, index = [0])
-    inputs.to_csv("{0}{1}_inputs.csv".format(settings["workdir"], settings["label"]))
+    inputs.transpose().to_csv("{0}{1}_inputs.csv".format(settings["workdir"], settings["label"]))
     
    
   
