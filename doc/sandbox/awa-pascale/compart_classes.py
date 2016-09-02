@@ -95,7 +95,10 @@ class Optimize(object):
     exp.stress *= settings['exp_stress_factor']
     exp.strain *= settings['exp_strain_factor']
     # STRAIN GRID FOR LEAST SQUARE OPTIMIZATION
-    self.strain_grid = np.linspace(settings["eps_lim_min"], settings["eps_lim_max"], 100) # Strain grid
+    self.strain_grid = np.linspace(
+             max(settings["eps_lim_min"], exp.strain.min()), 
+             min(settings["eps_lim_max"], exp.strain.max()), 
+             100) # Strain grid
     self.sigma_exp_grid = interpolate.interp1d(exp.strain, exp.stress)(self.strain_grid)
     
   def Cost_Function(self, X):

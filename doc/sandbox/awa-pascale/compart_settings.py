@@ -36,11 +36,11 @@ settings['experiment']= "CuFe2p_ANR.txt"
 settings['exp_stress_factor'] = 1.e6 # A factor to adjust units between exp and simulations
 settings['exp_strain_factor'] = 1.   # A factor to adjust units between exp and simulations
 settings["eps_lim_min"]           = 1.e-3  # Limits of the exp strain
-settings["eps_lim_max"]           = .1  # Limits of the exp strain   
+settings["eps_lim_max"]           = .5  # Limits of the exp strain   
 # NUMBER OF CORES/CPUS
 settings['cpus']      = 1          #Number of CPUs/cores
 # OPTIMIZATION SETTINGS
-settings["max_number_of_simulations"] = 20 # 4 or more, 100 is ok
+settings["max_number_of_simulations"] = 4 # 4 or more, 100 is ok
 
 # ABAQUS PATH SETTINGS
 node = platform.node()
