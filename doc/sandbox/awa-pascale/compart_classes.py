@@ -124,7 +124,8 @@ class Optimize(object):
     X0 = np.array([settings["sy_mean"], settings["n_bil"], settings['sigma_sat']])
     sol_compart = optimize.minimize(self.Cost_Function, X0, 
       method = "Nelder-Mead", 
-      options = {"maxfev": settings["max_number_of_simulations"]})
+      options = {"maxfev": settings["max_number_of_simulations"],
+                 "maxiter": settings["max_number_of_iterations"]})
     self.sol = sol_compart  
     inputs = np.array(self.inputs).transpose()
     df = pd.DataFrame({"sim_id": inputs[0],
